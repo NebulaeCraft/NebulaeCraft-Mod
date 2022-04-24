@@ -1,0 +1,7 @@
+{
+  "variants": {
+	"colour=black": {"model": "nebulaecraft:asphalt_black"},
+	"colour=red": {"model": "nebulaecraft:asphalt_red"},
+	"colour=green": {"model": "nebulaecraft:asphalt_green"}
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "_fv": 18,
+  "_type": "tab",
+  "definition": {
+    "name": "NebulaeCraft | Optics",
+    "icon": {
+      "value": "CUSTOM:Lamp"
+    },
+    "showSearch": false
+  }
+}

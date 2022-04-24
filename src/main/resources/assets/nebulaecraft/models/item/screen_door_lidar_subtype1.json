@@ -1,0 +1,34 @@
+{
+  "parent": "nebulaecraft:block/screen_door_lidar_2",
+  "display": {
+		"thirdperson_righthand": {
+			"translation": [-12.75, 3.75, -4.75],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"thirdperson_lefthand": {
+			"translation": [10.75, 3.75, -5],
+			"scale": [0.5, 0.5, 0.5]
+		},
+		"firstperson_righthand": {
+			"translation": [-11.5, 5.5, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"firstperson_lefthand": {
+			"translation": [8.25, 5.75, 0],
+			"scale": [0.4, 0.4, 0.4]
+		},
+		"ground": {
+			"translation": [-23.75, 6.5, -10.75]
+		},
+		"gui": {
+			"rotation": [30, 135, 0],
+			"translation": [8.5, -9, 0]
+		},
+		"head": {
+			"translation": [-23.75, 14.5, -11.25]
+		},
+		"fixed": {
+			"translation": [-23.75, 2.75, -11.75]
+		}
+	}
+}

@@ -1,0 +1,11 @@
+{
+  "_fv": 18,
+  "_type": "tab",
+  "definition": {
+    "name": "NebulaeCraft | Color",
+    "icon": {
+      "value": "Blocks.AIR"
+    },
+    "showSearch": false
+  }
+}

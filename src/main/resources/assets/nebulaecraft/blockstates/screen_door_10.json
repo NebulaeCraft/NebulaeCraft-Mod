@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:screen_door_10","y": 90},
+	"facing=south": { "model": "nebulaecraft:screen_door_10","y": 180},
+	"facing=west":  { "model": "nebulaecraft:screen_door_10","y": 270},
+	"facing=north":  { "model": "nebulaecraft:screen_door_10"}
+  }
+}

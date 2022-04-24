@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench",
+	"ambientocclusion": false,
+	"textures": {
+		"2": "nebulaecraft:blocks/platform_fence_1",
+		"particle": "nebulaecraft:blocks/platform_fence_1"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 7],
+			"to": [9, 16, 9],
+			"faces": {
+				"up": {"uv": [7, 7, 9, 9], "texture": "#2"},
+				"down": {"uv": [7, 7, 9, 9], "texture": "#2"}
+			}
+		}
+	]
+}

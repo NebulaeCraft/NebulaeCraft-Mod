@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nebulaecraft:blocks/labelsign_2",
+		"1": "nebulaecraft:blocks/catenary_steel",
+		"particle": "nebulaecraft:blocks/labelsign_2"
+	},
+	"elements": [
+		{
+			"from": [4, 0, 0.05],
+			"to": [12, 8, 0.05],
+			"faces": {
+				"north": {"uv": [4, 8, 12, 16], "texture": "#1"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		}
+	]
+}

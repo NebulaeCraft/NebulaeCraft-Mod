@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:signal_3_green","y": 270},
+	"facing=south": { "model": "nebulaecraft:signal_3_green"},
+	"facing=west":  { "model": "nebulaecraft:signal_3_green","y": 90},
+	"facing=north":  { "model": "nebulaecraft:signal_3_green","y": 180}
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:platform_security_lightbar_2","y": 90},
+	"facing=south": { "model": "nebulaecraft:platform_security_lightbar_2","y": 180},
+	"facing=west":  { "model": "nebulaecraft:platform_security_lightbar_2","y": 270},
+	"facing=north":  { "model": "nebulaecraft:platform_security_lightbar_2"}
+  }
+}

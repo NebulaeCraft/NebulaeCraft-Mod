@@ -1,0 +1,11 @@
+{
+  "variants": {
+	"inventory": {"model": "nebulaecraft:lantern"},
+	"facing=north": { "model": "nebulaecraft:lantern_3", "y": 180 },
+	"facing=east":  { "model": "nebulaecraft:lantern_3", "y": 270 },
+	"facing=south": { "model": "nebulaecraft:lantern_3", "y": 0 },
+	"facing=west":  { "model": "nebulaecraft:lantern_3", "y": 90 },
+	"facing=up": { "model": "nebulaecraft:lantern_1" },
+	"facing=down": { "model": "nebulaecraft:lantern_2" }
+  }
+}

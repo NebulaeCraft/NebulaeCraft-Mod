@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:catenary_wire_double_diagonal_2","y": 270},
+	"facing=south": { "model": "nebulaecraft:catenary_wire_double_diagonal_2"},
+	"facing=west":  { "model": "nebulaecraft:catenary_wire_double_diagonal_2","y": 90},
+	"facing=north":  { "model": "nebulaecraft:catenary_wire_double_diagonal_2","y": 180}
+  }
+}

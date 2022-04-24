@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:catenary_steel_support","y": 90},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:catenary_steel_support"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:catenary_steel_support","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:catenary_steel_support"},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:catenary_steel_support_v"},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:catenary_steel_support_v","y": 90},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:catenary_steel_support_v","y": 180},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:catenary_steel_support_v","y": 270}
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:roadsign_27","y": 270},
+	"facing=south": { "model": "nebulaecraft:roadsign_27"},
+	"facing=west":  { "model": "nebulaecraft:roadsign_27","y": 90},
+	"facing=north":  { "model": "nebulaecraft:roadsign_27","y": 180}
+  }
+}

@@ -1,0 +1,105 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"3": "nebulaecraft:blocks/catenary_wire",
+		"particle": "nebulaecraft:blocks/catenary_steel"
+	},
+	"elements": [
+		{
+			"from": [7.25, 0, 0],
+			"to": [7.75, 0.5, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [16, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#3"}
+			}
+		},
+		{
+			"from": [8.25, 0, 0],
+			"to": [8.75, 0.5, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [16, 8, 8]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"east": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"west": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#3"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#3"}
+			}
+		},
+		{
+			"name": "Under",
+			"from": [2.2, 0, 0],
+			"to": [4.2, 1, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [3.2, 8, 21.2]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 1], "texture": "#particle"},
+				"east": {"uv": [0, 0, 8, 1], "texture": "#particle"},
+				"south": {"uv": [13, 1, 15, 2], "texture": "#particle"},
+				"west": {"uv": [0, 0, 8, 1], "texture": "#particle"},
+				"up": {"uv": [0, 0, 2, 8], "texture": "#particle"},
+				"down": {"uv": [0, 0, 2, 8], "texture": "#particle"}
+			}
+		},
+		{
+			"name": "Top",
+			"from": [2.2, 2, 0],
+			"to": [4.2, 2.8, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [3.2, 8, 21.2]},
+			"faces": {
+				"north": {"uv": [0, 0, 2, 0.8], "texture": "#particle"},
+				"east": {"uv": [0, 0, 8, 0.8], "texture": "#particle"},
+				"south": {"uv": [13, 1, 15, 1.8], "texture": "#particle"},
+				"west": {"uv": [0, 0, 8, 0.8], "texture": "#particle"},
+				"up": {"uv": [0, 0, 2, 8], "texture": "#particle"},
+				"down": {"uv": [0, 0, 2, 8], "texture": "#particle"}
+			}
+		},
+		{
+			"name": "Middle",
+			"from": [2.7, 1, 0],
+			"to": [3.7, 2, 8],
+			"rotation": {"angle": 0, "axis": "y", "origin": [3.2, 8, 21.2]},
+			"faces": {
+				"north": {"uv": [0, 0, 1, 1], "texture": "#particle"},
+				"east": {"uv": [0, 0, 8, 1], "texture": "#particle"},
+				"south": {"uv": [13, 1, 14, 2], "texture": "#particle"},
+				"west": {"uv": [0, 0, 8, 1], "texture": "#particle"},
+				"up": {"uv": [0, 0, 1, 8], "texture": "#particle"},
+				"down": {"uv": [0, 0, 1, 8], "texture": "#particle"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "Catenary",
+			"origin": [0, 0, 0],
+			"children": []
+		},
+		{
+			"name": "Bracket",
+			"origin": [0, 0, 0],
+			"children": []
+		},
+		{
+			"name": "Branch",
+			"origin": [8, 8, 8],
+			"children": [
+				{
+					"name": "Catenary_Branch",
+					"origin": [0, 0, 0],
+					"children": []
+				}
+			]
+		}, 0, 1,
+		{
+			"name": "Catenary",
+			"origin": [0, 0, 0],
+			"children": [2, 3, 4]
+		}
+	]
+}

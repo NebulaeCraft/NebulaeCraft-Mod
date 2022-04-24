@@ -1,0 +1,20 @@
+[
+  {
+    "modid": "nebulaecraft",
+    "name": "NebulaeCraft",
+    "description": "This mod is only designed for NebulaeCraft 5th Server.",
+    "version": "2.7",
+    "credits": "(c)2017-2022 NebulaeCraft  All Rights Reserved.",
+    "logoFile": "assets/nebulaecraft/textures/logo.png",
+    "mcversion": "1.12.2",
+    "url": "https://wiki.knebulae.com",
+    "updateUrl": "",
+    "authorList": [
+      "Kuina, Ishirai, Srcphy"
+    ],
+    "dependencies": [],
+    "dependants": [],
+    "requiredMods": [],
+    "useDependencyInformation": "true"
+  }
+]
