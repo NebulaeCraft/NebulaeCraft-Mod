@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:device_apple_macbook","y": 270},
+	"facing=south": { "model": "nebulaecraft:device_apple_macbook"},
+	"facing=west":  { "model": "nebulaecraft:device_apple_macbook","y": 90},
+	"facing=north":  { "model": "nebulaecraft:device_apple_macbook","y": 180}
+  }
+}

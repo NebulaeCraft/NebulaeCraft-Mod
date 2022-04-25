@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:device_apple_imac","y": 270},
+	"facing=south": { "model": "nebulaecraft:device_apple_imac"},
+	"facing=west":  { "model": "nebulaecraft:device_apple_imac","y": 90},
+	"facing=north":  { "model": "nebulaecraft:device_apple_imac","y": 180}
+  }
+}

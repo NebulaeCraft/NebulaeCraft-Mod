@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:asphalt_light_green_1","y": 0},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:asphalt_light_green_1","y": 90},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:asphalt_light_green_1","y": 180},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:asphalt_light_green_1","y": 270},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:asphalt_light_green_2","y": 0},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:asphalt_light_green_2","y": 90},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:asphalt_light_green_2","y": 180},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:asphalt_light_green_2","y": 270}
+  }
+}

@@ -20,7 +20,7 @@
 				"east": {"uv": [0, 0, 7, 16], "texture": "#1"},
 				"south": {"uv": [7, 0, 9, 16], "texture": "#1", "cullface": "south"},
 				"west": {"uv": [7, 0, 0, 16], "texture": "#1"},
-				"up": {"uv": [9, 0, 16, 0], "texture": "#1"}
+				"up": {"uv": [9, 0, 16, 1], "texture": "#1"}
 			}
 		},
 		{
@@ -36,7 +36,7 @@
 			"faces": {
 				"east": {"uv": [0, 0, 0, 0], "texture": "#1"},
 				"west": {"uv": [0, 0, 0, 0], "texture": "#1"},
-				"up": {"uv": [0, 0, 0, 0], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 1], "texture": "#1"},
 				"down": {"uv": [7, 2, 8, 9], "texture": "#1"}
 			}
 		},
@@ -44,7 +44,7 @@
 			"from": [7, 7, 9],
 			"to": [9, 8, 16],
 			"faces": {
-				"up": {"uv": [0, 0, 0, 0], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 1], "texture": "#1"},
 				"down": {"uv": [7, 2, 8, 9], "texture": "#1"}
 			}
 		},
@@ -52,7 +52,7 @@
 			"from": [7, 11, 9],
 			"to": [9, 12, 16],
 			"faces": {
-				"up": {"uv": [0, 0, 0, 0], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 1], "texture": "#1"},
 				"down": {"uv": [7, 2, 8, 9], "texture": "#1"}
 			}
 		}
@@ -61,6 +61,7 @@
 		{
 			"name": "NebulaeCraft@Srcphy",
 			"origin": [0, 0, 0],
+			"color": 0,
 			"children": [0, 1, 2, 3, 4, 5]
 		}
 	]

@@ -1,0 +1,16 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nebulaecraft:blocks/roadmark_slowdown_full",
+		"particle": "nebulaecraft:blocks/roadmark_slowdown_full"
+	},
+	"elements": [
+		{
+			"from": [0, -7.95, 0],
+			"to": [16, -7.95, 16],
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		}
+	]
+}

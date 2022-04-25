@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:solar","y": 270},
+	"facing=south": { "model": "nebulaecraft:solar"},
+	"facing=west":  { "model": "nebulaecraft:solar","y": 90},
+	"facing=north":  { "model": "nebulaecraft:solar","y": 180}
+  }
+}

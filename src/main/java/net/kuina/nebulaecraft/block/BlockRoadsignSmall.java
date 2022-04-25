@@ -34,7 +34,7 @@ import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 public class BlockRoadsignSmall extends ElementsNebulaecraftMod.ModElement {
 
 	public BlockRoadsignSmall(ElementsNebulaecraftMod instance) {
-		super(instance, 3);
+		super(instance, 23);
 	}
 
 	public static final class BlockCustom extends Block {

@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:signpole_horizontal","y": 270},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:signpole_horizontal"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:signpole_horizontal","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:signpole_horizontal","y": 180},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:signpole_vertical_top_center","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:signpole_vertical_top_center"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:signpole_vertical_top_center","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:signpole_vertical_top_center","y": 180}
+  }
+}

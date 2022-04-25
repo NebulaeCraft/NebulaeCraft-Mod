@@ -34,7 +34,7 @@ public class BlockAsphaltSlab extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_slab")
 	public static final Block block = null;
 	public BlockAsphaltSlab(ElementsNebulaecraftMod instance) {
-		super(instance, 1);
+		super(instance, 2);
 	}
 
 	@Override
@@ -59,14 +59,24 @@ public class BlockAsphaltSlab extends ElementsNebulaecraftMod.ModElement {
 			setHardness(1F);
 			setResistance(10F);
 			setLightLevel(0F);
-			setLightOpacity(255);
+			setLightOpacity(0);
 			setCreativeTab(TabNebulaecraftRoad.tab);
 		}
 
 		@SideOnly(Side.CLIENT)
 		@Override
 		public BlockRenderLayer getBlockLayer() {
-			return BlockRenderLayer.SOLID;
+			return BlockRenderLayer.CUTOUT_MIPPED;
+		}
+
+		@Override
+		public boolean isFullCube(IBlockState state) {
+			return false;
+		}
+
+		@Override
+		public boolean isOpaqueCube(IBlockState state) {
+			return false;
 		}
 
 		@Override

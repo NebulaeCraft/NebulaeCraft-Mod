@@ -1,7 +1,7 @@
 {
   "variants": {
-	"colour=black": {"model": "nebulaecraft:asphalt_black_slab"},
-	"colour=red": {"model": "nebulaecraft:asphalt_red_slab"},
-	"colour=green": {"model": "nebulaecraft:asphalt_green_slab"}
+	"subtype=subtype0": {"model": "nebulaecraft:asphalt_normal_slab"},
+	"subtype=subtype1": {"model": "nebulaecraft:asphalt_bus_slab"},
+	"subtype=subtype2": {"model": "nebulaecraft:asphalt_bicycle_slab"}
   }
 }

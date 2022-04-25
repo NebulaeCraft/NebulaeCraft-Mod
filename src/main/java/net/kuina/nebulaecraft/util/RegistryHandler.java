@@ -8,6 +8,9 @@ import net.kuina.nebulaecraft.block.BlockScreenDoorSmall;
 import net.kuina.nebulaecraft.block.BlockInfoScreen;
 import net.kuina.nebulaecraft.block.BlockRoadsignBig;
 import net.kuina.nebulaecraft.block.BlockRoadsignSmall;
+import net.kuina.nebulaecraft.block.BlockAsphaltAddon;
+import net.kuina.nebulaecraft.block.BlockAsphaltSlabAddon;
+import net.kuina.nebulaecraft.block.BlockRoadmarkArrow;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -39,7 +42,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
 	
 
     public RegistryHandler(ElementsNebulaecraftMod instance) {
-        super(instance, 0);
+        super(instance, 100);
     }
 
     public void registerBlock(Block blockThis, String blockRegistryName){
@@ -72,6 +75,68 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
             registerBlock(new BlockRoadsignBig.BlockCustom(),"roadsign_" + i);
 
         }
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "white_line");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "white_line" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "white_line_diagonal");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "white_line_diagonal" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "white_line_l");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "white_line_l" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "white_line_t");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "white_line_t" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "white_line_x");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "white_line_x" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "double_white_line");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "double_white_line" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "double_white_line_diagonal");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "double_white_line_diagonal" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "double_white_line_wye");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "double_white_line_wye" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "double_white_line_lean");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "double_white_line_lean" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "yellow_line");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "yellow_line" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "yellow_line_diagonal");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "yellow_line_diagonal" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "yellow_line_lean");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "yellow_line_lean" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "double_yellow_line");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "double_yellow_line" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "double_yellow_line_diagonal");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "double_yellow_line_diagonal" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "stop_line_full");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "crosswalk");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bus_half");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bus_half" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bus_half_line");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bus_half_line" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bus_half_line_diagonal_right");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bus_half_line_diagonal_right" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bus_half_line_diagonal_left");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bus_half_line_diagonal_left" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bicycle_half");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bicycle_half" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bicycle_half_line");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bicycle_half_line" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bicycle_half_line_diagonal_right");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bicycle_half_line_diagonal_right" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "bicycle_half_line_diagonal_left");
+    registerBlock(new BlockAsphaltSlabAddon.BlockCustom(),"asphalt_" + "bicycle_half_line_diagonal_left" + "_slab");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "parallel_full");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "parallel_half");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "parallel_fork_right");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "parallel_fork_left");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "parallel_merge_right");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "parallel_merge_left");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "white_line_small");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "yellow_line_small");
+    registerBlock(new BlockAsphaltAddon.BlockCustom(),"asphalt_" + "light_red");
+    registerBlock(new BlockRoadmarkArrow.BlockCustom(),"roadmark_arrow_" + "straight");
+    registerBlock(new BlockRoadmarkArrow.BlockCustom(),"roadmark_arrow_" + "right");
+    registerBlock(new BlockRoadmarkArrow.BlockCustom(),"roadmark_arrow_" + "left");
+    registerBlock(new BlockRoadmarkArrow.BlockCustom(),"roadmark_arrow_" + "straight_right");
+    registerBlock(new BlockRoadmarkArrow.BlockCustom(),"roadmark_arrow_" + "straight_left");
+    registerBlock(new BlockRoadmarkArrow.BlockCustom(),"roadmark_arrow_" + "right_left");
+    registerBlock(new BlockRoadmarkArrow.BlockCustom(),"roadmark_arrow_" + "back");
     }
 
 

@@ -27,7 +27,7 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 public class BlockRoadsignBig extends ElementsNebulaecraftMod.ModElement {
 
 	public BlockRoadsignBig(ElementsNebulaecraftMod instance) {
-		super(instance, 4);
+		super(instance, 24);
 	}
 
 	public static final class BlockCustom extends Block {

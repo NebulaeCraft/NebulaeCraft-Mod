@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nebulaecraft:blocks/platform_edge",
+		"particle": "nebulaecraft:blocks/platform_edge"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 14],
+			"to": [9, 16, 16],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 8, 23]},
+			"faces": {
+				"north": {"uv": [9, 0, 7, 16], "texture": "#0"},
+				"east": {"uv": [16, 0, 14, 16], "texture": "#0"},
+				"south": {"uv": [9, 0, 7, 16], "texture": "#0"},
+				"west": {"uv": [2, 0, 0, 16], "texture": "#0"},
+				"up": {"uv": [9, 14, 7, 16], "texture": "#0"},
+				"down": {"uv": [9, 0, 7, 2], "texture": "#0"}
+			}
+		}
+	]
+}
