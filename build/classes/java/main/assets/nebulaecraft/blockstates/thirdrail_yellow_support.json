@@ -1,8 +1,0 @@
-{
-  "variants": {
-	"facing=east": { "model": "nebulaecraft:thirdrail_yellow_support"},
-	"facing=south": { "model": "nebulaecraft:thirdrail_yellow_support","y": 90},
-	"facing=west":  { "model": "nebulaecraft:thirdrail_yellow_support","y": 180},
-	"facing=north":  { "model": "nebulaecraft:thirdrail_yellow_support","y": 270}
-  }
-}

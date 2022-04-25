@@ -1,8 +1,0 @@
-{
-  "variants": {
-	"facing=east": { "model": "nebulaecraft:catenary_steel_slope","y": 270},
-	"facing=south": { "model": "nebulaecraft:catenary_steel_slope"},
-	"facing=west":  { "model": "nebulaecraft:catenary_steel_slope","y": 90},
-	"facing=north":  { "model": "nebulaecraft:catenary_steel_slope","y": 180}
-  }
-}

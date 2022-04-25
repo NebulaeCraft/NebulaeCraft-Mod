@@ -1,8 +1,0 @@
-{
-  "variants": {
-	"facing=east": { "model": "nebulaecraft:noise_barrier","y": 90},
-	"facing=south": { "model": "nebulaecraft:noise_barrier"},
-	"facing=west":  { "model": "nebulaecraft:noise_barrier","y": 90},
-	"facing=north":  { "model": "nebulaecraft:noise_barrier"}
-  }
-}
