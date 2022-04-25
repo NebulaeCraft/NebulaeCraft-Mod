@@ -30,17 +30,17 @@ import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockAsphalt extends ElementsNebulaecraftMod.ModElement {
-	@GameRegistry.ObjectHolder("nebulaecraft:asphalt")
+public class BlockAsphaltSlab extends ElementsNebulaecraftMod.ModElement {
+	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_slab")
 	public static final Block block = null;
-	public BlockAsphalt(ElementsNebulaecraftMod instance) {
+	public BlockAsphaltSlab(ElementsNebulaecraftMod instance) {
 		super(instance, 1);
 	}
 
 	@Override
 	public void initElements() {
-		elements.blocks.add(() -> new BlockCustom().setRegistryName("asphalt"));
-		elements.items.add(() -> new ItemAsphalt(block).setRegistryName(block.getRegistryName()));
+		elements.blocks.add(() -> new BlockCustom().setRegistryName("asphalt_slab"));
+		elements.items.add(() -> new ItemAsphaltSlab(block).setRegistryName(block.getRegistryName()));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -48,13 +48,13 @@ public class BlockAsphalt extends ElementsNebulaecraftMod.ModElement {
 	public void registerModels(ModelRegistryEvent event) {
 		BlockCustom.EnumColour[] allColours = BlockCustom.EnumColour.values();
 		for (BlockCustom.EnumColour colour : allColours) {
-			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), colour.getMetadata(), new ModelResourceLocation("nebulaecraft:asphalt_"+colour.getName(), "inventory"));
+			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), colour.getMetadata(), new ModelResourceLocation("nebulaecraft:asphalt_slab_"+colour.getName(), "inventory"));
 		}
 	}
 	public static class BlockCustom extends Block {
 		public BlockCustom() {
 			super(Material.ROCK);
-			setUnlocalizedName("asphalt");
+			setUnlocalizedName("asphalt_slab");
 			setSoundType(SoundType.STONE);
 			setHardness(1F);
 			setResistance(10F);
@@ -71,7 +71,7 @@ public class BlockAsphalt extends ElementsNebulaecraftMod.ModElement {
 
 		@Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			return new AxisAlignedBB(0, 0, 0, 1, 1, 1);
+			return new AxisAlignedBB(0, 0, 0, 1, 0.5, 1);
 		}
 
 		public static final PropertyEnum PROPERTYCOLOUR = PropertyEnum.create("colour", BlockCustom.EnumColour.class);

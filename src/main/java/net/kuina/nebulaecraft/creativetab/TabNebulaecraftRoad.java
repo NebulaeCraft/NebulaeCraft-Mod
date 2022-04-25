@@ -5,9 +5,9 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 
 import net.minecraft.item.ItemStack;
-import net.minecraft.init.Blocks;
 import net.minecraft.creativetab.CreativeTabs;
 
+import net.kuina.nebulaecraft.block.BlockAsphalt;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 
 @ElementsNebulaecraftMod.ModElement.Tag
@@ -22,7 +22,7 @@ public class TabNebulaecraftRoad extends ElementsNebulaecraftMod.ModElement {
 			@SideOnly(Side.CLIENT)
 			@Override
 			public ItemStack getTabIconItem() {
-				return new ItemStack(Blocks.AIR, (int) (1));
+				return new ItemStack(BlockAsphalt.block, (int) (1));
 			}
 
 			@SideOnly(Side.CLIENT)
