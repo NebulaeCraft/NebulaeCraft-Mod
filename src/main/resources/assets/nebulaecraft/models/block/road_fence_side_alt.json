@@ -8,13 +8,6 @@
 	"elements": [
 		{
 			"from": [7, 0, 9],
-			"to": [9, 8, 16],
-			"faces": {
-				"south": {"uv": [7, 0, 9, 16], "texture": "#1", "cullface": "south"}
-			}
-		},
-		{
-			"from": [7, 0, 9],
 			"to": [9, 8, 9],
 			"faces": {
 				"south": {"uv": [7, 4, 9, 6], "texture": "#1"}
