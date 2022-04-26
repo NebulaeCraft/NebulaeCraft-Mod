@@ -4,7 +4,7 @@
   "definition": {
     "name": "NebulaeCraft | Color",
     "icon": {
-      "value": "Blocks.AIR"
+      "value": "CUSTOM:Color1"
     },
     "showSearch": false
   }
