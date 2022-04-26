@@ -1,79 +1,75 @@
-
 package net.kuina.nebulaecraft.block;
 
+import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
+import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
+import net.minecraft.block.*;
+import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.*;
-import net.minecraftforge.fml.relauncher.SideOnly;
-import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.fml.common.registry.GameRegistry;
-import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.client.event.ModelRegistryEvent;
-
-import net.minecraft.world.World;
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.item.Item;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.block.state.IBlockState;
-import net.minecraft.block.properties.PropertyDirection;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.material.Material;
-import net.minecraft.block.SoundType;
-import net.minecraft.block.BlockHorizontal;
-import net.minecraft.block.Block;
-
-import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
-import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
-	@GameRegistry.ObjectHolder("nebulaecraft:roadmark_slowdown")
-	public static final Block block = null;
-	public BlockRoadmarkSlowdown(ElementsNebulaecraftMod instance) {
-		super(instance, 21);
-	}
+    @GameRegistry.ObjectHolder("nebulaecraft:roadmark_slowdown")
+    public static final Block block = null;
 
-	@Override
-	public void initElements() {
-		elements.blocks.add(() -> new BlockCustom().setRegistryName("roadmark_slowdown"));
-		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
-	}
+    public BlockRoadmarkSlowdown(ElementsNebulaecraftMod instance) {
+        super(instance, 21);
+    }
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerModels(ModelRegistryEvent event) {
+    @Override
+    public void initElements() {
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("roadmark_slowdown"));
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void registerModels(ModelRegistryEvent event) {
         BlockRoadmarkSlowdown.BlockCustom.EnumType[] allSubtypes = BlockRoadmarkSlowdown.BlockCustom.EnumType.values();
         for (BlockRoadmarkSlowdown.BlockCustom.EnumType subtype : allSubtypes) {
             ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:roadmark_slowdown_" + subtype.getName(), "inventory"));
         }
     }
-    
-	public static class BlockCustom extends Block {
-		public static final PropertyDirection FACING = BlockHorizontal.FACING;
-		public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
-		public BlockCustom() {
-			super(Material.IRON);
-			setUnlocalizedName("roadmark_slowdown");
-			setSoundType(SoundType.METAL);
-			setHardness(1F);
-			setResistance(10F);
-			setLightLevel(0F);
-			setLightOpacity(0);
-			setCreativeTab(TabNebulaecraftRoad.tab);
-			this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
-		}
 
-		@Override
-		@javax.annotation.Nullable
-		public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-			return NULL_AABB;
-		}
+    public static class BlockCustom extends BlockColored {
+        public static final PropertyDirection FACING = BlockHorizontal.FACING;
+        public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
 
-		@Override
+        public BlockCustom() {
+            super(Material.IRON);
+            setUnlocalizedName("roadmark_slowdown");
+            setSoundType(SoundType.METAL);
+            setHardness(1F);
+            setResistance(10F);
+            setLightLevel(0F);
+            setLightOpacity(0);
+            setCreativeTab(TabNebulaecraftRoad.tab);
+            this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+        }
+
+        @Override
+        @javax.annotation.Nullable
+        public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+            return NULL_AABB;
+        }
+
+        @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
             BlockRoadmarkSlowdown.BlockCustom.EnumType[] allSubtypes = BlockRoadmarkSlowdown.BlockCustom.EnumType.values();
@@ -81,38 +77,38 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
-        
-		@Override
-		public BlockRenderLayer getBlockLayer() {
-			return BlockRenderLayer.CUTOUT_MIPPED;
-		}
 
-		@Override
-		public boolean isFullCube(IBlockState state) {
-			return false;
-		}
+        @Override
+        public BlockRenderLayer getBlockLayer() {
+            return BlockRenderLayer.CUTOUT_MIPPED;
+        }
 
-		@Override
-		public boolean isOpaqueCube(IBlockState state) {
-			return false;
-		}
+        @Override
+        public boolean isFullCube(IBlockState state) {
+            return false;
+        }
 
-		@Override
-		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			switch (state.getValue(BlockHorizontal.FACING)) {
-				case SOUTH :
-					default :
-						return new AxisAlignedBB(0.1875, 0, 0.0625, 0.8125, 0.1, 0.9375);
-					case NORTH :
-						return new AxisAlignedBB(0.1875, 0, 0.0625, 0.8125, 0.1, 0.9375);
-					case EAST :
-						return new AxisAlignedBB(0.0625, 0, 0.1875, 0.9375, 0.1, 0.8125);
-					case WEST :
-						return new AxisAlignedBB(0.0625, 0, 0.1875, 0.9375, 0.1, 0.8125);
-			}
-		}
+        @Override
+        public boolean isOpaqueCube(IBlockState state) {
+            return false;
+        }
 
-		@Override
+        @Override
+        public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+            switch (state.getValue(BlockHorizontal.FACING)) {
+                case SOUTH:
+                default:
+                    return new AxisAlignedBB(0.1875, 0, 0.0625, 0.8125, 0.1, 0.9375);
+                case NORTH:
+                    return new AxisAlignedBB(0.1875, 0, 0.0625, 0.8125, 0.1, 0.9375);
+                case EAST:
+                    return new AxisAlignedBB(0.0625, 0, 0.1875, 0.9375, 0.1, 0.8125);
+                case WEST:
+                    return new AxisAlignedBB(0.0625, 0, 0.1875, 0.9375, 0.1, 0.8125);
+            }
+        }
+
+        @Override
         protected net.minecraft.block.state.BlockStateContainer createBlockState() {
             return new net.minecraft.block.state.BlockStateContainer(this, FACING, SUBTYPE);
         }
@@ -129,12 +125,12 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public IBlockState getStateFromMeta(int meta) {
-            return this.getDefaultState().withProperty(FACING, EnumFacing.getFront((meta >= 4 ? meta - 4 : meta) + 2)).withProperty(SUBTYPE, meta >= 4 ? EnumType.SUBTYPE1 : EnumType.SUBTYPE0);
+            return this.getDefaultState().withProperty(FACING, EnumFacing.getFront((meta % 4) + 2)).withProperty(SUBTYPE, EnumType.byMetadata(meta / 4));
         }
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            return ((state.getValue(FACING).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4));
+            return ((state.getValue(FACING).getIndex() - 2) + (4 * state.getValue(SUBTYPE).getMetadata()));
         }
 
         @Override
@@ -144,7 +140,7 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
             if (facing == EnumFacing.UP || facing == EnumFacing.DOWN)
                 return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
 
-            System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
+//            System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
             return this.getDefaultState().withProperty(FACING, facing).withProperty(SUBTYPE, subtype);
         }
 
@@ -190,5 +186,5 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
                 return this.name;
             }
         }
-	}
+    }
 }
