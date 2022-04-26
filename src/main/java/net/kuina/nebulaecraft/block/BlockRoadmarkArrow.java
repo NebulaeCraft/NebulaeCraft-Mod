@@ -74,7 +74,7 @@ public class BlockRoadmarkArrow extends ElementsNebulaecraftMod.ModElement {
 
 		@Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			switch ((EnumFacing) state.getValue(BlockHorizontal.FACING)) {
+			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
 					return new AxisAlignedBB(-0.125, 0, -0.4375, 1.125, 0.1, 1.4375);

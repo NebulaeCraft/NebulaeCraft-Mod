@@ -83,17 +83,17 @@ public class BlockCatenaryWirePoleDrcore extends ElementsNebulaecraftMod.ModElem
 
 		@Override
 		protected net.minecraft.block.state.BlockStateContainer createBlockState() {
-			return new net.minecraft.block.state.BlockStateContainer(this, new IProperty[]{FACING});
+			return new net.minecraft.block.state.BlockStateContainer(this, FACING);
 		}
 
 		@Override
 		public IBlockState withRotation(IBlockState state, Rotation rot) {
-			return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
+			return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
 		}
 
 		@Override
 		public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
-			return state.withRotation(mirrorIn.toRotation((EnumFacing) state.getValue(FACING)));
+			return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
 		}
 
 		@Override
@@ -103,7 +103,7 @@ public class BlockCatenaryWirePoleDrcore extends ElementsNebulaecraftMod.ModElem
 
 		@Override
 		public int getMetaFromState(IBlockState state) {
-			return (((EnumFacing) state.getValue(FACING)).getIndex()-2);
+			return (state.getValue(FACING).getIndex()-2);
 		}
 
 		@Override

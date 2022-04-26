@@ -4,11 +4,11 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class ItemHasVarientsAndSubtypes extends ItemBlock
+public class ItemHasVariantsAndSubtypes extends ItemBlock
 {
     private String[] subtypeNames;
 
-    public ItemHasVarientsAndSubtypes(Block block)
+    public ItemHasVariantsAndSubtypes(Block block)
     {
         super(block);
         this.setMaxDamage(0);
@@ -18,12 +18,12 @@ public class ItemHasVarientsAndSubtypes extends ItemBlock
     @Override
     public int getMetadata(int metadata)
     {
-        System.out.println("Ishirai DEBUG#Item#meta: "+metadata);
+//        System.out.println("Ishirai DEBUG#Item#meta: "+metadata);
         return metadata;
     }
 
 
-    public ItemHasVarientsAndSubtypes setSubtypeNames(String[] names)
+    public ItemHasVariantsAndSubtypes setSubtypeNames(String[] names)
     {
         this.subtypeNames = names;
         return this;

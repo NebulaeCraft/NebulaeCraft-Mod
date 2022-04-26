@@ -4,25 +4,21 @@ import net.minecraft.block.Block;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 
-public class ItemBlockVariants extends ItemBlock
-{
-    public ItemBlockVariants(Block block)
-    {
+public class ItemBlockVariants extends ItemBlock {
+    public ItemBlockVariants(Block block) {
         super(block);
         this.setMaxDamage(0);
         this.setHasSubtypes(true);
     }
 
     @Override
-    public int getMetadata(int metadata)
-    {
-        System.out.println("Ishirai DEBUG#Item#meta: "+metadata);
+    public int getMetadata(int metadata) {
+//        System.out.println("Ishirai DEBUG#Item#meta: "+metadata);
         return metadata;
     }
 
     @Override
-    public String getUnlocalizedName(ItemStack stack)
-    {
+    public String getUnlocalizedName(ItemStack stack) {
         return super.getUnlocalizedName();
     }
 }

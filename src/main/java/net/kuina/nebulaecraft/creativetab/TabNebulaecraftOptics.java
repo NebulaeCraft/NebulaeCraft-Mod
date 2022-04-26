@@ -22,7 +22,7 @@ public class TabNebulaecraftOptics extends ElementsNebulaecraftMod.ModElement {
 			@SideOnly(Side.CLIENT)
 			@Override
 			public ItemStack getTabIconItem() {
-				return new ItemStack(BlockLamp.block, (int) (1));
+				return new ItemStack(BlockLamp.block, 1);
 			}
 
 			@SideOnly(Side.CLIENT)

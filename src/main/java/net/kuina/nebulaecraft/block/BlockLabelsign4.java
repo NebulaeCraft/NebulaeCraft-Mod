@@ -77,7 +77,7 @@ public class BlockLabelsign4 extends ElementsNebulaecraftMod.ModElement {
 
 		@Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			switch ((EnumFacing) state.getValue(BlockHorizontal.FACING)) {
+			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 					default :
 						return new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 0.1);
@@ -92,17 +92,17 @@ public class BlockLabelsign4 extends ElementsNebulaecraftMod.ModElement {
 
 		@Override
 		protected net.minecraft.block.state.BlockStateContainer createBlockState() {
-			return new net.minecraft.block.state.BlockStateContainer(this, new IProperty[]{FACING});
+			return new net.minecraft.block.state.BlockStateContainer(this, FACING);
 		}
 
 		@Override
 		public IBlockState withRotation(IBlockState state, Rotation rot) {
-			return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
+			return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
 		}
 
 		@Override
 		public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
-			return state.withRotation(mirrorIn.toRotation((EnumFacing) state.getValue(FACING)));
+			return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
 		}
 
 		@Override
@@ -112,7 +112,7 @@ public class BlockLabelsign4 extends ElementsNebulaecraftMod.ModElement {
 
 		@Override
 		public int getMetaFromState(IBlockState state) {
-			return (((EnumFacing) state.getValue(FACING)).getIndex()-2);
+			return (state.getValue(FACING).getIndex()-2);
 		}
 
 		@Override

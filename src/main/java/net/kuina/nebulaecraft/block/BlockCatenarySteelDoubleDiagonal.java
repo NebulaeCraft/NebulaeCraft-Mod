@@ -1,7 +1,6 @@
 
 package net.kuina.nebulaecraft.block;
 
-import net.minecraft.block.BlockTallGrass;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
@@ -16,7 +15,6 @@ import net.minecraft.world.World;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.AxisAlignedBB;
-import net.minecraft.item.ItemBlock;
 import net.minecraft.item.Item;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -30,7 +28,6 @@ import net.minecraft.block.Block;
 
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
-import scala.reflect.internal.Types;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.ModElement {
@@ -43,7 +40,7 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
 	@Override
 	public void initElements() {
 		elements.blocks.add(() -> new BlockCustom().setRegistryName("catenary_steel_double_diagonal"));
-		elements.items.add(() -> new ItemHasVarientsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
+		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -57,7 +54,7 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
     
 	public static class BlockCustom extends Block {
 		public static final PropertyDirection FACING = BlockHorizontal.FACING;
-		public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.<BlockCustom.EnumType>create("subtype", BlockCustom.EnumType.class);
+		public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
 		public BlockCustom() {
 			super(Material.IRON);
 			setUnlocalizedName("catenary_steel_double_diagonal");
@@ -92,7 +89,7 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
 		@Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
             if(state.getValue(SUBTYPE).getMetadata()==0){
-                switch ((EnumFacing) state.getValue(BlockHorizontal.FACING)) {
+                switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
 						return new AxisAlignedBB(0.4375, 0, 0, 1, 0.2, 1);
@@ -106,7 +103,7 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
                 }
             }
             else{
-                switch ((EnumFacing) state.getValue(BlockHorizontal.FACING)) {
+                switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
 						return new AxisAlignedBB(0, 0, 0, 0.5625, 0.2, 1);
@@ -123,17 +120,17 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
 
 		@Override
         protected net.minecraft.block.state.BlockStateContainer createBlockState() {
-            return new net.minecraft.block.state.BlockStateContainer(this, new IProperty[]{FACING, SUBTYPE});
+            return new net.minecraft.block.state.BlockStateContainer(this, FACING, SUBTYPE);
         }
 
         @Override
         public IBlockState withRotation(IBlockState state, Rotation rot) {
-            return state.withProperty(FACING, rot.rotate((EnumFacing) state.getValue(FACING)));
+            return state.withProperty(FACING, rot.rotate(state.getValue(FACING)));
         }
 
         @Override
         public IBlockState withMirror(IBlockState state, Mirror mirrorIn) {
-            return state.withRotation(mirrorIn.toRotation((EnumFacing) state.getValue(FACING)));
+            return state.withRotation(mirrorIn.toRotation(state.getValue(FACING)));
         }
 
         @Override
@@ -143,7 +140,7 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            return ((((EnumFacing) state.getValue(FACING)).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4));
+            return ((state.getValue(FACING).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4));
         }
 
         @Override
@@ -162,7 +159,7 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
             return false;
         }
 
-        public static enum EnumType implements IStringSerializable {
+        public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1");
 
@@ -177,7 +174,7 @@ public class BlockCatenarySteelDoubleDiagonal extends ElementsNebulaecraftMod.Mo
             private final int meta;
             private final String name;
 
-            private EnumType(int i_meta, String i_name) {
+            EnumType(int i_meta, String i_name) {
                 this.meta = i_meta;
                 this.name = i_name;
             }

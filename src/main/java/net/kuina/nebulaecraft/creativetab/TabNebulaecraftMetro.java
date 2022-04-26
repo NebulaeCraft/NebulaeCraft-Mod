@@ -22,7 +22,7 @@ public class TabNebulaecraftMetro extends ElementsNebulaecraftMod.ModElement {
 			@SideOnly(Side.CLIENT)
 			@Override
 			public ItemStack getTabIconItem() {
-				return new ItemStack(BlockThirdrailYellowSupport.block, (int) (1));
+				return new ItemStack(BlockThirdrailYellowSupport.block, 1);
 			}
 
 			@SideOnly(Side.CLIENT)
