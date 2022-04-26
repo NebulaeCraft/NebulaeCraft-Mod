@@ -2,7 +2,9 @@ package net.kuina.nebulaecraft.block;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
-import net.minecraft.block.*;
+import net.minecraft.block.Block;
+import net.minecraft.block.BlockHorizontal;
+import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
@@ -35,7 +37,7 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         elements.blocks.add(() -> new BlockCustom().setRegistryName("roadmark_slowdown"));
-        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
@@ -47,7 +49,7 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
         }
     }
 
-    public static class BlockCustom extends BlockColored {
+    public static class BlockCustom extends Block {
         public static final PropertyDirection FACING = BlockHorizontal.FACING;
         public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
 
