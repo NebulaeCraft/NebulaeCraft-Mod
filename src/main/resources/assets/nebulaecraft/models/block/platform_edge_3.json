@@ -1,0 +1,42 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "nebulaecraft:blocks/catenary_wire_pole",
+		"particle": "nebulaecraft:blocks/platform_edge"
+	},
+	"elements": [
+		{
+			"from": [0, 8, 0],
+			"to": [16, 16, 3.375],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 8], "texture": "#1"},
+				"east": {"uv": [0, 0, 3.375, 8], "texture": "#1"},
+				"south": {"uv": [0, 0, 16, 8], "texture": "#1"},
+				"west": {"uv": [0, 0, 3.375, 8], "texture": "#1"},
+				"up": {"uv": [0, 0, 16, 3.375], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 3.375], "texture": "#1"}
+			}
+		},
+		{
+			"from": [6.5, 0, 0],
+			"to": [9.5, 8, 2.775],
+			"faces": {
+				"east": {"uv": [0, 0, 2.775, 8], "texture": "#1"},
+				"south": {"uv": [0, 0, 3, 8], "texture": "#1"},
+				"west": {"uv": [0, 0, 2.775, 8], "texture": "#1"},
+				"down": {"uv": [0, 0, 3, 2.775], "texture": "#1"}
+			}
+		},
+		{
+			"from": [0, 0, 0],
+			"to": [16, 8, 0.5],
+			"faces": {
+				"north": {"uv": [0, 0, 16, 8], "texture": "#1"},
+				"east": {"uv": [0, 0, 0.5, 8], "texture": "#1"},
+				"south": {"uv": [0, 0, 16, 8], "texture": "#1"},
+				"west": {"uv": [0, 0, 0.5, 8], "texture": "#1"},
+				"down": {"uv": [0, 0, 16, 0.5], "texture": "#1"}
+			}
+		}
+	]
+}

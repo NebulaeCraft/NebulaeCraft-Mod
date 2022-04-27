@@ -34,7 +34,7 @@ public class BlockAsphaltStopLineConnected extends ElementsNebulaecraftMod.ModEl
 	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_stop_line_connected")
 	public static final Block block = null;
 	public BlockAsphaltStopLineConnected(ElementsNebulaecraftMod instance) {
-		super(instance, 6);
+		super(instance, 8);
 	}
 
 	@Override

@@ -35,7 +35,7 @@ public class BlockStreetlightPole extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:streetlight_pole")
 	public static final Block block = null;
 	public BlockStreetlightPole(ElementsNebulaecraftMod instance) {
-		super(instance, 14);
+		super(instance, 16);
 	}
 
 	@Override

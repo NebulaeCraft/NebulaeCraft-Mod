@@ -35,7 +35,7 @@ public class BlockRoadmarkBusonly extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:roadmark_busonly")
 	public static final Block block = null;
 	public BlockRoadmarkBusonly(ElementsNebulaecraftMod instance) {
-		super(instance, 20);
+		super(instance, 21);
 	}
 
 	@Override

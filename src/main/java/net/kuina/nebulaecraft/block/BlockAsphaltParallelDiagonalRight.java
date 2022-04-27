@@ -34,7 +34,7 @@ public class BlockAsphaltParallelDiagonalRight extends ElementsNebulaecraftMod.M
 	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_parallel_diagonal_right")
 	public static final Block block = null;
 	public BlockAsphaltParallelDiagonalRight(ElementsNebulaecraftMod instance) {
-		super(instance, 7);
+		super(instance, 9);
 	}
 
 	@Override

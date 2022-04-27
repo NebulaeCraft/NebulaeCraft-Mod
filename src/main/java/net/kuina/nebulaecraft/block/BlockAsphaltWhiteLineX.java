@@ -26,7 +26,7 @@ public class BlockAsphaltWhiteLineX extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_white_line_x")
 	public static final Block block = null;
 	public BlockAsphaltWhiteLineX(ElementsNebulaecraftMod instance) {
-		super(instance, 23);
+		super(instance, 5);
 	}
 
 	@Override

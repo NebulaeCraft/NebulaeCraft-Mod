@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/platform_edge_1",
+  "parent": "nebulaecraft:block/platform_edge_3",
   "display": {
 		"thirdperson_righthand": {
 			"translation": [0, -1.25, 3.25],

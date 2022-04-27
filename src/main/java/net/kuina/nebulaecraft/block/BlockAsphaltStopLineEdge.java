@@ -34,7 +34,7 @@ public class BlockAsphaltStopLineEdge extends ElementsNebulaecraftMod.ModElement
 	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_stop_line_edge")
 	public static final Block block = null;
 	public BlockAsphaltStopLineEdge(ElementsNebulaecraftMod instance) {
-		super(instance, 5);
+		super(instance, 7);
 	}
 
 	@Override

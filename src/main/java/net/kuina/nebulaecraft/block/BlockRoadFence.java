@@ -25,7 +25,7 @@ public class BlockRoadFence extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:road_fence")
 	public static final Block block = null;
 	public BlockRoadFence(ElementsNebulaecraftMod instance) {
-		super(instance, 15);
+		super(instance, 24);
 	}
 
 	@Override

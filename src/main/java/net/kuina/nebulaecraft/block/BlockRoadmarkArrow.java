@@ -34,7 +34,7 @@ import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 public class BlockRoadmarkArrow extends ElementsNebulaecraftMod.ModElement {
 
 	public BlockRoadmarkArrow(ElementsNebulaecraftMod instance) {
-		super(instance, 16);
+		super(instance, 17);
 	}
 
 	public static final class BlockCustom extends Block {

@@ -34,7 +34,7 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
 	@GameRegistry.ObjectHolder("nebulaecraft:signpole_horizontal")
 	public static final Block block = null;
 	public BlockSignpoleHorizontal(ElementsNebulaecraftMod instance) {
-		super(instance, 11);
+		super(instance, 13);
 	}
 
 	@Override
