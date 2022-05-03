@@ -30,25 +30,25 @@ import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement {
-	@GameRegistry.ObjectHolder("nebulaecraft:signpole_horizontal")
+public class BlockAsphaltYellowLineSmallDiagonal extends ElementsNebulaecraftMod.ModElement {
+	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_yellow_line_small_diagonal")
 	public static final Block block = null;
-	public BlockSignpoleHorizontal(ElementsNebulaecraftMod instance) {
-		super(instance, 15);
+	public BlockAsphaltYellowLineSmallDiagonal(ElementsNebulaecraftMod instance) {
+		super(instance, 12);
 	}
 
 	@Override
 	public void initElements() {
-		elements.blocks.add(() -> new BlockCustom().setRegistryName("signpole_horizontal"));
+		elements.blocks.add(() -> new BlockCustom().setRegistryName("asphalt_yellow_line_small_diagonal"));
 		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
 	}
 
 	@SideOnly(Side.CLIENT)
 	@Override
 	public void registerModels(ModelRegistryEvent event) {
-        BlockSignpoleHorizontal.BlockCustom.EnumType[] allSubtypes = BlockSignpoleHorizontal.BlockCustom.EnumType.values();
-        for (BlockSignpoleHorizontal.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:signpole_horizontal_" + subtype.getName(), "inventory"));
+        BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType[] allSubtypes = BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType.values();
+        for (BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:asphalt_yellow_line_small_diagonal_" + subtype.getName(), "inventory"));
         }
     }
     
@@ -56,13 +56,13 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
 		public static final PropertyDirection FACING = BlockHorizontal.FACING;
 		public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
 		public BlockCustom() {
-			super(Material.IRON);
-			setUnlocalizedName("signpole_horizontal");
-			setSoundType(SoundType.METAL);
+			super(Material.ROCK);
+			setUnlocalizedName("asphalt_yellow_line_small_diagonal");
+			setSoundType(SoundType.STONE);
 			setHardness(1F);
 			setResistance(10F);
 			setLightLevel(0F);
-			setLightOpacity(0);
+			setLightOpacity(255);
 			setCreativeTab(TabNebulaecraftRoad.tab);
 			this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		}
@@ -70,57 +70,20 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
 		@Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockSignpoleHorizontal.BlockCustom.EnumType[] allSubtypes = BlockSignpoleHorizontal.BlockCustom.EnumType.values();
-            for (BlockSignpoleHorizontal.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType[] allSubtypes = BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType.values();
+            for (BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
         
 		@Override
 		public BlockRenderLayer getBlockLayer() {
-			return BlockRenderLayer.CUTOUT_MIPPED;
-		}
-
-		@Override
-		public boolean isFullCube(IBlockState state) {
-			return false;
-		}
-
-		@Override
-		public boolean isOpaqueCube(IBlockState state) {
-			return false;
+			return BlockRenderLayer.SOLID;
 		}
 
 		@Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-            if(state.getValue(SUBTYPE).getMetadata()==0){
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(0, 0.125, 0.875, 1, 1.1875, 1);
-					case NORTH :
-						return new AxisAlignedBB(0, 0.125, 0, 1, 1.1875, 0.125);
-					case EAST :
-						return new AxisAlignedBB(0.875, 0.125, 0, 1, 1.1875, 1);
-					case WEST :
-						return new AxisAlignedBB(0, 0.125, 0, 0.125, 1.1875, 1);
-
-                }
-            }
-            else{
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(0, 0, 0.875, 1, 1.3125, 1);
-					case NORTH :
-						return new AxisAlignedBB(0, 0, 0, 1, 1.3125, 0.125);
-					case EAST :
-						return new AxisAlignedBB(0.875, 0, 0, 1, 1.3125, 1);
-					case WEST :
-						return new AxisAlignedBB(0, 0, 0, 0.125, 1.3125, 1);
-
-                }
-            }
+			return new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 		}
 
 		@Override
@@ -163,10 +126,10 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1");
 
-            private static final BlockSignpoleHorizontal.BlockCustom.EnumType[] META_LOOKUP = new BlockSignpoleHorizontal.BlockCustom.EnumType[values().length];
+            private static final BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType[] META_LOOKUP = new BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockSignpoleHorizontal.BlockCustom.EnumType type : values()) {
+                for (BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -179,7 +142,7 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
                 this.name = i_name;
             }
 
-            public static BlockSignpoleHorizontal.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockAsphaltYellowLineSmallDiagonal.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }

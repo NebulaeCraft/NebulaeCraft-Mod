@@ -31,7 +31,7 @@ public class BlockRoadmarkSlowdownS extends ElementsNebulaecraftMod.ModElement {
     public static final Block block = null;
 
     public BlockRoadmarkSlowdownS(ElementsNebulaecraftMod instance) {
-        super(instance, 23);
+        super(instance, 25);
     }
 
     @Override

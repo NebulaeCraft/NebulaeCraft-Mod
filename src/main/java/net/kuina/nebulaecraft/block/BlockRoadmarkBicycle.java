@@ -35,7 +35,7 @@ public class BlockRoadmarkBicycle extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:roadmark_bicycle")
 	public static final Block block = null;
 	public BlockRoadmarkBicycle(ElementsNebulaecraftMod instance) {
-		super(instance, 18);
+		super(instance, 20);
 	}
 
 	@Override

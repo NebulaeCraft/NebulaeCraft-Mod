@@ -35,7 +35,7 @@ public class BlockRoadmarkWheelchair extends ElementsNebulaecraftMod.ModElement 
 	@GameRegistry.ObjectHolder("nebulaecraft:roadmark_wheelchair")
 	public static final Block block = null;
 	public BlockRoadmarkWheelchair(ElementsNebulaecraftMod instance) {
-		super(instance, 19);
+		super(instance, 21);
 	}
 
 	@Override

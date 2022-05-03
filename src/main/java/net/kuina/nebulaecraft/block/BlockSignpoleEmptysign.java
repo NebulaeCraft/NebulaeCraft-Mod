@@ -35,7 +35,7 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:signpole_emptysign")
 	public static final Block block = null;
 	public BlockSignpoleEmptysign(ElementsNebulaecraftMod instance) {
-		super(instance, 14);
+		super(instance, 16);
 	}
 
 	@Override

@@ -35,7 +35,7 @@ public class BlockRoadmarkPedestrianCrossing extends ElementsNebulaecraftMod.Mod
 	@GameRegistry.ObjectHolder("nebulaecraft:roadmark_pedestrian_crossing")
 	public static final Block block = null;
 	public BlockRoadmarkPedestrianCrossing(ElementsNebulaecraftMod instance) {
-		super(instance, 20);
+		super(instance, 22);
 	}
 
 	@Override

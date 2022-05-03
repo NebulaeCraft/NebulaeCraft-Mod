@@ -31,7 +31,7 @@ public class BlockSignpoleVertical extends ElementsNebulaecraftMod.ModElement {
     public static final Block block = null;
 
     public BlockSignpoleVertical(ElementsNebulaecraftMod instance) {
-        super(instance, 12);
+        super(instance, 14);
     }
 
     @Override
