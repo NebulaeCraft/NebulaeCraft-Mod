@@ -15,6 +15,8 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import org.lwjgl.Sys;
 import org.lwjgl.opencl.CLKernel;
 
 
@@ -50,8 +52,11 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         ForgeRegistries.ITEMS.register(new ItemBlock(blockThis).setRegistryName(blockThis.getRegistryName()));
     }
 
+    ServerHandler handler = new ServerHandler();
+
     @Override
     public void initElements() {
+        System.out.println(handler.CornField);
         for (int i = ScreenDoorBigIDStart; i <= ScreenDoorBigIDEnd; i++) {
             registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
         }

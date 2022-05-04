@@ -5,5 +5,5 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 public class ServerHandler {
     @SideOnly(Side.CLIENT)
-    public static int status;
+    public static int CornField;
 }
