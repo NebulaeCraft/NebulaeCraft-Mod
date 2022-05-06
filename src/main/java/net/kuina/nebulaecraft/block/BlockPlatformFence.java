@@ -55,7 +55,7 @@ public class BlockPlatformFence extends ElementsNebulaecraftMod.ModElement {
 		@SideOnly(Side.CLIENT)
 		@Override
 		public BlockRenderLayer getBlockLayer() {
-			return BlockRenderLayer.CUTOUT_MIPPED;
+			return BlockRenderLayer.TRANSLUCENT;
 		}
 
 		@Override
