@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/catenary_steel",
+  "parent": "nebulaecraft:block/catenary_steel_diagonal",
   "display": {
 		"thirdperson_righthand": {
 			"rotation": [90, 30, -10],
