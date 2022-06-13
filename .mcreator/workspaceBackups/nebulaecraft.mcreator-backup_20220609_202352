@@ -1197,6 +1197,15 @@
       "locked_code": true,
       "ids": {},
       "registry_name": "roadsign_86"
+    },
+    {
+      "name": "TestPane",
+      "type": "block",
+      "sortid": 135,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {},
+      "registry_name": "test_pane"
     }
   ],
   "variable_elements": [],
@@ -1533,6 +1542,7 @@
       "tile.asphalt_parallel_diagonal_right.subtype1.name": "Asphalt",
       "tile.asphalt_bus_half_line.name": "Asphalt",
       "tile.roadsign_84.name": "Roadsign",
+      "tile.test_pane.name": "Test Pane",
       "tile.roadsign_6.name": "Roadsign",
       "tile.tunnel_light.name": "Tunnel Light",
       "tile.thirdrail_yellow_slope_1.name": "Third Rail Slope Left",
@@ -1870,6 +1880,7 @@
       "tile.asphalt_parallel_diagonal_right.subtype1.name": "导流线右斜线",
       "tile.asphalt_bus_half_line.name": "公交专用道线",
       "tile.roadsign_84.name": "指示：非机动车车道",
+      "tile.test_pane.name": "Test Pane",
       "tile.roadsign_6.name": "禁令：禁止非机动车通行",
       "tile.tunnel_light.name": "隧道灯",
       "tile.thirdrail_yellow_slope_1.name": "第三轨左斜坡",
