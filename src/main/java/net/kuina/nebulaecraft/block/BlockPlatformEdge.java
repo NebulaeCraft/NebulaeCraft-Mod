@@ -24,6 +24,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.RayTraceResult;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockPlatformEdge extends ElementsNebulaecraftMod.ModElement {
@@ -126,7 +128,14 @@ public class BlockPlatformEdge extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            return ((state.getValue(FACING).getIndex() - 2) + (4 * state.getValue(SUBTYPE).getMetadata()));
+            int metadata=((state.getValue(FACING).getIndex() - 2) + (4 * state.getValue(SUBTYPE).getMetadata()))/4;
+            return metadata;
+        }
+
+        @Override
+        public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+            super.getPickBlock(state, target, world, pos, player);
+            return new ItemStack(this,1,getMetaFromState(state));
         }
 
         @Override

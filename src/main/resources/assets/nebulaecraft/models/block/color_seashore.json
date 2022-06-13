@@ -1,0 +1,6 @@
+{
+    "parent": "block/cube_all",
+    "textures": {
+        "all": "nebulaecraft:blocks/color_seashore"
+    }
+}

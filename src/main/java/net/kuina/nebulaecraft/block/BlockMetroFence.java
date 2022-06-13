@@ -14,7 +14,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.SoundType;
-import net.minecraft.block.BlockFence;
+import net.minecraft.block.BlockPane;
 import net.minecraft.block.Block;
 
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
@@ -40,9 +40,9 @@ public class BlockMetroFence extends ElementsNebulaecraftMod.ModElement {
 		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0,
 				new ModelResourceLocation("nebulaecraft:metro_fence", "inventory"));
 	}
-	public static class BlockCustom extends BlockFence {
+	public static class BlockCustom extends BlockPane {
 		public BlockCustom() {
-			super(Material.ROCK, Material.ROCK.getMaterialMapColor());
+			super(Material.ROCK, true);
 			setUnlocalizedName("metro_fence");
 			setSoundType(SoundType.STONE);
 			setHardness(1F);

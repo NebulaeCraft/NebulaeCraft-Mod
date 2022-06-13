@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:catenary_wire_bracket_half_t","y": 90},
+	"facing=south": { "model": "nebulaecraft:catenary_wire_bracket_half_t"},
+	"facing=west":  { "model": "nebulaecraft:catenary_wire_bracket_half_t","y": 90},
+	"facing=north":  { "model": "nebulaecraft:catenary_wire_bracket_half_t"}
+  }
+}

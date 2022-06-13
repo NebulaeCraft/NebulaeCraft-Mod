@@ -28,6 +28,8 @@ import net.minecraft.block.Block;
 
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.util.math.RayTraceResult;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement {
@@ -145,7 +147,13 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            return ((state.getValue(FACING).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4));
+            return ((state.getValue(FACING).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4))/4;
+        }
+
+        @Override
+        public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+            super.getPickBlock(state, target, world, pos, player);
+            return new ItemStack(this,1,getMetaFromState(state));
         }
 
         @Override
