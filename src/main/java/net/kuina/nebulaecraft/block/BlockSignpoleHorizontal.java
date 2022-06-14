@@ -147,13 +147,13 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            return ((state.getValue(FACING).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4))/4;
+            return ((state.getValue(FACING).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4));
         }
 
         @Override
         public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
             super.getPickBlock(state, target, world, pos, player);
-            return new ItemStack(this,1,getMetaFromState(state));
+            return new ItemStack(this,1,getMetaFromState(state)/4);
         }
 
         @Override

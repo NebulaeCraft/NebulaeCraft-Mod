@@ -1242,6 +1242,24 @@
       "locked_code": true,
       "ids": {},
       "registry_name": "labelsign_9"
+    },
+    {
+      "name": "TrackbedStation",
+      "type": "block",
+      "sortid": 141,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {},
+      "registry_name": "trackbed_station"
+    },
+    {
+      "name": "TrackbedNoise",
+      "type": "block",
+      "sortid": 142,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {},
+      "registry_name": "trackbed_noise"
     }
   ],
   "variable_elements": [],
@@ -1333,6 +1351,7 @@
       "tile.lamp.purple.name": "Purple Lamp",
       "tile.asphalt_double_yellow_line_diagonal.name": "Asphalt",
       "tile.lamp.cyan.name": "Cyan Lamp",
+      "tile.trackbed_station.name": "Track Bed",
       "tile.labelsign_1.name": "Metro Label Sign",
       "tile.asphalt_white_line_slab.name": "Asphalt Slab",
       "tile.roadsign_79.name": "Roadsign",
@@ -1474,6 +1493,7 @@
       "tile.roadsign_66.name": "Roadsign",
       "tile.platform_edge.subtype2.name": "Platform Edge",
       "tile.thirdrail_yellow_slope_2.name": "Third Rail Slope Right",
+      "tile.trackbed_noise.name": "Track Bed",
       "tile.roadsign_44.name": "Roadsign",
       "tile.asphalt_double_white_line_diagonal.name": "Asphalt",
       "tile.roadsign_1.name": "Roadsign",
@@ -1677,6 +1697,7 @@
       "tile.lamp.purple.name": "紫色灯",
       "tile.asphalt_double_yellow_line_diagonal.name": "双黄线斜线",
       "tile.lamp.cyan.name": "青色灯",
+      "tile.trackbed_station.name": "地下车站强化混凝土道床",
       "tile.labelsign_1.name": "指示：一度停车位置",
       "tile.asphalt_white_line_slab.name": "白线台阶",
       "tile.roadsign_79.name": "指示：机动车行驶",
@@ -1817,6 +1838,7 @@
       "tile.roadsign_66.name": "警告：慢行",
       "tile.platform_edge.subtype2.name": "站台边缘",
       "tile.thirdrail_yellow_slope_2.name": "第三轨右斜坡",
+      "tile.trackbed_noise.name": "安装有降噪组件的道床",
       "tile.roadsign_44.name": "警告：向右急弯路",
       "tile.asphalt_double_white_line_diagonal.name": "双白线斜线",
       "tile.roadsign_1.name": "禁令：禁止通行",
@@ -1941,7 +1963,7 @@
   "workspaceSettings": {
     "modid": "nebulaecraft",
     "modName": "NebulaeCraft",
-    "version": "2.7.1",
+    "version": "2.8",
     "description": "This mod is only designed for NebulaeCraft 5th Server.",
     "author": "Kuina, Ishirai, Srcphy, CuteKims",
     "websiteURL": "https://wiki.knebulae.com",

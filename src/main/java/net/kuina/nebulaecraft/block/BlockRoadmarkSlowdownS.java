@@ -134,14 +134,14 @@ public class BlockRoadmarkSlowdownS extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            int metadata=((state.getValue(FACING).getIndex() - 2) + (4 * state.getValue(SUBTYPE).getMetadata()))/4;
+            int metadata=((state.getValue(FACING).getIndex() - 2) + (4 * state.getValue(SUBTYPE).getMetadata()));
             return metadata;
         }
 
         @Override
         public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
             super.getPickBlock(state, target, world, pos, player);
-            return new ItemStack(this,1,getMetaFromState(state));
+            return new ItemStack(this,1,getMetaFromState(state)/4);
         }
 
         @Override
