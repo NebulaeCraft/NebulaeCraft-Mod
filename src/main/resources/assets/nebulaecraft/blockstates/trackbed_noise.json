@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:trackbed_noise","y": 90},
+	"facing=south": { "model": "nebulaecraft:trackbed_noise"},
+	"facing=west":  { "model": "nebulaecraft:trackbed_noise","y": 90},
+	"facing=north":  { "model": "nebulaecraft:trackbed_noise"}
+  }
+}

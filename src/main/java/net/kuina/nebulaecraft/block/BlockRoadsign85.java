@@ -36,7 +36,7 @@ public class BlockRoadsign85 extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:roadsign_85")
 	public static final Block block = null;
 	public BlockRoadsign85(ElementsNebulaecraftMod instance) {
-		super(instance, 25);
+		super(instance, 27);
 	}
 
 	@Override

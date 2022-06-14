@@ -35,7 +35,7 @@ public class BlockCatenaryWireBracketHalfT extends ElementsNebulaecraftMod.ModEl
 	@GameRegistry.ObjectHolder("nebulaecraft:catenary_wire_bracket_half_t")
 	public static final Block block = null;
 	public BlockCatenaryWireBracketHalfT(ElementsNebulaecraftMod instance) {
-		super(instance, 89);
+		super(instance, 90);
 	}
 
 	@Override
