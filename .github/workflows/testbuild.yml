@@ -33,7 +33,6 @@ jobs:
     - name: Generate Changelog
       id: changelog
       shell: bash
-      env:
       CURRENT: ${{ github.ref }}
       run: |
         current_tag=${CURRENT/refs\/tags\//}
