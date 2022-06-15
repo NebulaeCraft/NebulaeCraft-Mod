@@ -40,8 +40,8 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: SNAPSHOT+${{ steps.short-sha.outputs.sha }}
-        release_name: Pre-Release SNAPSHOT+${{ steps.short-sha.outputs.sha }}
+        tag_name: SNAPSHOT-${{ steps.short-sha.outputs.sha }}
+        release_name: Pre-Release SNAPSHOT-${{ steps.short-sha.outputs.sha }}
         body_path: publish.md
         draft: false
         prerelease: true
@@ -54,5 +54,5 @@ jobs:
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }} 
         asset_path: ./build/libs/modid-1.0.jar
-        asset_name: NebulaeMod-SNAPSHOT+${{ steps.short-sha.outputs.sha }}.jar
+        asset_name: NebulaeMod-SNAPSHOT-${{ steps.short-sha.outputs.sha }}.jar
         asset_content_type: application/x-java-archive
