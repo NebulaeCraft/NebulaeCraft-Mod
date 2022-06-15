@@ -46,27 +46,26 @@ jobs:
         changelog="${changelog//'%'/'%25'}"
         changelog="${changelog//$'\n'/'  %0A'}"
         echo "::set-output name=value::Change set since ${last_tag:-the beginning}:  %0A%0A$changelog"
-      
-    - name: Create Release
+
+    - name: GitHub Release
       id: create_release
-      uses: actions/create-release@v1
+      uses: actions/create-release@v1.1.1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        body: |
-          ${{ steps.changelog.outputs.value }}
+        release_name: ${{ github.ref }}
         draft: false
         prerelease: true
-    
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
+        body: |
+          ${{ steps.changelog.outputs.value }}
+
+    - name: GitHub Release Artifact
+      uses: actions/upload-release-asset@v1.0.2
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} 
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./build/libs/modid-1.0.jar
         asset_name: NebulaeMod-${{ github.ref_name }}.jar
-        asset_content_type: application/x-java-archive
+        asset_content_type: "application/java-archive"
