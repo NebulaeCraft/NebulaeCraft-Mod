@@ -17,7 +17,7 @@ public class EntityCameraCart extends EntityMinecartEmpty {
     @Override
     public double getMountedYOffset()
     {
-        return 0.8D;
+        return 0.84D;
     }
 
 }
