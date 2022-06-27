@@ -18,7 +18,7 @@ renderClouds:false
 resourcePacks:[]
 incompatibleResourcePacks:[]
 lastServer:localhost:25463
-lang:en_us
+lang:zh_cn
 chatVisibility:0
 chatColors:true
 chatLinks:true

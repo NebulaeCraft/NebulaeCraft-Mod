@@ -2,20 +2,13 @@ package net.kuina.nebulaecraft.util;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.block.*;
-import net.kuina.nebulaecraft.entities.EntityCameraCart;
 import net.kuina.nebulaecraft.util.ServerHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.item.EntityMinecart;
-import net.minecraft.entity.item.EntityMinecartEmpty;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
-import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -59,14 +52,11 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         ForgeRegistries.ITEMS.register(new ItemBlock(blockThis).setRegistryName(blockThis.getRegistryName()));
     }
 
-
-
-
     ServerHandler handler = new ServerHandler();
 
     @Override
     public void initElements() {
-        System.out.println(ServerHandler.CornField);
+        System.out.println(handler.CornField);
         for (int i = ScreenDoorBigIDStart; i <= ScreenDoorBigIDEnd; i++) {
             registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
         }
