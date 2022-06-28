@@ -59,6 +59,3 @@ dependencies {
 
 apply from: 'mcreator.gradle'
 
-tasks.withType(JavaCompile) {
-    options.encoding = "UTF-8"
-}
