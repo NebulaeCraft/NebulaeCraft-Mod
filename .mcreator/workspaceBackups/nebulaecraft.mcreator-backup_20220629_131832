@@ -1319,7 +1319,7 @@
       "type": "keybind",
       "sortid": 147,
       "compiles": true,
-      "locked_code": true,
+      "locked_code": false,
       "ids": {},
       "registry_name": "mode_switching"
     }

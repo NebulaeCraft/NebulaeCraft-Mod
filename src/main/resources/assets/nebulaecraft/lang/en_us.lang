@@ -249,6 +249,7 @@ tile.labelsign_6.subtype1.name=Metro Label Sign
 tile.screen_door_4.name=Full Screen Door Wall-Right
 tile.asphalt_bus_half_line_diagonal_left.name=Asphalt
 tile.pot_light.name=Pot Light
+key.mcreator.mode_switching=Mode Switching
 tile.roadsign_73.name=Roadsign
 tile.lamp.green.name=Green Lamp
 tile.labelsign_7.name=Metro Label Sign

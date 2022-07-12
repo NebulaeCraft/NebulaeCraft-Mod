@@ -1319,9 +1319,18 @@
       "type": "keybind",
       "sortid": 147,
       "compiles": true,
-      "locked_code": true,
+      "locked_code": false,
       "ids": {},
       "registry_name": "mode_switching"
+    },
+    {
+      "name": "ModeSwitchingAnXiaAnJianShi",
+      "type": "procedure",
+      "sortid": 148,
+      "compiles": true,
+      "locked_code": false,
+      "ids": {},
+      "registry_name": "mode_switching_an_xia_an_jian_shi"
     }
   ],
   "variable_elements": [],

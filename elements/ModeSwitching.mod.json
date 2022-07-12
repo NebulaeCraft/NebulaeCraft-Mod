@@ -1,0 +1,12 @@
+{
+  "_fv": 18,
+  "_type": "keybind",
+  "definition": {
+    "triggerKey": "R",
+    "keyBindingName": "Mode Switching",
+    "keyBindingCategoryKey": "misc",
+    "onKeyPressed": {
+      "name": "ModeSwitchingEvent"
+    }
+  }
+}
