@@ -1296,32 +1296,6 @@
       "locked_code": true,
       "ids": {},
       "registry_name": "signal_35_white_left"
-    },
-    {
-      "name": "ModeSwitchingEvent",
-      "type": "procedure",
-      "sortid": 147,
-      "compiles": true,
-      "locked_code": true,
-      "ids": {},
-      "registry_name": "mode_switching_event",
-      "metadata": {
-        "dependencies": [
-          {
-            "name": "entity",
-            "type": "entity"
-          }
-        ]
-      }
-    },
-    {
-      "name": "ModeSwitching",
-      "type": "keybind",
-      "sortid": 147,
-      "compiles": true,
-      "locked_code": false,
-      "ids": {},
-      "registry_name": "mode_switching"
     }
   ],
   "variable_elements": [],
@@ -1579,7 +1553,6 @@
       "tile.screen_door_4.name": "Full Screen Door Wall-Right",
       "tile.asphalt_bus_half_line_diagonal_left.name": "Asphalt",
       "tile.pot_light.name": "Pot Light",
-      "key.mcreator.mode_switching": "Mode Switching",
       "tile.roadsign_73.name": "Roadsign",
       "tile.lamp.green.name": "Green Lamp",
       "tile.labelsign_7.name": "Metro Label Sign",
@@ -1929,7 +1902,6 @@
       "tile.screen_door_4.name": "全高站台幕墙-右半",
       "tile.asphalt_bus_half_line_diagonal_left.name": "左半公交专用道斜线",
       "tile.pot_light.name": "点状灯",
-      "key.mcreator.mode_switching": "切换模式",
       "tile.roadsign_73.name": "指示：靠右侧道路行驶",
       "tile.lamp.green.name": "绿色灯",
       "tile.labelsign_7.name": "指示：站界",
