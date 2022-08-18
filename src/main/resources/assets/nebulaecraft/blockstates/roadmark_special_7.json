@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "normal": {
+      "model": "nebulaecraft:roadmark_special_7"
+    },
+    "facing=north": {
+      "model": "nebulaecraft:roadmark_special_7",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "nebulaecraft:roadmark_special_7",
+      "y": 270
+    },
+    "facing=south": {
+      "model": "nebulaecraft:roadmark_special_7"
+    },
+    "facing=west": {
+      "model": "nebulaecraft:roadmark_special_7",
+      "y": 90
+    }
+  }
+}

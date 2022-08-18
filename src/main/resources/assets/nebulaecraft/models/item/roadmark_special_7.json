@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/roadmark_busonly",
+  "parent": "nebulaecraft:block/roadmark_special_7",
   "display": {
 		"thirdperson_righthand": {
 			"rotation": [90, 0, 0],

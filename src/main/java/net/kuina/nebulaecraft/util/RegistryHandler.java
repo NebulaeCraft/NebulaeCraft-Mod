@@ -39,6 +39,8 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
     private final int RoadsignSmallIDEnd = 81;
     private final int RoadsignBigIDStart = 82;
     private final int RoadsignBigIDEnd = 84;
+    private final int RoadmarkSpecialIDStart = 1;
+    private final int RoadmarkSpecialIDEnd = 8;
 
 
     public RegistryHandler(ElementsNebulaecraftMod instance) {
@@ -76,6 +78,10 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         }
         for (int i = RoadsignBigIDStart; i <= RoadsignBigIDEnd; i++) {
             registerBlock(new BlockRoadsignBig.BlockCustom(), "roadsign_" + i);
+
+        }
+        for (int i = RoadmarkSpecialIDStart; i <= RoadmarkSpecialIDEnd; i++) {
+            registerBlock(new BlockRoadmarkSpecial.BlockCustom(), "roadmark_special_" + i);
 
         }
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_" + "white_line");
@@ -138,6 +144,8 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "straight_left");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "right_left");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "back");
+        registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "halfright");
+    	registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "halfleft");
     }
 
 
