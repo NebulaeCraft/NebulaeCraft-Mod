@@ -7,6 +7,7 @@ import net.minecraft.block.BlockDispenser;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.dispenser.BehaviorDefaultDispenseItem;
 import net.minecraft.dispenser.IBehaviorDispenseItem;
@@ -22,8 +23,12 @@ import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.EntityEntryBuilder;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class CameraCart extends ElementsNebulaecraftMod.ModElement {
@@ -36,7 +41,6 @@ public class CameraCart extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         elements.entities.add(() -> EntityEntryBuilder.create().entity(EntityCameraCart.class).id(new ResourceLocation("nebulaecraft:cameracart"), 0).name("cameracart").tracker(64, 1, true).build());
-        elements.items.add(() -> new ItemCameraCart().setUnlocalizedName("cameracart").setRegistryName("cameracart").setCreativeTab(CreativeTabs.TRANSPORTATION));
     }
 
     public static class EntityCameraCart extends EntityMinecartEmpty {
