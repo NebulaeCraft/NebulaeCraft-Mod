@@ -32,8 +32,11 @@ public class CameraCart extends ElementsNebulaecraftMod.ModElement {
         }
 
         @Override
-        public double getMountedYOffset() {
-            return 0.875D;
+        public void updatePassenger(Entity entity) {
+            super.updatePassenger(entity);
+            if(entity instanceof EntityPlayer){
+                entity.setPosition(this.posX, this.posY + 0.875D + entity.getYOffset(), this.posZ);
+            }
         }
     }
 }
