@@ -2,6 +2,7 @@ package net.kuina.nebulaecraft.util;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.block.*;
+import net.kuina.nebulaecraft.entities.*;
 import net.kuina.nebulaecraft.util.ServerHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -24,6 +25,7 @@ import org.lwjgl.opencl.CLKernel;
 public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
 
     public static final List<Block> BLOCKS = new ArrayList<Block>();
+    public static final List<Item> ITEMS = new ArrayList<Item>();
 
     public Block blockToRegister = null;
     public String blockRegistryName;
@@ -52,6 +54,12 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         BLOCKS.add(blockThis);
         ForgeRegistries.BLOCKS.register(blockThis);
         ForgeRegistries.ITEMS.register(new ItemBlock(blockThis).setRegistryName(blockThis.getRegistryName()));
+    }
+
+    public void registerItem(Item itemThis, String itemRegistryName) {
+        itemThis.setRegistryName(itemRegistryName).setUnlocalizedName(itemRegistryName);
+        ITEMS.add(itemThis);
+        ForgeRegistries.ITEMS.register(itemThis);
     }
 
     ServerHandler handler = new ServerHandler();
@@ -146,6 +154,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "back");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "halfright");
     	registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "halfleft");
+        registerItem(new CameraCart.ItemCameraCart(), "cameracart");
     }
 
 
@@ -155,6 +164,11 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         for (Block BLOCK : BLOCKS) {
             ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(BLOCK), 0,
                     new ModelResourceLocation(Item.getItemFromBlock(BLOCK).getRegistryName(), "inventory"));
+        }
+
+        for (Item ITEM : ITEMS) {
+            ModelLoader.setCustomModelResourceLocation(ITEM, 0,
+                    new ModelResourceLocation(ITEM.getRegistryName(), "inventory"));
         }
     }
 }
