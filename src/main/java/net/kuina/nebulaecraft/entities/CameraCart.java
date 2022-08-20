@@ -68,7 +68,7 @@ public class CameraCart extends ElementsNebulaecraftMod.ModElement {
             private final BehaviorDefaultDispenseItem behaviourDefaultDispenseItem = new BehaviorDefaultDispenseItem();
             public ItemStack dispenseStack(IBlockSource source, ItemStack stack)
             {
-                EnumFacing enumfacing = (EnumFacing)source.getBlockState().getValue(BlockDispenser.FACING);
+                EnumFacing enumfacing = source.getBlockState().getValue(BlockDispenser.FACING);
                 World world = source.getWorld();
                 double d0 = source.getX() + (double)enumfacing.getFrontOffsetX() * 1.125D;
                 double d1 = Math.floor(source.getY()) + (double)enumfacing.getFrontOffsetY();

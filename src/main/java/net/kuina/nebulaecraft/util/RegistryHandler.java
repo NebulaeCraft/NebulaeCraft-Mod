@@ -66,7 +66,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
 
     @Override
     public void initElements() {
-        System.out.println(handler.CornField);
+        System.out.println(ServerHandler.CornField);
         for (int i = ScreenDoorBigIDStart; i <= ScreenDoorBigIDEnd; i++) {
             registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
         }
