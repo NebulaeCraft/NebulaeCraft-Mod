@@ -9,6 +9,7 @@
 	"colour=northern": {"model": "nebulaecraft:color_northern"},
 	"colour=trickle": {"model": "nebulaecraft:color_trickle"},
 	"colour=district": {"model": "nebulaecraft:color_district"},
-	"colour=seashore": {"model": "nebulaecraft:color_seashore"}
+	"colour=seashore": {"model": "nebulaecraft:color_seashore"},
+	"colour=valley": {"model": "nebulaecraft:color_valley"}
   }
 }
