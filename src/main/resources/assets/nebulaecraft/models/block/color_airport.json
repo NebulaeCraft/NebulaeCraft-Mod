@@ -1,6 +1,6 @@
 {
     "parent": "block/cube_all",
     "textures": {
-        "all": "nebulaecraft:blocks/color_estuary"
+        "all": "nebulaecraft:blocks/color_airport"
     }
 }

@@ -132,7 +132,7 @@ public class BlockColor1 extends ElementsNebulaecraftMod.ModElement {
 			CENTRAL(1, "central"),
 			ISLAND(2, "island"),
 			HARBOUR(3, "harbour"),
-			ESTUARY(4, "estuary"),
+			AIRPORT(4, "airport"),
 			METROPOLITAN(5, "metropolitan"),
 			NORTHERN(6, "northern"),
 			TRICKLE(7, "trickle"),

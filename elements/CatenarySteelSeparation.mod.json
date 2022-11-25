@@ -17,7 +17,7 @@
     "particleTexture": "",
     "tintType": "No tint",
     "isItemTinted": false,
-    "hasTransparency": false,
+    "hasTransparency": true,
     "connectedSides": false,
     "transparencyType": "CUTOUT_MIPPED",
     "disableOffset": false,
@@ -26,20 +26,20 @@
         "mx": 0.0,
         "my": 0.0,
         "mz": 0.0,
-        "Mx": 16.0,
-        "My": 16.0,
-        "Mz": 16.0,
+        "Mx": 1.0,
+        "My": 1.0,
+        "Mz": 1.0,
         "subtract": false
       }
     ],
-    "name": "MacBook Pro",
+    "name": "Catenary Wire",
     "specialInfo": [],
     "hardness": 1.0,
     "resistance": 10.0,
     "hasGravity": false,
     "isWaterloggable": false,
     "creativeTab": {
-      "value": "DECORATIONS"
+      "value": "CUSTOM:NebulaecraftMetro"
     },
     "destroyTool": "Not specified",
     "customDrop": {
@@ -52,7 +52,7 @@
     "canProvidePower": false,
     "lightOpacity": 0,
     "material": {
-      "value": "IRON"
+      "value": "CLOTH"
     },
     "tickRate": 10,
     "tickRandomly": false,
@@ -72,7 +72,7 @@
     "reactionToPushing": "NORMAL",
     "isNotColidable": false,
     "soundOnStep": {
-      "value": "METAL"
+      "value": "CLOTH"
     },
     "luminance": 0,
     "unbreakable": false,

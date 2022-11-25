@@ -6,6 +6,6 @@
     "icon": {
       "value": "CUSTOM:Color1"
     },
-    "showSearch": false
+    "showSearch": true
   }
 }

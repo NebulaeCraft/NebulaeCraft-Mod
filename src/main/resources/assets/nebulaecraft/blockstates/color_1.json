@@ -4,7 +4,7 @@
 	"colour=central": {"model": "nebulaecraft:color_central"},
 	"colour=island": {"model": "nebulaecraft:color_island"},
 	"colour=harbour": {"model": "nebulaecraft:color_harbour"},
-	"colour=estuary": {"model": "nebulaecraft:color_estuary"},
+	"colour=airport": {"model": "nebulaecraft:color_airport"},
 	"colour=metropolitan": {"model": "nebulaecraft:color_metropolitan"},
 	"colour=northern": {"model": "nebulaecraft:color_northern"},
 	"colour=trickle": {"model": "nebulaecraft:color_trickle"},

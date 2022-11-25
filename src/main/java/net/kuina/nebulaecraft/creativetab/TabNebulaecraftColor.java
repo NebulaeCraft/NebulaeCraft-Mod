@@ -22,14 +22,14 @@ public class TabNebulaecraftColor extends ElementsNebulaecraftMod.ModElement {
 			@SideOnly(Side.CLIENT)
 			@Override
 			public ItemStack getTabIconItem() {
-				return new ItemStack(BlockColor1.block, 1);
+				return new ItemStack(BlockColor1.block, (int) (1));
 			}
 
 			@SideOnly(Side.CLIENT)
 			public boolean hasSearchBar() {
-				return false;
+				return true;
 			}
-		};
+		}.setBackgroundImageName("item_search.png");
 	}
 	public static CreativeTabs tab;
 }

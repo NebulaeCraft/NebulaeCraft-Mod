@@ -8,8 +8,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
 import net.minecraft.world.World;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
+import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.Rotation;
 import net.minecraft.util.Mirror;
@@ -18,7 +18,6 @@ import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.Item;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.properties.PropertyDirection;
@@ -28,19 +27,20 @@ import net.minecraft.block.SoundType;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.Block;
 
+import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockDeviceAppleIphone extends ElementsNebulaecraftMod.ModElement {
-	@GameRegistry.ObjectHolder("nebulaecraft:device_apple_iphone")
+public class BlockCatenarySteelSeparation extends ElementsNebulaecraftMod.ModElement {
+	@GameRegistry.ObjectHolder("nebulaecraft:catenary_steel_separation")
 	public static final Block block = null;
-	public BlockDeviceAppleIphone(ElementsNebulaecraftMod instance) {
-		super(instance, 103);
+	public BlockCatenarySteelSeparation(ElementsNebulaecraftMod instance) {
+		super(instance, 99);
 	}
 
 	@Override
 	public void initElements() {
-		elements.blocks.add(() -> new BlockCustom().setRegistryName("device_apple_iphone"));
+		elements.blocks.add(() -> new BlockCustom().setRegistryName("catenary_steel_separation"));
 		elements.items.add(() -> new ItemBlock(block).setRegistryName(block.getRegistryName()));
 	}
 
@@ -48,19 +48,19 @@ public class BlockDeviceAppleIphone extends ElementsNebulaecraftMod.ModElement {
 	@Override
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0,
-				new ModelResourceLocation("nebulaecraft:device_apple_iphone", "inventory"));
+				new ModelResourceLocation("nebulaecraft:catenary_steel_separation", "inventory"));
 	}
 	public static class BlockCustom extends Block {
 		public static final PropertyDirection FACING = BlockHorizontal.FACING;
 		public BlockCustom() {
 			super(Material.IRON);
-			setUnlocalizedName("device_apple_iphone");
+			setUnlocalizedName("catenary_steel_separation");
 			setSoundType(SoundType.METAL);
 			setHardness(1F);
 			setResistance(10F);
-			setLightLevel(0.25F);
+			setLightLevel(0F);
 			setLightOpacity(0);
-			setCreativeTab(CreativeTabs.DECORATIONS);
+			setCreativeTab(TabNebulaecraftMetro.tab);
 			this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		}
 
@@ -76,13 +76,18 @@ public class BlockDeviceAppleIphone extends ElementsNebulaecraftMod.ModElement {
 		}
 
 		@Override
-		public boolean isOpaqueCube(IBlockState state) {
-			return false;
-		}
-
-		@Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			return new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.75, 0.75);
+			switch (state.getValue(BlockHorizontal.FACING)) {
+				case SOUTH :
+				default :
+					return new AxisAlignedBB(0.4375, 0, 0, 0.8125, 0.2, 1);
+				case NORTH :
+					return new AxisAlignedBB(0.1875, 0, 0, 0.5625, 0.2, 1);
+				case EAST :
+					return new AxisAlignedBB(0, 0, 0.1875, 1, 0.2, 0.5625);
+				case WEST :
+					return new AxisAlignedBB(0, 0, 0.4375, 1, 0.2, 0.8125);
+			}
 		}
 
 		@Override
@@ -114,6 +119,11 @@ public class BlockDeviceAppleIphone extends ElementsNebulaecraftMod.ModElement {
 		public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta,
 				EntityLivingBase placer) {
 			return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite());
+		}
+
+		@Override
+		public boolean isOpaqueCube(IBlockState state) {
+			return false;
 		}
 	}
 }
