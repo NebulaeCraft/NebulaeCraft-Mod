@@ -97,52 +97,52 @@ public class BlockSignpoleVertical extends ElementsNebulaecraftMod.ModElement {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.4375, 0, 0.875, 0.5625, 1, 1);
+                        return new AxisAlignedBB(0.35, 0, 0.725, 0.65, 1, 1.025);
                     case NORTH:
-                        return new AxisAlignedBB(0.4375, 0, 0, 0.5625, 1, 0.125);
+                        return new AxisAlignedBB(0.35, 0, -0.025, 0.65, 1, 0.275);
                     case EAST:
-                        return new AxisAlignedBB(0.875, 0, 0.4375, 1, 1, 0.5625);
+                        return new AxisAlignedBB(0.725, 0, 0.35, 1.025, 1, 0.65);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0.4375, 0.125, 1, 0.5625);
+                        return new AxisAlignedBB(-0.025, 0, 0.35, 0.275, 1, 0.65);
 
                 }
             } else if (state.getValue(SUBTYPE).getMetadata() == 1) {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.4375, 0, 0.875, 0.5625, 0.5, 1);
+                        return new AxisAlignedBB(0.35, 0, 0.725, 0.65, 0.5, 1.025);
                     case NORTH:
-                        return new AxisAlignedBB(0.4375, 0, 0, 0.5625, 0.5, 0.125);
+                        return new AxisAlignedBB(0.35, 0, -0.025, 0.65, 0.5, 0.275);
                     case EAST:
-                        return new AxisAlignedBB(0.875, 0, 0.4375, 1, 0.5, 0.5625);
+                        return new AxisAlignedBB(0.725, 0, 0.35, 1.025, 0.5, 0.65);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0.4375, 0.125, 0.5, 0.5625);
+                        return new AxisAlignedBB(-0.025, 0, 0.35, 0.275, 0.5, 0.65);
 
                 }
             } else if (state.getValue(SUBTYPE).getMetadata() == 2) {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.4375, 0, 0.875, 1, 1.3125, 1);
+                        return new AxisAlignedBB(0.35, 0, 0.725, 1, 1.3125, 1.025);
                     case NORTH:
-                        return new AxisAlignedBB(0, 0, 0, 0.5625, 1.3125, 0.125);
+                        return new AxisAlignedBB(0, 0, -0.025, 0.65, 1.3125, 0.275);
                     case EAST:
-                        return new AxisAlignedBB(0.875, 0, 0, 1, 1.3125, 0.5625);
+                        return new AxisAlignedBB(0.725, 0, 0, 1.025, 1.3125, 0.65);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0.4375, 0.125, 1.3125, 1);
+                        return new AxisAlignedBB(-0.025, 0, 0.35, 0.275, 1.3125, 1);
 
                 }
             } else {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0, 0, 0.875, 0.5625, 1.3125, 1);
+                        return new AxisAlignedBB(0, 0, 0.725, 0.65, 1.3125, 1.025);
                     case NORTH:
-                        return new AxisAlignedBB(0.4375, 0, 0, 1, 1.3125, 0.125);
+                        return new AxisAlignedBB(0.35, 0, -0.025, 1, 1.3125, 0.275);
                     case EAST:
-                        return new AxisAlignedBB(0.875, 0, 0.4375, 1, 1.3125, 1);
+                        return new AxisAlignedBB(0.725, 0, 0.35, 1.025, 1.3125, 1);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0, 0.125, 1.3125, 0.5625);
+                        return new AxisAlignedBB(-0.025, 0, 0, 0.275, 1.3125, 0.65);
 
                 }
             }
@@ -183,12 +183,8 @@ public class BlockSignpoleVertical extends ElementsNebulaecraftMod.ModElement {
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
             BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
-
-            if (facing == EnumFacing.UP || facing == EnumFacing.DOWN)
-                return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
-
             System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
-            return this.getDefaultState().withProperty(FACING, facing).withProperty(SUBTYPE, subtype);
+            return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
 
         public enum EnumType implements IStringSerializable {

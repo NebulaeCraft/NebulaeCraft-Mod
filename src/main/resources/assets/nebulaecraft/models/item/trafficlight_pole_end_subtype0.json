@@ -1,0 +1,41 @@
+{
+  "parent": "nebulaecraft:block/trafficlight_pole_right_end1",
+  "display": {
+	"thirdperson_righthand": {
+		"translation": [0, 3, -3],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"thirdperson_lefthand": {
+		"translation": [0, 3, -3],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"firstperson_righthand": {
+		"rotation": [0, -30, 0],
+		"translation": [0, 3, 0],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"firstperson_lefthand": {
+		"rotation": [0, -30, 0],
+		"translation": [0, 3, 0],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"ground": {
+		"translation": [0, 2, -1.75],
+		"scale": [0.25, 0.25, 0.25]
+	},
+	"gui": {
+		"rotation": [30, 30, 0],
+		"translation": [-1.5, 3, 0],
+		"scale": [0.8, 0.8, 0.8]
+	},
+	"head": {
+		"rotation": [0, 180, 0],
+		"translation": [0, 10.25, 0],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"fixed": {
+		"rotation": [0, 180, 0],
+		"translation": [0, 0, 7.75]
+	}
+}
+}

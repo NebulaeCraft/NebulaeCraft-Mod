@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:device_ms_surface","y": 270},
+	"facing=south": { "model": "nebulaecraft:device_ms_surface"},
+	"facing=west":  { "model": "nebulaecraft:device_ms_surface","y": 90},
+	"facing=north":  { "model": "nebulaecraft:device_ms_surface","y": 180}
+  }
+}

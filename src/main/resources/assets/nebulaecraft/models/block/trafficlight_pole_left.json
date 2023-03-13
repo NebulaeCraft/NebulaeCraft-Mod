@@ -1,0 +1,35 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "nebulaecraft:blocks/roadsign_back_5",
+		"particle": "nebulaecraft:blocks/platform_edge"
+	},
+	"elements": [
+		{
+			"from": [0, 7, 13.5],
+			"to": [5.825, 9, 15.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [32, 0, 1.5]},
+			"faces": {
+				"north": {"uv": [5, 0, 0, 2], "texture": "#1"},
+				"east": {"uv": [2, 0, 0, 2], "texture": "#1"},
+				"south": {"uv": [5, 0, 0, 2], "texture": "#1"},
+				"west": {"uv": [2, 0, 0, 2], "texture": "#1"},
+				"up": {"uv": [5, 0, 0, 2], "texture": "#1"},
+				"down": {"uv": [5, 0, 0, 2], "texture": "#1"}
+			}
+		},
+		{
+			"from": [4.375, -3.7, 13.5],
+			"to": [22.775, -1.7, 15.5],
+			"rotation": {"angle": -22.5, "axis": "z", "origin": [32, 0, 1.5]},
+			"faces": {
+				"north": {"uv": [13.625, 0, 0, 2], "texture": "#1"},
+				"east": {"uv": [2, 0, 0, 2], "texture": "#1"},
+				"south": {"uv": [13.625, 0, 0, 2], "texture": "#1"},
+				"west": {"uv": [2, 0, 0, 2], "texture": "#1"},
+				"up": {"uv": [13.625, 0, 0, 2], "texture": "#1"},
+				"down": {"uv": [13.625, 0, 0, 2], "texture": "#1"}
+			}
+		}
+	]
+}

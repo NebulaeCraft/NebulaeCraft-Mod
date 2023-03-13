@@ -80,13 +80,13 @@ public class BlockStreetlight extends ElementsNebulaecraftMod.ModElement {
 			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
-					return new AxisAlignedBB(0.4375, 0, -0.375, 0.5625, 1.375, 1.5625);
+					return new AxisAlignedBB(0.35, 0, -0.375, 0.65, 1.375, 1.5625);
 				case NORTH :
-					return new AxisAlignedBB(0.4375, 0, -0.5625, 0.5625, 1.375, 1.375);
+					return new AxisAlignedBB(0.35, 0, -0.5625, 0.65, 1.375, 1.375);
 				case EAST :
-					return new AxisAlignedBB(-0.375, 0, 0.4375, 1.5625, 1.375, 0.5625);
+					return new AxisAlignedBB(-0.375, 0, 0.35, 1.5625, 1.375, 0.65);
 				case WEST :
-					return new AxisAlignedBB(-0.5625, 0, 0.4375, 1.375, 1.375, 0.5625);
+					return new AxisAlignedBB(-0.5625, 0, 0.35, 1.375, 1.375, 0.65);
 			}
 		}
 

@@ -99,13 +99,13 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
-						return new AxisAlignedBB(0, 0.125, 0.875, 1, 1.1875, 1);
+						return new AxisAlignedBB(0, 0.125, 0.75, 1, 1.1875, 0);
 					case NORTH :
-						return new AxisAlignedBB(0, 0.125, 0, 1, 1.1875, 0.125);
+						return new AxisAlignedBB(0, 0.125, 0, 1, 1.1875, 0.25);
 					case EAST :
-						return new AxisAlignedBB(0.875, 0.125, 0, 1, 1.1875, 1);
+						return new AxisAlignedBB(0.75, 0.125, 0, 1, 1.1875, 1);
 					case WEST :
-						return new AxisAlignedBB(0, 0.125, 0, 0.125, 1.1875, 1);
+						return new AxisAlignedBB(0, 0.125, 0, 0.25, 1.1875, 1);
 
                 }
             }
@@ -113,13 +113,13 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
-						return new AxisAlignedBB(0, 0, 0.875, 1, 1.3125, 1);
+						return new AxisAlignedBB(0, 0, 0.725, 1, 1.3125, 1.025);
 					case NORTH :
-						return new AxisAlignedBB(0, 0, 0, 1, 1.3125, 0.125);
+						return new AxisAlignedBB(0, 0, -0.025, 1, 1.3125, 0.275);
 					case EAST :
-						return new AxisAlignedBB(0.875, 0, 0, 1, 1.3125, 1);
+						return new AxisAlignedBB(0.725, 0, 0, 1.025, 1.3125, 1);
 					case WEST :
-						return new AxisAlignedBB(0, 0, 0, 0.125, 1.3125, 1);
+						return new AxisAlignedBB(-0.025, 0, 0, 0.275, 1.3125, 1);
 
                 }
             }
@@ -159,12 +159,8 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
             BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
-
-            if (facing == EnumFacing.UP || facing == EnumFacing.DOWN)
-                return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
-
             System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
-            return this.getDefaultState().withProperty(FACING, facing).withProperty(SUBTYPE, subtype);
+            return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
 
         public enum EnumType implements IStringSerializable {

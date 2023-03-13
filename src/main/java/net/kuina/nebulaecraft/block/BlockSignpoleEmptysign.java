@@ -80,13 +80,13 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
 			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
-					return new AxisAlignedBB(-0.375, 0, 0, 1.375, 1.3125, 0.1);
+					return new AxisAlignedBB(-0.375, 0, -0.1, 1.375, 1.3125, 0.1);
 				case NORTH :
-					return new AxisAlignedBB(-0.375, 0, 0.9, 1.375, 1.3125, 1);
+					return new AxisAlignedBB(-0.375, 0, 0.9, 1.375, 1.3125, 1.1);
 				case EAST :
-					return new AxisAlignedBB(0, 0, -0.375, 0.1, 1.3125, 1.375);
+					return new AxisAlignedBB(-0.1, 0, -0.375, 0.1, 1.3125, 1.375);
 				case WEST :
-					return new AxisAlignedBB(0.9, 0, -0.375, 1, 1.3125, 1.375);
+					return new AxisAlignedBB(0.9, 0, -0.375, 1.1, 1.3125, 1.375);
 			}
 		}
 

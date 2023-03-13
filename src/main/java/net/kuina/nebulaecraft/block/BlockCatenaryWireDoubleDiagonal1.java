@@ -80,13 +80,13 @@ public class BlockCatenaryWireDoubleDiagonal1 extends ElementsNebulaecraftMod.Mo
 			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
-					return new AxisAlignedBB(0.4375, 0, 0, 1, 0.6875, 1);
+					return new AxisAlignedBB(0.375, 0, 0, 1, 0.6875, 1);
 				case NORTH :
-					return new AxisAlignedBB(0, 0, 0, 0.5625, 0.6875, 1);
+					return new AxisAlignedBB(0, 0, 0, 0.625, 0.6875, 1);
 				case EAST :
-					return new AxisAlignedBB(0, 0, 0, 1, 0.6875, 0.5625);
+					return new AxisAlignedBB(0, 0, 0, 1, 0.6875, 0.625);
 				case WEST :
-					return new AxisAlignedBB(0, 0, 0.4375, 1, 0.6875, 1);
+					return new AxisAlignedBB(0, 0, 0.375, 1, 0.6875, 1);
 			}
 		}
 
