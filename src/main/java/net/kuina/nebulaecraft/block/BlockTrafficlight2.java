@@ -33,7 +33,7 @@ public class BlockTrafficlight2 extends ElementsNebulaecraftMod.ModElement {
     public static final Block block = null;
 
     public BlockTrafficlight2(ElementsNebulaecraftMod instance) {
-        super(instance, 29);
+        super(instance, 33);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class BlockTrafficlight2 extends ElementsNebulaecraftMod.ModElement {
             setSoundType(SoundType.METAL);
             setHardness(1F);
             setResistance(10F);
-            setLightLevel(0F);
+            setLightLevel(0.5F);
             setLightOpacity(0);
             setCreativeTab(TabNebulaecraftRoad.tab);
             this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));

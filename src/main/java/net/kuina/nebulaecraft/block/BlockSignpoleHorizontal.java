@@ -99,13 +99,13 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
-						return new AxisAlignedBB(0, 0.125, 0.75, 1, 1.1875, 0);
+						return new AxisAlignedBB(0, 0.125, 0.84375, 1, 1.1875, 0.96875);
 					case NORTH :
-						return new AxisAlignedBB(0, 0.125, 0, 1, 1.1875, 0.25);
+						return new AxisAlignedBB(0, 0.125, 0.03125, 1, 1.1875, 0.15625);
 					case EAST :
-						return new AxisAlignedBB(0.75, 0.125, 0, 1, 1.1875, 1);
+						return new AxisAlignedBB(0.84375, 0.125, 0, 0.96875, 1.1875, 1);
 					case WEST :
-						return new AxisAlignedBB(0, 0.125, 0, 0.25, 1.1875, 1);
+						return new AxisAlignedBB(0.03125, 0.125, 0, 0.15625, 1.1875, 1);
 
                 }
             }
@@ -113,13 +113,13 @@ public class BlockSignpoleHorizontal extends ElementsNebulaecraftMod.ModElement 
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
-						return new AxisAlignedBB(0, 0, 0.725, 1, 1.3125, 1.025);
+						return new AxisAlignedBB(0, 0, 0.75, 1, 1.3125, 1.0625);
 					case NORTH :
-						return new AxisAlignedBB(0, 0, -0.025, 1, 1.3125, 0.275);
+						return new AxisAlignedBB(0, 0, -0.0625, 1, 1.3125, 0.25);
 					case EAST :
-						return new AxisAlignedBB(0.725, 0, 0, 1.025, 1.3125, 1);
+						return new AxisAlignedBB(0.75, 0, 0, 1.0625, 1.3125, 1);
 					case WEST :
-						return new AxisAlignedBB(-0.025, 0, 0, 0.275, 1.3125, 1);
+						return new AxisAlignedBB(-0.0625, 0, 0, 0.25, 1.3125, 1);
 
                 }
             }

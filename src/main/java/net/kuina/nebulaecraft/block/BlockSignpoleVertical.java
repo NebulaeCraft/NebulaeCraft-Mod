@@ -97,52 +97,52 @@ public class BlockSignpoleVertical extends ElementsNebulaecraftMod.ModElement {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.35, 0, 0.725, 0.65, 1, 1.025);
+                        return new AxisAlignedBB(0.34375, 0, 0.75, 0.65625, 1, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0.35, 0, -0.025, 0.65, 1, 0.275);
+                        return new AxisAlignedBB(0.34375, 0, 0, 0.65625, 1, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.725, 0, 0.35, 1.025, 1, 0.65);
+                        return new AxisAlignedBB(0.75, 0, 0.34375, 1, 1, 0.65625);
                     case WEST:
-                        return new AxisAlignedBB(-0.025, 0, 0.35, 0.275, 1, 0.65);
+                        return new AxisAlignedBB(0, 0, 0.34375, 0.25, 1, 0.65625);
 
                 }
             } else if (state.getValue(SUBTYPE).getMetadata() == 1) {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.35, 0, 0.725, 0.65, 0.5, 1.025);
+                        return new AxisAlignedBB(0.34375, 0, 0.75, 0.65625, 0.5, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0.35, 0, -0.025, 0.65, 0.5, 0.275);
+                        return new AxisAlignedBB(0.34375, 0, 0, 0.65625, 0.5, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.725, 0, 0.35, 1.025, 0.5, 0.65);
+                        return new AxisAlignedBB(0.75, 0, 0.34375, 1, 0.5, 0.65625);
                     case WEST:
-                        return new AxisAlignedBB(-0.025, 0, 0.35, 0.275, 0.5, 0.65);
+                        return new AxisAlignedBB(0, 0, 0.34375, 0.25, 0.5, 0.65625);
 
                 }
             } else if (state.getValue(SUBTYPE).getMetadata() == 2) {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.35, 0, 0.725, 1, 1.3125, 1.025);
+                        return new AxisAlignedBB(0.25, 0, 0.75, 1, 1.3125, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0, 0, -0.025, 0.65, 1.3125, 0.275);
+                        return new AxisAlignedBB(0, 0, 0, 0.75, 1.3125, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.725, 0, 0, 1.025, 1.3125, 0.65);
+                        return new AxisAlignedBB(0.75, 0, 0, 1 1.3125, 0.75);
                     case WEST:
-                        return new AxisAlignedBB(-0.025, 0, 0.35, 0.275, 1.3125, 1);
+                        return new AxisAlignedBB(0, 0, 0.25, 0.25, 1.3125, 1);
 
                 }
             } else {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0, 0, 0.725, 0.65, 1.3125, 1.025);
+                        return new AxisAlignedBB(0, 0, 0.75, 0.75, 1.3125, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0.35, 0, -0.025, 1, 1.3125, 0.275);
+                        return new AxisAlignedBB(0.25, 0, 0, 1, 1.3125, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.725, 0, 0.35, 1.025, 1.3125, 1);
+                        return new AxisAlignedBB(0.75, 0, 0.25, 1, 1.3125, 1);
                     case WEST:
-                        return new AxisAlignedBB(-0.025, 0, 0, 0.275, 1.3125, 0.65);
+                        return new AxisAlignedBB(0, 0, 0, 0.25, 1.3125, 0.75);
 
                 }
             }
