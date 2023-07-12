@@ -33,7 +33,7 @@ public class BlockTrafficlight3 extends ElementsNebulaecraftMod.ModElement {
     public static final Block block = null;
 
     public BlockTrafficlight3(ElementsNebulaecraftMod instance) {
-        super(instance, 33);
+        super(instance, 34);
     }
 
     @Override

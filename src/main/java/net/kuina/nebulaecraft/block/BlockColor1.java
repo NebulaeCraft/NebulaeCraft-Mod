@@ -138,7 +138,8 @@ public class BlockColor1 extends ElementsNebulaecraftMod.ModElement {
 			TRICKLE(7, "trickle"),
 			DISTRICT(8, "district"),
 			SEASHORE(9, "seashore"),
-			VALLEY(10, "valley");
+			VALLEY(10, "valley"),
+			LOUGH(11, "lough");
 
 			public int getMetadata()
 			{

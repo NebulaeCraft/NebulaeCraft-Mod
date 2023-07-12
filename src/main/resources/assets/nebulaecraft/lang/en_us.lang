@@ -303,6 +303,7 @@ tile.catenary_steel_separation.name=Catenary Steel Separation
 tile.asphalt_yellow_line_small_diagonal.subtype1.name=Asphalt
 tile.roadmark_busonly.subtype0.name=Road Mark
 tile.catenary_wire_pole_regular.name=Catenary Wire Pole
+tile.color_1.lough.name=Lough Line
 tile.roadsign_5.name=Roadsign
 tile.screen_door_10.name=Low Screen Door-Right
 tile.roadsign_45.name=Roadsign

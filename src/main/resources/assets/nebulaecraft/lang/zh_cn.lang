@@ -303,6 +303,7 @@ tile.catenary_steel_separation.name=刚性接触网分相转换
 tile.asphalt_yellow_line_small_diagonal.subtype1.name=路口黄虚线斜线
 tile.roadmark_busonly.subtype0.name=路标：公
 tile.catenary_wire_pole_regular.name=接触网杆
+tile.color_1.lough.name=上屿线
 tile.roadsign_5.name=禁令：禁止大型客车通行
 tile.screen_door_10.name=电动栏杆门-右半
 tile.roadsign_45.name=警告：反向弯路
