@@ -1,8 +1,12 @@
 {
   "variants": {
-	"facing=east": { "model": "nebulaecraft:signpole_emptysign","y": 270},
-	"facing=south": { "model": "nebulaecraft:signpole_emptysign"},
-	"facing=west":  { "model": "nebulaecraft:signpole_emptysign","y": 90},
-	"facing=north":  { "model": "nebulaecraft:signpole_emptysign","y": 180}
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:signpole_emptysign","y": 270},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:signpole_emptysign"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:signpole_emptysign","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:signpole_emptysign","y": 180},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:signpole_emptysign_s","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:signpole_emptysign_s"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:signpole_emptysign_s","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:signpole_emptysign_s","y": 180}
   }
 }

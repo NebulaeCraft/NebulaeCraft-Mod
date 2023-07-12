@@ -28,26 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:signpole_emptysign")
+public class BlockRoadsign87 extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:roadsign_87")
     public static final Block block = null;
 
-    public BlockSignpoleEmptysign(ElementsNebulaecraftMod instance) {
-        super(instance, 32);
+    public BlockRoadsign87(ElementsNebulaecraftMod instance) {
+        super(instance, 35);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("signpole_emptysign"));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("roadsign_87"));
         elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockSignpoleEmptysign.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign.BlockCustom.EnumType.values();
-        for (BlockSignpoleEmptysign.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:signpole_emptysign_" + subtype.getName(), "inventory"));
+        BlockRoadsign87.BlockCustom.EnumType[] allSubtypes = BlockRoadsign87.BlockCustom.EnumType.values();
+        for (BlockRoadsign87.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:roadsign_87_" + subtype.getName(), "inventory"));
         }
     }
 
@@ -57,8 +57,8 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
 
         public BlockCustom() {
             super(Material.IRON);
-            setUnlocalizedName("signpole_emptysign");
-            setSoundType(SoundType.METAL);
+			setSoundType(SoundType.METAL);
+			setUnlocalizedName("roadsign_87");
 			setHardness(1F);
 			setResistance(10F);
 			setLightLevel(0F);
@@ -68,10 +68,16 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
         }
 
         @Override
+        @javax.annotation.Nullable
+        public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
+            return NULL_AABB;
+        }
+
+        @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockSignpoleEmptysign.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign.BlockCustom.EnumType.values();
-            for (BlockSignpoleEmptysign.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockRoadsign87.BlockCustom.EnumType[] allSubtypes = BlockRoadsign87.BlockCustom.EnumType.values();
+            for (BlockRoadsign87.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
@@ -93,34 +99,17 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
 
         @Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			if(state.getValue(SUBTYPE).getMetadata()==0){
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(-0.375, 0, -0.1, 1.375, 1.3125, 0.1);
-					case NORTH :
-						return new AxisAlignedBB(-0.375, 0, 0.9, 1.375, 1.3125, 1.1);
-					case EAST :
-						return new AxisAlignedBB(-0.1, 0, -0.375, 0.1, 1.3125, 1.375);
-					case WEST :
-						return new AxisAlignedBB(0.9, 0, -0.375, 1.1, 1.3125, 1.375);
-
-                }
-            }
-            else{
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 0.15);
-					case NORTH :
-						return new AxisAlignedBB(0.25, 0, 0.85, 0.75, 1, 1);
-					case EAST :
-						return new AxisAlignedBB(0, 0, 0.25, 0.15, 1, 0.75);
-					case WEST :
-						return new AxisAlignedBB(0.85, 0, 0.25, 1, 1, 0.75);
-
-                }
-            }
+			switch (state.getValue(BlockHorizontal.FACING)) {
+				case SOUTH :
+				default :
+					return new AxisAlignedBB(0.5, 0, 0, 1, 1, 0.15);
+				case NORTH :
+					return new AxisAlignedBB(0, 0, 0.85, 0.5, 1, 1);
+				case EAST :
+					return new AxisAlignedBB(0, 0, 0, 0.15, 1, 0.5);
+				case WEST :
+					return new AxisAlignedBB(0.85, 0, 0.5, 1, 1, 1);
+			}
 		}
 
         @Override
@@ -165,10 +154,10 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1");
 
-            private static final BlockSignpoleEmptysign.BlockCustom.EnumType[] META_LOOKUP = new BlockSignpoleEmptysign.BlockCustom.EnumType[values().length];
+            private static final BlockRoadsign87.BlockCustom.EnumType[] META_LOOKUP = new BlockRoadsign87.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockSignpoleEmptysign.BlockCustom.EnumType type : values()) {
+                for (BlockRoadsign87.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -181,7 +170,7 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
                 this.name = i_name;
             }
 
-            public static BlockSignpoleEmptysign.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockRoadsign87.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }
