@@ -5,6 +5,7 @@
 		"2": "nebulaecraft:blocks/device_ms_surfaceblack",
 		"4": "nebulaecraft:blocks/signal_white",
 		"5": "nebulaecraft:blocks/signal_green",
+		"7": "nebulaecraft:blocks/roadsign_back_5",
 		"particle": "nebulaecraft:blocks/signal"
 	},
 	"elements": [
@@ -1255,6 +1256,42 @@
 				"up": {"uv": [0, 0.7, 1.075, 1.4], "texture": "#2"},
 				"down": {"uv": [0, 0.7, 1.075, 1.4], "texture": "#2"}
 			}
+		},
+		{
+			"from": [7.5, 0, 0],
+			"to": [8.5, 0.5, 1],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"east": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"south": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"west": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"up": {"uv": [0, 0, 1, 1], "texture": "#7"},
+				"down": {"uv": [0, 0, 1, 1], "texture": "#7"}
+			}
+		},
+		{
+			"from": [7.5, 15.5, 0],
+			"to": [8.5, 16, 1],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"east": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"south": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"west": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"up": {"uv": [0, 0, 1, 1], "texture": "#7"},
+				"down": {"uv": [0, 0, 1, 1], "texture": "#7"}
+			}
+		},
+		{
+			"from": [7.5, 0, -0.5],
+			"to": [8.5, 16, 0],
+			"faces": {
+				"north": {"uv": [0, 0, 1, 16], "texture": "#7"},
+				"east": {"uv": [0, 0, 0.5, 16], "texture": "#7"},
+				"south": {"uv": [0, 0, 1, 16], "texture": "#7"},
+				"west": {"uv": [0, 0, 0.5, 16], "texture": "#7"},
+				"up": {"uv": [0, 0, 1, 0.5], "texture": "#7"},
+				"down": {"uv": [0, 0, 1, 0.5], "texture": "#7"}
+			}
 		}
 	],
 	"groups": [
@@ -1313,6 +1350,9 @@
 			"origin": [0, -0.05, 0],
 			"color": 0,
 			"children": [83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95]
-		}
+		},
+		96,
+		97,
+		98
 	]
 }

@@ -127,7 +127,7 @@ public class BlockSignpoleVertical extends ElementsNebulaecraftMod.ModElement {
                     case NORTH:
                         return new AxisAlignedBB(0, 0, 0, 0.75, 1.3125, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.75, 0, 0, 1 1.3125, 0.75);
+                        return new AxisAlignedBB(0.75, 0, 0, 1, 1.3125, 0.75);
                     case WEST:
                         return new AxisAlignedBB(0, 0, 0.25, 0.25, 1.3125, 1);
 
@@ -183,7 +183,6 @@ public class BlockSignpoleVertical extends ElementsNebulaecraftMod.ModElement {
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
             BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
-            System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
             return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
 

@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/trafficlight_pole_right_end1",
+  "parent": "nebulaecraft:block/trafficlight_pole_end_right",
   "display": {
 	"thirdperson_righthand": {
 		"translation": [0, 3, -3],

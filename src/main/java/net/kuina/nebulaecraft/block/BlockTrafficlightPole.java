@@ -97,13 +97,13 @@ public class BlockTrafficlightPole extends ElementsNebulaecraftMod.ModElement {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0, 0.375, 0.75, 1, 0.625, 1.0625);
+                        return new AxisAlignedBB(0, 0.375, 0.75, 1, 0.625, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0, 0.375, -0.0625, 1, 0.625, 0.25);
+                        return new AxisAlignedBB(0, 0.375, 0, 1, 0.625, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.75, 0.375, 0, 1.0625, 0.625, 1);
+                        return new AxisAlignedBB(0.75, 0.375, 0, 1, 0.625, 1);
                     case WEST:
-                        return new AxisAlignedBB(-0.0625, 0.375, 0, 0.25, 0.625, 1);
+                        return new AxisAlignedBB(0, 0.375, 0, 0.25, 0.625, 1);
 
                 }
             } else if (state.getValue(SUBTYPE).getMetadata() == 1) {
@@ -170,7 +170,6 @@ public class BlockTrafficlightPole extends ElementsNebulaecraftMod.ModElement {
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
             BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
-            System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
             return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
 

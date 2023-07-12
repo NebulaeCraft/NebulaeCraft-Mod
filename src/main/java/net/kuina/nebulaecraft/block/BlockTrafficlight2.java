@@ -141,7 +141,6 @@ public class BlockTrafficlight2 extends ElementsNebulaecraftMod.ModElement {
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
             BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
-            System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
             return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
 

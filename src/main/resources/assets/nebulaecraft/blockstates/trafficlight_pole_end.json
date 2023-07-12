@@ -1,20 +1,12 @@
 {
   "variants": {
-	"facing=east,subtype=subtype0": { "model": "nebulaecraft:trafficlight_pole_right_end1","y": 270},
-	"facing=south,subtype=subtype0": { "model": "nebulaecraft:trafficlight_pole_right_end1"},
-	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_pole_right_end1","y": 90},
-	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_pole_right_end1","y": 180},
-	"facing=east,subtype=subtype1": { "model": "nebulaecraft:trafficlight_pole_right_end2","y": 270},
-	"facing=south,subtype=subtype1": { "model": "nebulaecraft:trafficlight_pole_right_end2"},
-	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:trafficlight_pole_right_end2","y": 90},
-	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:trafficlight_pole_right_end2","y": 180},
-	"facing=east,subtype=subtype2": { "model": "nebulaecraft:trafficlight_pole_left_end1","y": 270},
-	"facing=south,subtype=subtype2": { "model": "nebulaecraft:trafficlight_pole_left_end1"},
-	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:trafficlight_pole_left_end1","y": 90},
-	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:trafficlight_pole_left_end1","y": 180},
-	"facing=east,subtype=subtype3": { "model": "nebulaecraft:trafficlight_pole_left_end2","y": 270},
-	"facing=south,subtype=subtype3": { "model": "nebulaecraft:trafficlight_pole_left_end2"},
-	"facing=west,subtype=subtype3":  { "model": "nebulaecraft:trafficlight_pole_left_end2","y": 90},
-	"facing=north,subtype=subtype3":  { "model": "nebulaecraft:trafficlight_pole_left_end2","y": 180}
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:trafficlight_pole_end_right","y": 270},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:trafficlight_pole_end_right"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_pole_end_right","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_pole_end_right","y": 180},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:trafficlight_pole_end_left","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:trafficlight_pole_end_left"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:trafficlight_pole_end_left","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:trafficlight_pole_end_left","y": 180}
   }
 }

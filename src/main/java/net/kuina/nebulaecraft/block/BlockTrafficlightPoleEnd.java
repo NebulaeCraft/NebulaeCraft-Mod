@@ -39,7 +39,7 @@ public class BlockTrafficlightPoleEnd extends ElementsNebulaecraftMod.ModElement
     @Override
     public void initElements() {
         elements.blocks.add(() -> new BlockCustom().setRegistryName("trafficlight_pole_end"));
-        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
@@ -97,52 +97,26 @@ public class BlockTrafficlightPoleEnd extends ElementsNebulaecraftMod.ModElement
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0, 0, 0.75, 0.8125, 1, 1);
+                        return new AxisAlignedBB(0, 0.375, 0.75, 0.765625, 0.625, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0.1875, 0, 0, 1, 1, 0.25);
+                        return new AxisAlignedBB(0.234375, 0.375, 0, 1, 0.625, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.75, 0, 0.1875, 1, 1, 1);
+                        return new AxisAlignedBB(0.75, 0.375, 0.234375, 1, 0.625, 1);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0, 0.25, 1, 0.8125);
-
-                }
-            } else if (state.getValue(SUBTYPE).getMetadata() == 1) {
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH:
-                    default:
-                        return new AxisAlignedBB(0, 0, 0.75, 0.8125, 1, 1);
-                    case NORTH:
-                        return new AxisAlignedBB(0.1875, 0, 0, 1, 1, 0.25);
-                    case EAST:
-                        return new AxisAlignedBB(0.75, 0, 0.1875, 1, 1, 1);
-                    case WEST:
-                        return new AxisAlignedBB(0, 0, 0, 0.25, 1, 0.8125);
-
-                }
-            } else if (state.getValue(SUBTYPE).getMetadata() == 2) {
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH:
-                    default:
-                        return new AxisAlignedBB(0.1875, 0, 0.75, 1, 1, 1);
-                    case NORTH:
-                        return new AxisAlignedBB(0, 0, 0, 0.8125, 1, 0.25);
-                    case EAST:
-                        return new AxisAlignedBB(0.75, 0, 0, 1, 1, 0.8125);
-                    case WEST:
-                        return new AxisAlignedBB(0, 0, 0.1875, 0.25, 1, 1);
+                        return new AxisAlignedBB(0, 0.375, 0, 0.25, 0.625, 0.765625);
 
                 }
             } else {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.1875, 0, 0.75, 1, 1, 1);
+                        return new AxisAlignedBB(0.234375, 0.375, 0.75, 1, 0.625, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0, 0, 0, 0.8125, 1, 0.25);
+                        return new AxisAlignedBB(0, 0.375, 0, 0.765625, 0.625, 0.25);
                     case EAST:
-                        return new AxisAlignedBB(0.75, 0, 0, 1, 1, 0.8125);
+                        return new AxisAlignedBB(0.75, 0.375, 0, 1, 0.625, 0.765625);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0.1875, 0.25, 1, 1);
+                        return new AxisAlignedBB(0, 0.375, 0.234375, 0.25, 0.625, 1);
 
                 }
             }
@@ -183,15 +157,12 @@ public class BlockTrafficlightPoleEnd extends ElementsNebulaecraftMod.ModElement
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
             BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
-            System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
             return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
 
         public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),
-            SUBTYPE1(1, "subtype1"),
-            SUBTYPE2(2, "subtype2"),
-            SUBTYPE3(3, "subtype3");
+            SUBTYPE1(1, "subtype1");
 
             private static final BlockTrafficlightPoleEnd.BlockCustom.EnumType[] META_LOOKUP = new BlockTrafficlightPoleEnd.BlockCustom.EnumType[values().length];
 

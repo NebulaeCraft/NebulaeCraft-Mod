@@ -1,0 +1,22 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"1": "nebulaecraft:blocks/roadsign_back_5",
+		"particle": "nebulaecraft:blocks/platform_edge"
+	},
+	"elements": [
+		{
+			"from": [0, 7, 13.5],
+			"to": [12.25, 9, 15.5],
+			"rotation": {"angle": 0, "axis": "y", "origin": [-16, 0, 1]},
+			"faces": {
+				"north": {"uv": [3.75, 7, 16, 9], "texture": "#1"},
+				"east": {"uv": [0.5, 7, 2.5, 9], "texture": "#1"},
+				"south": {"uv": [0, 7, 12.25, 9], "texture": "#1"},
+				"west": {"uv": [13.5, 7, 15.5, 9], "texture": "#1"},
+				"up": {"uv": [0, 13.5, 12.25, 15.5], "texture": "#1"},
+				"down": {"uv": [0, 0.5, 12.25, 2.5], "texture": "#1"}
+			}
+		}
+	]
+}
