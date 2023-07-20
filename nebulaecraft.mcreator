@@ -1395,6 +1395,24 @@
       "locked_code": true,
       "ids": {},
       "registry_name": "trafficlight_ped"
+    },
+    {
+      "name": "Labelsign10",
+      "type": "block",
+      "sortid": 165,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {},
+      "registry_name": "labelsign_10"
+    },
+    {
+      "name": "Labelsign11",
+      "type": "block",
+      "sortid": 166,
+      "compiles": true,
+      "locked_code": true,
+      "ids": {},
+      "registry_name": "labelsign_11"
     }
   ],
   "variable_elements": [],
@@ -1475,6 +1493,7 @@
       "tile.trafficlight_1.subtype1.name": "Traffic Light",
       "tile.roadsign_29.name": "Roadsign",
       "tile.roadsign_34.name": "Roadsign",
+      "tile.labelsign_10.name": "Metro Label Sign",
       "tile.asphalt_bicycle_half_line_diagonal_right_slab.name": "Asphalt Slab",
       "tile.roadsign_14.name": "Roadsign",
       "tile.asphalt_bus_half_line_diagonal_right_slab.name": "Asphalt Slab",
@@ -1650,6 +1669,7 @@
       "tile.asphalt_yellow_line_lean_slab.name": "Asphalt Slab",
       "tile.roadsign_78.name": "Roadsign",
       "tile.roadsign_33.name": "Roadsign",
+      "tile.labelsign_11.name": "Metro Label Sign",
       "tile.catenary_steel_double_diagonal.subtype0.name": "Catenary Steel Fork Right",
       "tile.signal_3_off.name": "Signal Box",
       "tile.catenary_wire_pole_drcore.name": "Catenary Wire Pole",
@@ -1866,6 +1886,7 @@
       "tile.trafficlight_1.subtype1.name": "交通信号灯：直行绿色",
       "tile.roadsign_29.name": "禁令：限制速度60km/h",
       "tile.roadsign_34.name": "禁令：限制高度3m",
+      "tile.labelsign_10.name": "指示：列车停车位置",
       "tile.asphalt_bicycle_half_line_diagonal_right_slab.name": "右半非机动车道线台阶",
       "tile.roadsign_14.name": "禁令：禁止掉头",
       "tile.asphalt_bus_half_line_diagonal_right_slab.name": "右半公交专用道斜线台阶",
@@ -2042,6 +2063,7 @@
       "tile.asphalt_yellow_line_lean_slab.name": "双黄线虚线台阶",
       "tile.roadsign_78.name": "指示：步行",
       "tile.roadsign_33.name": "禁令：限制速度120km/h",
+      "tile.labelsign_11.name": "指示：动车组停车位置",
       "tile.catenary_steel_double_diagonal.subtype0.name": "刚性接触网向右分支",
       "tile.signal_3_off.name": "三灯信号机",
       "tile.catenary_wire_pole_drcore.name": "接触网杆",
