@@ -1,30 +1,32 @@
 
 package net.kuina.nebulaecraft.block;
 
-import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.*;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
@@ -33,6 +35,7 @@ import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 public class BlockAsphaltSlab extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_slab")
 	public static final Block block = null;
+	
 	public BlockAsphaltSlab(ElementsNebulaecraftMod instance) {
 		super(instance, 2);
 	}
@@ -40,18 +43,20 @@ public class BlockAsphaltSlab extends ElementsNebulaecraftMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.blocks.add(() -> new BlockCustom().setRegistryName("asphalt_slab"));
-		elements.items.add(() -> new ItemAsphaltSlab(block).setRegistryName(block.getRegistryName()));
+		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2"}).setRegistryName(block.getRegistryName()));
 	}
 
 	@SideOnly(Side.CLIENT)
-	@Override
 	public void registerModels(ModelRegistryEvent event) {
-		BlockCustom.EnumColour[] allColours = BlockCustom.EnumColour.values();
-		for (BlockCustom.EnumColour colour : allColours) {
-			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), colour.getMetadata(), new ModelResourceLocation("nebulaecraft:asphalt_slab_"+colour.getName(), "inventory"));
-		}
-	}
+        BlockAsphaltSlab.BlockCustom.EnumType[] allSubtypes = BlockAsphaltSlab.BlockCustom.EnumType.values();
+        for (BlockAsphaltSlab.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:asphalt_slab_" + subtype.getName(), "inventory"));
+        }
+    }
+	
 	public static class BlockCustom extends Block {
+		public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
+		
 		public BlockCustom() {
 			super(Material.ROCK);
 			setUnlocalizedName("asphalt_slab");
@@ -63,15 +68,18 @@ public class BlockAsphaltSlab extends ElementsNebulaecraftMod.ModElement {
 			setCreativeTab(TabNebulaecraftRoad.tab);
 		}
 
-		@SideOnly(Side.CLIENT)
+		@Override
+        @SideOnly(Side.CLIENT)
+        public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
+            BlockAsphaltSlab.BlockCustom.EnumType[] allSubtypes = BlockAsphaltSlab.BlockCustom.EnumType.values();
+            for (BlockAsphaltSlab.BlockCustom.EnumType subtype : allSubtypes) {
+                items.add(new ItemStack(this, 1, subtype.getMetadata()));
+            }
+        }
+
 		@Override
 		public BlockRenderLayer getBlockLayer() {
 			return BlockRenderLayer.CUTOUT_MIPPED;
-		}
-
-		@Override
-		public boolean isFullCube(IBlockState state) {
-			return false;
 		}
 
 		@Override
@@ -80,110 +88,84 @@ public class BlockAsphaltSlab extends ElementsNebulaecraftMod.ModElement {
 		}
 
 		@Override
+        public boolean isFullCube(IBlockState state) {
+            return false;
+        }
+
+        @Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 			return new AxisAlignedBB(0, 0, 0, 1, 0.5, 1);
 		}
 
-		public static final PropertyEnum PROPERTYCOLOUR = PropertyEnum.create("colour", BlockCustom.EnumColour.class);
-
-		@Override
-		public int damageDropped(IBlockState state)
-		{
-			BlockCustom.EnumColour enumColour = (BlockCustom.EnumColour)state.getValue(PROPERTYCOLOUR);
-			return enumColour.getMetadata();
+        @Override
+		protected net.minecraft.block.state.BlockStateContainer createBlockState(){
+			return new net.minecraft.block.state.BlockStateContainer(this, SUBTYPE);
 		}
 
 		@Override
-		@SideOnly(Side.CLIENT)
-		public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items)
-		{
-			BlockCustom.EnumColour[] allColours = BlockCustom.EnumColour.values();
-			for (BlockCustom.EnumColour colour : allColours) {
-				items.add(new ItemStack(this, 1, colour.getMetadata()));
-			}
-		}
+        public IBlockState getStateFromMeta(int meta) {
+            return this.getDefaultState().withProperty(SUBTYPE, EnumType.byMetadata(meta));
+        }
+
+        @Override
+        public int getMetaFromState(IBlockState state) {
+            int metadata=(state.getValue(SUBTYPE).getMetadata());
+            return metadata;
+        }
+
+        @Override
+        public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+            super.getPickBlock(state, target, world, pos, player);
+            return new ItemStack(this,1,getMetaFromState(state));
+        }
 
 		@Override
-		public IBlockState getStateFromMeta(int meta)
-		{
-			return this.getDefaultState().withProperty(PROPERTYCOLOUR, BlockCustom.EnumColour.byMetadata(meta));
-		}
+        public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+            BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
+            return this.getDefaultState().withProperty(SUBTYPE, subtype);
+        }
+        
+        public enum EnumType implements IStringSerializable {
+            SUBTYPE0(0, "subtype0"),
+            SUBTYPE1(1, "subtype1"),
+            SUBTYPE2(2, "subtype2");
 
-		@Override
-		public int getMetaFromState(IBlockState state)
-		{
-			BlockCustom.EnumColour colour = (BlockCustom.EnumColour)state.getValue(PROPERTYCOLOUR);
-			return colour.getMetadata();
-		}
+            private static final BlockAsphaltSlab.BlockCustom.EnumType[] META_LOOKUP = new BlockAsphaltSlab.BlockCustom.EnumType[values().length];
 
-		@Override
-		public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-		{
-			return state;
-		}
+            static {
+                for (BlockAsphaltSlab.BlockCustom.EnumType type : values()) {
+                    META_LOOKUP[type.getMetadata()] = type;
+                }
+            }
 
-		@Override
-		protected BlockStateContainer createBlockState()
-		{
-			return new BlockStateContainer(this, PROPERTYCOLOUR);
-		}
+            private final int meta;
+            private final String name;
 
-		@Override
-		public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
-		{
-			BlockCustom.EnumColour colour = BlockCustom.EnumColour.byMetadata(meta);
+            EnumType(int i_meta, String i_name) {
+                this.meta = i_meta;
+                this.name = i_name;
+            }
 
-			return this.getDefaultState().withProperty(PROPERTYCOLOUR, colour);
-		}
+            public static BlockAsphaltSlab.BlockCustom.EnumType byMetadata(int meta) {
+                if (meta < 0 || meta >= META_LOOKUP.length) {
+                    meta = 0;
+                }
 
-		public enum EnumColour implements IStringSerializable
-		{
-			BLACK(0, "black"),
-			RED(1, "red"),
-			GREEN(2, "green");
+                return META_LOOKUP[meta];
+            }
 
-			public int getMetadata()
-			{
-				return this.meta;
-			}
+            public int getMetadata() {
+                return this.meta;
+            }
 
-			@Override
-			public String toString()
-			{
-				return this.name;
-			}
+            @Override
+            public String toString() {
+                return this.name;
+            }
 
-			public static BlockCustom.EnumColour byMetadata(int meta)
-			{
-				if (meta < 0 || meta >= META_LOOKUP.length)
-				{
-					meta = 0;
-				}
-
-				return META_LOOKUP[meta];
-			}
-
-			public String getName()
-			{
-				return this.name;
-			}
-
-			private final int meta;
-			private final String name;
-			private static final BlockCustom.EnumColour[] META_LOOKUP = new BlockCustom.EnumColour[values().length];
-
-			EnumColour(int i_meta, String i_name)
-			{
-				this.meta = i_meta;
-				this.name = i_name;
-			}
-
-			static
-			{
-				for (BlockCustom.EnumColour colour : values()) {
-					META_LOOKUP[colour.getMetadata()] = colour;
-				}
-			}
-		}
+            public String getName() {
+                return this.name;
+            }
+        }
 	}
 }

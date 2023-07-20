@@ -1,7 +1,7 @@
 {
   "variants": {
-	"colour=black": {"model": "nebulaecraft:asphalt_black"},
-	"colour=red": {"model": "nebulaecraft:asphalt_red"},
-	"colour=green": {"model": "nebulaecraft:asphalt_green"}
+	"subtype=subtype0": {"model": "nebulaecraft:asphalt"},
+	"subtype=subtype1": {"model": "nebulaecraft:asphalt_bus"},
+	"subtype=subtype2": {"model": "nebulaecraft:asphalt_bike"}
   }
 }

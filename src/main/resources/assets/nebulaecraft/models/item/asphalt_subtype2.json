@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/asphalt_black",
+  "parent": "nebulaecraft:block/asphalt_bike",
   "display": {
         "gui": {
             "rotation": [ 30, 225, 0 ],

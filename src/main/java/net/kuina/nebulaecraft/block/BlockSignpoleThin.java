@@ -25,7 +25,7 @@ import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
-net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayer;
 
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftRoad;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;

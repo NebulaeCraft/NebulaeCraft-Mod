@@ -1,30 +1,32 @@
 
 package net.kuina.nebulaecraft.block;
 
-import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
-import net.minecraft.block.properties.IProperty;
-import net.minecraft.block.properties.PropertyEnum;
-import net.minecraft.block.state.BlockStateContainer;
-import net.minecraft.creativetab.CreativeTabs;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.*;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.relauncher.SideOnly;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 
-import net.minecraft.world.IBlockAccess;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.*;
+import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.math.AxisAlignedBB;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.Block;
+import net.minecraft.block.properties.PropertyEnum;
+import net.minecraft.block.state.IBlockState;
+import net.minecraft.world.IBlockAccess;
+import net.minecraft.world.World;
+import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.player.EntityPlayer;
 
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftColor;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
@@ -33,6 +35,7 @@ import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 public class BlockColor1 extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:color_1")
 	public static final Block block = null;
+	
 	public BlockColor1(ElementsNebulaecraftMod instance) {
 		super(instance, 91);
 	}
@@ -40,18 +43,20 @@ public class BlockColor1 extends ElementsNebulaecraftMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.blocks.add(() -> new BlockCustom().setRegistryName("color_1"));
-		elements.items.add(() -> new ItemColor1(block).setRegistryName(block.getRegistryName()));
+		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3", "subtype4", "subtype5", "subtype6", "subtype7", "subtype8", "subtype9", "subtype10", "subtype11"}).setRegistryName(block.getRegistryName()));
 	}
 
 	@SideOnly(Side.CLIENT)
-	@Override
 	public void registerModels(ModelRegistryEvent event) {
-		BlockCustom.EnumColour[] allColours = BlockCustom.EnumColour.values();
-		for (BlockCustom.EnumColour colour : allColours) {
-			ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), colour.getMetadata(), new ModelResourceLocation("nebulaecraft:color_1_"+colour.getName(), "inventory"));
-		}
-	}
+        BlockColor1.BlockCustom.EnumType[] allSubtypes = BlockColor1.BlockCustom.EnumType.values();
+        for (BlockColor1.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:color_1_" + subtype.getName(), "inventory"));
+        }
+    }
+	
 	public static class BlockCustom extends Block {
+		public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
+		
 		public BlockCustom() {
 			super(Material.ROCK);
 			setUnlocalizedName("color_1");
@@ -63,126 +68,113 @@ public class BlockColor1 extends ElementsNebulaecraftMod.ModElement {
 			setCreativeTab(TabNebulaecraftColor.tab);
 		}
 
-		@SideOnly(Side.CLIENT)
+		@Override
+        @SideOnly(Side.CLIENT)
+        public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
+            BlockColor1.BlockCustom.EnumType[] allSubtypes = BlockColor1.BlockCustom.EnumType.values();
+            for (BlockColor1.BlockCustom.EnumType subtype : allSubtypes) {
+                items.add(new ItemStack(this, 1, subtype.getMetadata()));
+            }
+        }
+
 		@Override
 		public BlockRenderLayer getBlockLayer() {
 			return BlockRenderLayer.SOLID;
 		}
 
 		@Override
+		public boolean isOpaqueCube(IBlockState state) {
+			return true;
+		}
+
+		@Override
+        public boolean isFullCube(IBlockState state) {
+            return true;
+        }
+
+        @Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
 			return new AxisAlignedBB(0, 0, 0, 1, 1, 1);
 		}
 
-		public static final PropertyEnum PROPERTYCOLOUR = PropertyEnum.create("colour", BlockCustom.EnumColour.class);
-
-		@Override
-		public int damageDropped(IBlockState state)
-		{
-			BlockCustom.EnumColour enumColour = (BlockCustom.EnumColour)state.getValue(PROPERTYCOLOUR);
-			return enumColour.getMetadata();
+        @Override
+		protected net.minecraft.block.state.BlockStateContainer createBlockState(){
+			return new net.minecraft.block.state.BlockStateContainer(this, SUBTYPE);
 		}
 
 		@Override
-		@SideOnly(Side.CLIENT)
-		public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items)
-		{
-			BlockCustom.EnumColour[] allColours = BlockCustom.EnumColour.values();
-			for (BlockCustom.EnumColour colour : allColours) {
-				items.add(new ItemStack(this, 1, colour.getMetadata()));
-			}
-		}
+        public IBlockState getStateFromMeta(int meta) {
+            return this.getDefaultState().withProperty(SUBTYPE, EnumType.byMetadata(meta));
+        }
+
+        @Override
+        public int getMetaFromState(IBlockState state) {
+            int metadata=(state.getValue(SUBTYPE).getMetadata());
+            return metadata;
+        }
+
+        @Override
+        public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+            super.getPickBlock(state, target, world, pos, player);
+            return new ItemStack(this,1,getMetaFromState(state));
+        }
 
 		@Override
-		public IBlockState getStateFromMeta(int meta)
-		{
-			return this.getDefaultState().withProperty(PROPERTYCOLOUR, BlockCustom.EnumColour.byMetadata(meta));
-		}
+        public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
+            BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
+            return this.getDefaultState().withProperty(SUBTYPE, subtype);
+        }
+        
+        public enum EnumType implements IStringSerializable {
+            SUBTYPE0(0, "subtype0"),
+            SUBTYPE1(1, "subtype1"),
+            SUBTYPE2(2, "subtype2"),
+            SUBTYPE3(3, "subtype3"),
+            SUBTYPE4(4, "subtype4"),
+            SUBTYPE5(5, "subtype5"),
+            SUBTYPE6(6, "subtype6"),
+            SUBTYPE7(7, "subtype7"),
+            SUBTYPE8(8, "subtype8"),
+            SUBTYPE9(9, "subtype9"),
+            SUBTYPE10(10, "subtype10"),
+            SUBTYPE11(11, "subtype11");
 
-		@Override
-		public int getMetaFromState(IBlockState state)
-		{
-			BlockCustom.EnumColour colour = (BlockCustom.EnumColour)state.getValue(PROPERTYCOLOUR);
-			return colour.getMetadata();
-		}
+            private static final BlockColor1.BlockCustom.EnumType[] META_LOOKUP = new BlockColor1.BlockCustom.EnumType[values().length];
 
-		@Override
-		public IBlockState getActualState(IBlockState state, IBlockAccess worldIn, BlockPos pos)
-		{
-			return state;
-		}
+            static {
+                for (BlockColor1.BlockCustom.EnumType type : values()) {
+                    META_LOOKUP[type.getMetadata()] = type;
+                }
+            }
 
-		@Override
-		protected BlockStateContainer createBlockState()
-		{
-			return new BlockStateContainer(this, PROPERTYCOLOUR);
-		}
+            private final int meta;
+            private final String name;
 
-		@Override
-		public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer)
-		{
-			BlockCustom.EnumColour colour = BlockCustom.EnumColour.byMetadata(meta);
+            EnumType(int i_meta, String i_name) {
+                this.meta = i_meta;
+                this.name = i_name;
+            }
 
-			return this.getDefaultState().withProperty(PROPERTYCOLOUR, colour);
-		}
+            public static BlockColor1.BlockCustom.EnumType byMetadata(int meta) {
+                if (meta < 0 || meta >= META_LOOKUP.length) {
+                    meta = 0;
+                }
 
-		public enum EnumColour implements IStringSerializable
-		{
-			CIRCLE(0, "circle"),
-			CENTRAL(1, "central"),
-			ISLAND(2, "island"),
-			HARBOUR(3, "harbour"),
-			AIRPORT(4, "airport"),
-			METROPOLITAN(5, "metropolitan"),
-			NORTHERN(6, "northern"),
-			TRICKLE(7, "trickle"),
-			DISTRICT(8, "district"),
-			SEASHORE(9, "seashore"),
-			VALLEY(10, "valley"),
-			LOUGH(11, "lough");
+                return META_LOOKUP[meta];
+            }
 
-			public int getMetadata()
-			{
-				return this.meta;
-			}
+            public int getMetadata() {
+                return this.meta;
+            }
 
-			@Override
-			public String toString()
-			{
-				return this.name;
-			}
+            @Override
+            public String toString() {
+                return this.name;
+            }
 
-			public static BlockCustom.EnumColour byMetadata(int meta)
-			{
-				if (meta < 0 || meta >= META_LOOKUP.length)
-				{
-					meta = 0;
-				}
-
-				return META_LOOKUP[meta];
-			}
-
-			public String getName()
-			{
-				return this.name;
-			}
-
-			private final int meta;
-			private final String name;
-			private static final BlockCustom.EnumColour[] META_LOOKUP = new BlockCustom.EnumColour[values().length];
-
-			EnumColour(int i_meta, String i_name)
-			{
-				this.meta = i_meta;
-				this.name = i_name;
-			}
-
-			static
-			{
-				for (BlockCustom.EnumColour colour : values()) {
-					META_LOOKUP[colour.getMetadata()] = colour;
-				}
-			}
-		}
+            public String getName() {
+                return this.name;
+            }
+        }
 	}
 }

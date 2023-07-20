@@ -1,0 +1,39 @@
+{
+  "parent": "nebulaecraft:block/trafficlight_ped_r_red",
+  "display": {
+	"thirdperson_righthand": {
+		"translation": [-1.75, 4.75, 6.75],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"thirdperson_lefthand": {
+		"translation": [1.5, 4.75, 6.75],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"firstperson_righthand": {
+		"rotation": [0, -30, 0],
+		"translation": [5, 0, 0],
+		"scale": [0.8, 0.8, 0.8]
+	},
+	"firstperson_lefthand": {
+		"rotation": [0, -30, 0],
+		"translation": [10, 0, 0],
+		"scale": [0.8, 0.8, 0.8]
+	},
+	"ground": {
+		"translation": [-1.5, 3.25, 6],
+		"scale": [0.4, 0.4, 0.4]
+	},
+	"gui": {
+		"rotation": [30, 30, 0],
+		"translation": [4, -2, 0]
+	},
+	"head": {
+		"rotation": [0, 180, 0],
+		"translation": [4, 16.5, -14.75]
+	},
+	"fixed": {
+		"rotation": [0, 180, 0],
+		"translation": [4.5, 6.5, -15.75]
+	}
+	}
+}

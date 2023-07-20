@@ -1,16 +1,16 @@
 {
   "variants": {
-	"colour=circle": {"model": "nebulaecraft:color_circle"},
-	"colour=central": {"model": "nebulaecraft:color_central"},
-	"colour=island": {"model": "nebulaecraft:color_island"},
-	"colour=harbour": {"model": "nebulaecraft:color_harbour"},
-	"colour=airport": {"model": "nebulaecraft:color_airport"},
-	"colour=metropolitan": {"model": "nebulaecraft:color_metropolitan"},
-	"colour=northern": {"model": "nebulaecraft:color_northern"},
-	"colour=trickle": {"model": "nebulaecraft:color_trickle"},
-	"colour=district": {"model": "nebulaecraft:color_district"},
-	"colour=seashore": {"model": "nebulaecraft:color_seashore"},
-	"colour=valley": {"model": "nebulaecraft:color_valley"},
-	"colour=lough": {"model": "nebulaecraft:color_lough"}
+	"subtype=subtype0": {"model": "nebulaecraft:color_circle"},
+	"subtype=subtype1": {"model": "nebulaecraft:color_central"},
+	"subtype=subtype2": {"model": "nebulaecraft:color_island"},
+	"subtype=subtype3": {"model": "nebulaecraft:color_harbour"},
+	"subtype=subtype4": {"model": "nebulaecraft:color_airport"},
+	"subtype=subtype5": {"model": "nebulaecraft:color_metropolitan"},
+	"subtype=subtype6": {"model": "nebulaecraft:color_northern"},
+	"subtype=subtype7": {"model": "nebulaecraft:color_trickle"},
+	"subtype=subtype8": {"model": "nebulaecraft:color_district"},
+	"subtype=subtype9": {"model": "nebulaecraft:color_seashore"},
+	"subtype=subtype10": {"model": "nebulaecraft:color_valley"},
+	"subtype=subtype11": {"model": "nebulaecraft:color_lough"}
   }
 }

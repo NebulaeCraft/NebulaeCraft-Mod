@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/asphalt_green_slab",
+  "parent": "nebulaecraft:block/asphalt_bus_slab",
   "display": {
         "gui": {
             "rotation": [ 30, 225, 0 ],
