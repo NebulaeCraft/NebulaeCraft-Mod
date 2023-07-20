@@ -1,0 +1,36 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nebulaecraft:blocks/platform_edge",
+		"2": "nebulaecraft:blocks/thirdrail_yellow",
+		"particle": "nebulaecraft:blocks/platform_edge"
+	},
+	"elements": [
+		{
+			"from": [7, 0, 7],
+			"to": [9, 6, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 8, 23]},
+			"faces": {
+				"north": {"uv": [6, 11, 10, 16], "texture": "#0"},
+				"east": {"uv": [0, 11, 4, 16], "texture": "#0"},
+				"south": {"uv": [6, 11, 10, 16], "texture": "#0"},
+				"west": {"uv": [12, 11, 16, 16], "texture": "#0"},
+				"up": {"uv": [6, 12, 10, 16], "texture": "#0"},
+				"down": {"uv": [6, 0, 10, 4], "texture": "#0"}
+			}
+		},
+		{
+			"from": [7, 6, 7],
+			"to": [9, 8, 9],
+			"rotation": {"angle": 0, "axis": "y", "origin": [1, 8, 23]},
+			"faces": {
+				"north": {"uv": [6, 8, 10, 11], "texture": "#2"},
+				"east": {"uv": [0, 8, 4, 11], "texture": "#2"},
+				"south": {"uv": [6, 8, 10, 11], "texture": "#2"},
+				"west": {"uv": [12, 8, 16, 11], "texture": "#2"},
+				"up": {"uv": [6, 12, 10, 16], "texture": "#2"},
+				"down": {"uv": [6, 0, 10, 4], "texture": "#2"}
+			}
+		}
+	]
+}

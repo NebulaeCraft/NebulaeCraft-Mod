@@ -1,0 +1,6 @@
+{
+  "variants": {
+	"subtype=subtype0": { "model": "nebulaecraft:signpole_thin"},
+	"subtype=subtype1": { "model": "nebulaecraft:signpole_thin_half"}
+  }
+}
