@@ -2,9 +2,9 @@
   {
     "modid": "nebulaecraft",
     "name": "NebulaeCraft",
-    "description": "This mod is only designed for NebulaeCraft 5th Server.",
-    "version": "2.12",
-    "credits": "(c)2017-2022 NebulaeCraft  All Rights Reserved.",
+    "description": "This mod is designed for NebulaeCraft 5th Server only.",
+    "version": "2.14",
+    "credits": "(c)2017-2023 NebulaeCraft  All Rights Reserved.",
     "logoFile": "assets/nebulaecraft/textures/logo.png",
     "mcversion": "1.12.2",
     "url": "https://wiki.knebulae.com",
