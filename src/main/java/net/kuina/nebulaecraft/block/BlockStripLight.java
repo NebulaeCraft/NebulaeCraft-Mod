@@ -31,16 +31,16 @@ import net.kuina.nebulaecraft.creativetab.TabNebulaecraftOptics;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockTunnelLight extends ElementsNebulaecraftMod.ModElement {
-	@GameRegistry.ObjectHolder("nebulaecraft:tunnel_light")
+public class BlockStripLight extends ElementsNebulaecraftMod.ModElement {
+	@GameRegistry.ObjectHolder("nebulaecraft:strip_light")
 	public static final Block block = null;
-	public BlockTunnelLight(ElementsNebulaecraftMod instance) {
-		super(instance, 2);
+	public BlockStripLight(ElementsNebulaecraftMod instance) {
+		super(instance, 7);
 	}
 
 	@Override
 	public void initElements() {
-		elements.blocks.add(() -> new BlockCustom().setRegistryName("tunnel_light"));
+		elements.blocks.add(() -> new BlockCustom().setRegistryName("strip_light"));
 		elements.items.add(() -> new ItemBlock(block).setRegistryName(block.getRegistryName()));
 	}
 
@@ -48,13 +48,13 @@ public class BlockTunnelLight extends ElementsNebulaecraftMod.ModElement {
 	@Override
 	public void registerModels(ModelRegistryEvent event) {
 		ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), 0,
-				new ModelResourceLocation("nebulaecraft:tunnel_light", "inventory"));
+				new ModelResourceLocation("nebulaecraft:strip_light", "inventory"));
 	}
 	public static class BlockCustom extends Block {
 		public static final PropertyDirection FACING = BlockHorizontal.FACING;
 		public BlockCustom() {
 			super(Material.GLASS);
-			setUnlocalizedName("tunnel_light");
+			setUnlocalizedName("strip_light");
 			setSoundType(SoundType.GLASS);
 			setHardness(1F);
 			setResistance(10F);
@@ -80,13 +80,13 @@ public class BlockTunnelLight extends ElementsNebulaecraftMod.ModElement {
 			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
-					return new AxisAlignedBB(0.375, 0.375, 0, 0.625, 0.6875, 0.2);
+					return new AxisAlignedBB(0.125, 0.375, 0, 0.875, 0.625, 0.2);
 				case NORTH :
-					return new AxisAlignedBB(0.375, 0.375, 0.8, 0.625, 0.6875, 1);
+					return new AxisAlignedBB(0.125, 0.375, 0.8, 0.875, 0.625, 1);
 				case EAST :
-					return new AxisAlignedBB(0, 0.375, 0.375, 0.2, 0.6875, 0.625);
+					return new AxisAlignedBB(0, 0.375, 0.125, 0.2, 0.625, 0.875);
 				case WEST :
-					return new AxisAlignedBB(0.8, 0.375, 0.375, 1, 0.6875, 0.625);
+					return new AxisAlignedBB(0.8, 0.375, 0.125, 1, 0.625, 0.875);
 			}
 		}
 

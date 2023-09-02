@@ -1,0 +1,22 @@
+{
+  "variants": {
+    "normal": {
+      "model": "nebulaecraft:strip_light"
+    },
+    "facing=north": {
+      "model": "nebulaecraft:strip_light"
+    },
+    "facing=east": {
+      "model": "nebulaecraft:strip_light",
+      "y": 90
+    },
+    "facing=south": {
+      "model": "nebulaecraft:strip_light",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "nebulaecraft:strip_light",
+      "y": 270
+    }
+  }
+}
