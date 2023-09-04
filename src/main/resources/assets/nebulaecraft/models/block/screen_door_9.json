@@ -8,6 +8,7 @@
 		"5": "nebulaecraft:blocks/catenary_steel",
 		"6": "nebulaecraft:blocks/thirdrail_white",
 		"7": "nebulaecraft:blocks/screen_door_image_8",
+		"8": "nebulaecraft:blocks/screen_door_image_6b",
 		"particle": "nebulaecraft:blocks/screen_door_black"
 	},
 	"elements": [
@@ -133,7 +134,7 @@
 			"rotation": {"angle": 0, "axis": "y", "origin": [9, 38.3, 8.9]},
 			"faces": {
 				"north": {"uv": [0, 0, 16, 16], "texture": "#3"},
-				"south": {"uv": [16, 0, 0, 16], "texture": "#3"}
+				"south": {"uv": [0, 0, 16, 16], "texture": "#8"}
 			}
 		},
 		{

@@ -7,6 +7,7 @@
 		"3": "nebulaecraft:blocks/screen_door_image_5",
 		"5": "nebulaecraft:blocks/screen_door_lightgary",
 		"6": "nebulaecraft:blocks/screen_door_image_8",
+		"7": "nebulaecraft:blocks/screen_door_image_5b",
 		"particle": "nebulaecraft:blocks/screen_door_black"
 	},
 	"elements": [
@@ -109,7 +110,7 @@
 			"rotation": {"angle": 0, "axis": "y", "origin": [7, 38.3, 8.9]},
 			"faces": {
 				"north": {"uv": [0, 0, 16, 16], "texture": "#3"},
-				"south": {"uv": [16, 0, 0, 16], "texture": "#3"}
+				"south": {"uv": [0, 0, 16, 16], "texture": "#7"}
 			}
 		},
 		{
