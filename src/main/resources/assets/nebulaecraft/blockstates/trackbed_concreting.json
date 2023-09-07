@@ -1,8 +1,12 @@
 {
   "variants": {
-	"facing=east": { "model": "nebulaecraft:trackbed_concreting","y": 90},
-	"facing=south": { "model": "nebulaecraft:trackbed_concreting"},
-	"facing=west":  { "model": "nebulaecraft:trackbed_concreting","y": 90},
-	"facing=north":  { "model": "nebulaecraft:trackbed_concreting"}
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:trackbed_concreting","y": 90},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:trackbed_concreting"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:trackbed_concreting","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:trackbed_concreting"},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:trackbed_concreting_curved","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:trackbed_concreting_curved"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:trackbed_concreting_curved","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:trackbed_concreting_curved","y": 180}
   }
 }

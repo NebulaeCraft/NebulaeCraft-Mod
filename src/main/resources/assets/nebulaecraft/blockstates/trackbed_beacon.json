@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:trackbed_beacon_a","y": 90},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:trackbed_beacon_a"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:trackbed_beacon_a","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:trackbed_beacon_a"},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:trackbed_beacon_b","y": 90},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:trackbed_beacon_b"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:trackbed_beacon_b","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:trackbed_beacon_b"}
+  }
+}

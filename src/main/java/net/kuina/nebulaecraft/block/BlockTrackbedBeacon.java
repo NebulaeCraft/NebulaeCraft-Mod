@@ -28,26 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockTrackbedConcreting extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:trackbed_concreting")
+public class BlockTrackbedBeacon extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:trackbed_beacon")
     public static final Block block = null;
 
-    public BlockTrackbedConcreting(ElementsNebulaecraftMod instance) {
-        super(instance, 104);
+    public BlockTrackbedBeacon(ElementsNebulaecraftMod instance) {
+        super(instance, 105);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("trackbed_concreting"));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("trackbed_beacon"));
         elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockTrackbedConcreting.BlockCustom.EnumType[] allSubtypes = BlockTrackbedConcreting.BlockCustom.EnumType.values();
-        for (BlockTrackbedConcreting.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:trackbed_concreting_" + subtype.getName(), "inventory"));
+        BlockTrackbedBeacon.BlockCustom.EnumType[] allSubtypes = BlockTrackbedBeacon.BlockCustom.EnumType.values();
+        for (BlockTrackbedBeacon.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:trackbed_beacon_" + subtype.getName(), "inventory"));
         }
     }
 
@@ -57,7 +57,7 @@ public class BlockTrackbedConcreting extends ElementsNebulaecraftMod.ModElement 
 
         public BlockCustom() {
             super(Material.IRON);
-            setUnlocalizedName("trackbed_concreting");
+            setUnlocalizedName("trackbed_beacon");
             setSoundType(SoundType.STONE);
             setHardness(1F);
             setResistance(10F);
@@ -70,8 +70,8 @@ public class BlockTrackbedConcreting extends ElementsNebulaecraftMod.ModElement 
         @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockTrackbedConcreting.BlockCustom.EnumType[] allSubtypes = BlockTrackbedConcreting.BlockCustom.EnumType.values();
-            for (BlockTrackbedConcreting.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockTrackbedBeacon.BlockCustom.EnumType[] allSubtypes = BlockTrackbedBeacon.BlockCustom.EnumType.values();
+            for (BlockTrackbedBeacon.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
@@ -128,10 +128,10 @@ public class BlockTrackbedConcreting extends ElementsNebulaecraftMod.ModElement 
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1");
 
-            private static final BlockTrackbedConcreting.BlockCustom.EnumType[] META_LOOKUP = new BlockTrackbedConcreting.BlockCustom.EnumType[values().length];
+            private static final BlockTrackbedBeacon.BlockCustom.EnumType[] META_LOOKUP = new BlockTrackbedBeacon.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockTrackbedConcreting.BlockCustom.EnumType type : values()) {
+                for (BlockTrackbedBeacon.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -144,7 +144,7 @@ public class BlockTrackbedConcreting extends ElementsNebulaecraftMod.ModElement 
                 this.name = i_name;
             }
 
-            public static BlockTrackbedConcreting.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockTrackbedBeacon.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }
