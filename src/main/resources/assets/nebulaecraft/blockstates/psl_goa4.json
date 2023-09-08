@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:psl_goa4_6","y": 270},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:psl_goa4_6"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:psl_goa4_6","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:psl_goa4_6","y": 180},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:psl_goa4_8","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:psl_goa4_8"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:psl_goa4_8","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:psl_goa4_8","y": 180}
+  }
+}

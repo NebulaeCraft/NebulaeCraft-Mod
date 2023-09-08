@@ -58,7 +58,7 @@ public class BlockSignal3Yellow extends ElementsNebulaecraftMod.ModElement {
 			setSoundType(SoundType.METAL);
 			setHardness(1F);
 			setResistance(10F);
-			setLightLevel(0.5F);
+			setLightLevel(0.8F);
 			setLightOpacity(0);
 			setCreativeTab(TabNebulaecraftMetro.tab);
 			this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
