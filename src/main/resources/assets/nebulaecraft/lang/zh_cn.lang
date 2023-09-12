@@ -354,6 +354,7 @@ tile.roadsign_64.name=警告：无人看守铁路道口
 tile.color_1.subtype11.name=上屿线
 tile.asphalt_parallel_diagonal_right.subtype0.name=导流线右斜线
 tile.signpole_vertical.subtype0.name=牌杆
+tile.tdt_n.disabled.name=发车计时器
 tile.signal_4_blue.name=四灯信号机
 tile.psl_goa2.subtype2.name=屏蔽门就地控制盘（STO,DTO/8）
 tile.roadsign_16.name=禁令：结束禁止超车

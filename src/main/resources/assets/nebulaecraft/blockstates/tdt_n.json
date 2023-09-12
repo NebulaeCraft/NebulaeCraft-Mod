@@ -1,0 +1,20 @@
+{
+  "variants": {
+	"countdown=0": {"model": "nebulaecraft:tdt_0"},
+	"countdown=1": {"model": "nebulaecraft:tdt_1"},
+	"countdown=2": {"model": "nebulaecraft:tdt_2"},
+	"countdown=3": {"model": "nebulaecraft:tdt_3"},
+	"countdown=4": {"model": "nebulaecraft:tdt_4"},
+	"countdown=5": {"model": "nebulaecraft:tdt_5"},
+	"countdown=6": {"model": "nebulaecraft:tdt_6"},
+	"countdown=7": {"model": "nebulaecraft:tdt_7"},
+	"countdown=8": {"model": "nebulaecraft:tdt_8"},
+	"countdown=9": {"model": "nebulaecraft:tdt_9"},
+	"countdown=10": {"model": "nebulaecraft:tdt_10"},
+	"countdown=11": {"model": "nebulaecraft:tdt_11"},
+	"countdown=12": {"model": "nebulaecraft:tdt_12"},
+	"countdown=13": {"model": "nebulaecraft:tdt_13"},
+	"countdown=14": {"model": "nebulaecraft:tdt_14"},
+	"countdown=disabled": {"model": "nebulaecraft:tdt_disabled"}
+  }
+}

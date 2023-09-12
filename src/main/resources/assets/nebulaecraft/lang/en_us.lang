@@ -354,6 +354,7 @@ tile.roadsign_64.name=Roadsign
 tile.color_1.subtype11.name=Lough Line
 tile.asphalt_parallel_diagonal_right.subtype0.name=Asphalt
 tile.signpole_vertical.subtype0.name=Sign Pole
+tile.tdt_n.disabled.name=Train Depature Timer
 tile.signal_4_blue.name=Signal Box
 tile.psl_goa2.subtype2.name=PSL
 tile.roadsign_16.name=Roadsign
