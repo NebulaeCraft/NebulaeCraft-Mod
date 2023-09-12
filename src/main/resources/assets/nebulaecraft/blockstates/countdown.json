@@ -1,0 +1,20 @@
+{
+  "variants": {
+	"colour=white": {"model": "nebulaecraft:lamp_white"},
+	"colour=orange": {"model": "nebulaecraft:lamp_orange"},
+	"colour=magenta": {"model": "nebulaecraft:lamp_magenta"},
+	"colour=light_blue": {"model": "nebulaecraft:lamp_light_blue"},
+	"colour=yellow": {"model": "nebulaecraft:lamp_yellow"},
+	"colour=lime": {"model": "nebulaecraft:lamp_lime"},
+	"colour=pink": {"model": "nebulaecraft:lamp_pink"},
+	"colour=gray": {"model": "nebulaecraft:lamp_gray"},
+	"colour=silver": {"model": "nebulaecraft:lamp_silver"},
+	"colour=cyan": {"model": "nebulaecraft:lamp_cyan"},
+	"colour=purple": {"model": "nebulaecraft:lamp_purple"},
+	"colour=blue": {"model": "nebulaecraft:lamp_blue"},
+	"colour=brown": {"model": "nebulaecraft:lamp_brown"},
+	"colour=green": {"model": "nebulaecraft:lamp_green"},
+	"colour=red": {"model": "nebulaecraft:lamp_red"},
+	"colour=black": {"model": "nebulaecraft:lamp_black"}
+  }
+}
