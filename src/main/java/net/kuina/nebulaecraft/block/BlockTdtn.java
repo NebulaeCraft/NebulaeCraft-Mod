@@ -41,7 +41,7 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         elements.blocks.add(() -> new BlockCustom().setRegistryName("tdt_n"));
-        elements.items.add(() -> new ItemLamp(block).setRegistryName(block.getRegistryName()));
+        elements.items.add(() -> new ItemTdtn(block).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
