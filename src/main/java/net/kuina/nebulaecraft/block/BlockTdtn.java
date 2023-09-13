@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
@@ -41,7 +42,7 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         elements.blocks.add(() -> new BlockCustom().setRegistryName("tdt_n"));
-        elements.items.add(() -> new ItemTdtn(block).setRegistryName(block.getRegistryName()));
+        elements.items.add(() -> new ItemBlock(block).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
