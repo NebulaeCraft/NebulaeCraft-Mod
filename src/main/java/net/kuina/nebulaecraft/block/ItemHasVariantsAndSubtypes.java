@@ -18,7 +18,6 @@ public class ItemHasVariantsAndSubtypes extends ItemBlock
     @Override
     public int getMetadata(int metadata)
     {
-//        System.out.println("Ishirai DEBUG#Item#meta: "+metadata);
         return metadata;
     }
 

@@ -16,7 +16,6 @@ public class ItemLamp extends ItemBlock
     @Override
     public int getMetadata(int metadata)
     {
-//        System.out.println("Ishirai DEBUG#Item#meta: "+metadata);
         return metadata;
     }
 
