@@ -10,6 +10,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -18,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -100,6 +102,13 @@ public class BlockTdts extends ElementsNebulaecraftMod.ModElement {
         }
 
         @Override
+        @SideOnly(Side.CLIENT)
+        public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items)
+        {
+            items.add(new ItemStack(this, 1, BlockTdtn.BlockCustom.EnumTdtn.DISABLED.getMetadata()));
+        }
+
+        @Override
         public IBlockState getStateFromMeta(int meta) {
             return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdts.byMetadata(meta));
         }
@@ -142,7 +151,7 @@ public class BlockTdts extends ElementsNebulaecraftMod.ModElement {
             if (state.getBlock() == this) {
                 BlockCustom.EnumTdts countdown = (BlockCustom.EnumTdts) state.getValue(PROPERTYCOUNTDOWN);
 
-                if(!worldIn.isBlockPowered(pos)){
+                if (!worldIn.isBlockPowered(pos)) {
                     if (countdown != EnumTdts.DISABLED) {
                         worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdts.DISABLED), 3);
                     }
@@ -153,21 +162,21 @@ public class BlockTdts extends ElementsNebulaecraftMod.ModElement {
                 }
 
                 // if block is newly powered, start countdown
-                if(countdown == EnumTdts.DISABLED && canCountdown && worldIn.isBlockPowered(pos)){
+                if (countdown == EnumTdts.DISABLED && canCountdown && worldIn.isBlockPowered(pos)) {
                     worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdts.FOURTEEN), 3);
                     worldIn.scheduleUpdate(pos, this, 20);
                     return;
                 }
 
                 // display ZERO state for 3 seconds
-                if(countdown == EnumTdts.ONE){
+                if (countdown == EnumTdts.ONE) {
                     worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdts.ZERO), 3);
-                    worldIn.scheduleUpdate(pos, this, 3*20);
+                    worldIn.scheduleUpdate(pos, this, 3 * 20);
                     return;
                 }
 
                 // end countdown, detect isBlockPowered every 5 ticks
-                if(countdown == EnumTdts.ZERO){
+                if (countdown == EnumTdts.ZERO) {
                     worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdts.DISABLED), 3);
                     canCountdown = false;
                     worldIn.scheduleUpdate(pos, this, 5);
@@ -175,8 +184,8 @@ public class BlockTdts extends ElementsNebulaecraftMod.ModElement {
                 }
 
                 // countdown-=1
-                if(countdown.getMetadata()>=2&&countdown.getMetadata()<=14){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdts.byMetadata(countdown.getMetadata()-1)), 3);
+                if (countdown.getMetadata() >= 2 && countdown.getMetadata() <= 14) {
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdts.byMetadata(countdown.getMetadata() - 1)), 3);
                     worldIn.scheduleUpdate(pos, this, 20);
                     return;
                 }

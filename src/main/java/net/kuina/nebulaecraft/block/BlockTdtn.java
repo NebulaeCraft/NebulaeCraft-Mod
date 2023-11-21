@@ -10,6 +10,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
@@ -18,6 +19,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.BlockRenderLayer;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.IStringSerializable;
+import net.minecraft.util.NonNullList;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
@@ -97,6 +99,13 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
         public int damageDropped(IBlockState state) {
             BlockCustom.EnumTdtn enumTdtn = (BlockCustom.EnumTdtn) state.getValue(PROPERTYCOUNTDOWN);
             return enumTdtn.getMetadata();
+        }
+
+        @Override
+        @SideOnly(Side.CLIENT)
+        public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items)
+        {
+            items.add(new ItemStack(this, 1, EnumTdtn.DISABLED.getMetadata()));
         }
 
         @Override
