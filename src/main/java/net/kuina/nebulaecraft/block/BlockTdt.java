@@ -33,44 +33,44 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 import java.util.Random;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:tdt_n")
+public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:tdt")
     public static final Block block = null;
 
-    public BlockTdtn(ElementsNebulaecraftMod instance) {
+    public BlockTdt(ElementsNebulaecraftMod instance) {
         super(instance, 108);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("tdt_n"));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("tdt"));
         elements.items.add(() -> new ItemBlock(block).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockCustom.EnumTdtn[] allTdtns = BlockCustom.EnumTdtn.values();
-        for (BlockCustom.EnumTdtn countdown : allTdtns) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), countdown.getMetadata(), new ModelResourceLocation("nebulaecraft:tdt_n_" + countdown.getName(), "inventory"));
+        BlockCustom.EnumTdt[] allTdts = BlockCustom.EnumTdt.values();
+        for (BlockCustom.EnumTdt countdown : allTdts) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), countdown.getMetadata(), new ModelResourceLocation("nebulaecraft:tdt_" + countdown.getName(), "inventory"));
         }
     }
 
     public static class BlockCustom extends Block {
-        public static final PropertyEnum PROPERTYCOUNTDOWN = PropertyEnum.create("countdown", BlockCustom.EnumTdtn.class);
+        public static final PropertyEnum PROPERTYCOUNTDOWN = PropertyEnum.create("countdown", BlockCustom.EnumTdt.class);
 
         public boolean canCountdown;
 
         public BlockCustom() {
             super(Material.GLASS);
-            setUnlocalizedName("tdt_n");
+            setUnlocalizedName("tdt");
             setSoundType(SoundType.METAL);
             setHardness(1F);
             setResistance(10F);
             setLightLevel(0.8F);
             setLightOpacity(0);
             setCreativeTab(TabNebulaecraftMetro.tab);
-            setDefaultState(this.blockState.getBaseState().withProperty(PROPERTYCOUNTDOWN, EnumTdtn.DISABLED));
+            setDefaultState(this.blockState.getBaseState().withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED));
             canCountdown = false;
         }
 
@@ -97,25 +97,25 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public int damageDropped(IBlockState state) {
-            BlockCustom.EnumTdtn enumTdtn = (BlockCustom.EnumTdtn) state.getValue(PROPERTYCOUNTDOWN);
-            return enumTdtn.getMetadata();
+            BlockCustom.EnumTdt enumTdt = (BlockCustom.EnumTdt) state.getValue(PROPERTYCOUNTDOWN);
+            return enumTdt.getMetadata();
         }
 
         @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items)
         {
-            items.add(new ItemStack(this, 1, EnumTdtn.DISABLED.getMetadata()));
+            items.add(new ItemStack(this, 1, EnumTdt.DISABLED.getMetadata()));
         }
 
         @Override
         public IBlockState getStateFromMeta(int meta) {
-            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdtn.byMetadata(meta));
+            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(meta));
         }
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            BlockCustom.EnumTdtn countdown = (BlockCustom.EnumTdtn) state.getValue(PROPERTYCOUNTDOWN);
+            BlockCustom.EnumTdt countdown = (BlockCustom.EnumTdt) state.getValue(PROPERTYCOUNTDOWN);
             return countdown.getMetadata();
         }
 
@@ -131,7 +131,7 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-            BlockCustom.EnumTdtn countdown = BlockCustom.EnumTdtn.byMetadata(meta);
+            BlockCustom.EnumTdt countdown = BlockCustom.EnumTdt.byMetadata(meta);
 
             return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, countdown);
         }
@@ -139,7 +139,7 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
         // Default blockstate is disabled
         @Override
         public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdtn.DISABLED), 3);
+            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
             worldIn.scheduleUpdate(pos, this, 5);
         }
 
@@ -149,11 +149,11 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
         public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
             super.updateTick(worldIn, pos, state, rand);
             if (state.getBlock() == this) {
-                BlockCustom.EnumTdtn countdown = (BlockCustom.EnumTdtn) state.getValue(PROPERTYCOUNTDOWN);
+                BlockCustom.EnumTdt countdown = (BlockCustom.EnumTdt) state.getValue(PROPERTYCOUNTDOWN);
 
                 if(!worldIn.isBlockPowered(pos)){
-                    if (countdown != EnumTdtn.DISABLED) {
-                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdtn.DISABLED), 3);
+                    if (countdown != EnumTdt.DISABLED) {
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
                     }
                     // detect if block is powered every 5 ticks
                     worldIn.scheduleUpdate(pos, this, 5);
@@ -162,22 +162,22 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
                 }
 
                 // if block is newly powered, start countdown
-                if(countdown == EnumTdtn.DISABLED && canCountdown && worldIn.isBlockPowered(pos)){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdtn.FOURTEEN), 3);
+                if(countdown == EnumTdt.DISABLED && canCountdown && worldIn.isBlockPowered(pos)){
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.FOURTEEN), 3);
                     worldIn.scheduleUpdate(pos, this, 20);
                     return;
                 }
 
                 // display ZERO state for 3 seconds
-                if(countdown == EnumTdtn.ONE){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdtn.ZERO), 3);
+                if(countdown == EnumTdt.ONE){
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.ZERO), 3);
                     worldIn.scheduleUpdate(pos, this, 3*20);
                     return;
                 }
 
                 // end countdown, detect isBlockPowered every 5 ticks
-                if(countdown == EnumTdtn.ZERO){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdtn.DISABLED), 3);
+                if(countdown == EnumTdt.ZERO){
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
                     canCountdown = false;
                     worldIn.scheduleUpdate(pos, this, 5);
                     return;
@@ -185,7 +185,7 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
 
                 // countdown-=1
                 if(countdown.getMetadata()>=2&&countdown.getMetadata()<=14){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdtn.byMetadata(countdown.getMetadata()-1)), 3);
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(countdown.getMetadata()-1)), 3);
                     worldIn.scheduleUpdate(pos, this, 20);
                     return;
                 }
@@ -195,7 +195,7 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
             }
         }
 
-        public enum EnumTdtn implements IStringSerializable {
+        public enum EnumTdt implements IStringSerializable {
             ZERO(0, "0"),
             ONE(1, "1"),
             TWO(2, "2"),
@@ -214,10 +214,10 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
             DISABLED(15, "disabled");
 
 
-            private static final BlockCustom.EnumTdtn[] META_LOOKUP = new BlockCustom.EnumTdtn[values().length];
+            private static final BlockCustom.EnumTdt[] META_LOOKUP = new BlockCustom.EnumTdt[values().length];
 
             static {
-                for (BlockCustom.EnumTdtn countdown : values()) {
+                for (BlockCustom.EnumTdt countdown : values()) {
                     META_LOOKUP[countdown.getMetadata()] = countdown;
                 }
             }
@@ -225,12 +225,12 @@ public class BlockTdtn extends ElementsNebulaecraftMod.ModElement {
             private final int meta;
             private final String name;
 
-            EnumTdtn(int i_meta, String i_name) {
+            EnumTdt(int i_meta, String i_name) {
                 this.meta = i_meta;
                 this.name = i_name;
             }
 
-            public static BlockCustom.EnumTdtn byMetadata(int meta) {
+            public static BlockCustom.EnumTdt byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }
