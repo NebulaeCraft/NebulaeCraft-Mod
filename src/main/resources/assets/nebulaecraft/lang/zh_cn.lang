@@ -403,3 +403,4 @@ tile.roadsign_6.name=禁令：禁止非机动车通行
 tile.tunnel_light.name=隧道灯
 tile.catenary_steel_slope.name=刚性接触网斜坡
 tile.thirdrail_yellow_slope_1.name=第三轨左斜坡
+message.tdt_mode_switch.name=发车计时器倒计时时长

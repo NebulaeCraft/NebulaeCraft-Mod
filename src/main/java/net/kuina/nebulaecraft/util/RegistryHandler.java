@@ -3,7 +3,6 @@ package net.kuina.nebulaecraft.util;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.block.*;
 import net.kuina.nebulaecraft.entities.*;
-import net.kuina.nebulaecraft.util.ServerHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -11,14 +10,12 @@ import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
+import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import org.lwjgl.Sys;
-import org.lwjgl.opencl.CLKernel;
 
 
 @ElementsNebulaecraftMod.ModElement.Tag
@@ -60,6 +57,10 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         itemThis.setRegistryName(itemRegistryName).setUnlocalizedName(itemRegistryName);
         ITEMS.add(itemThis);
         ForgeRegistries.ITEMS.register(itemThis);
+    }
+
+    public void registerTileEntity(Class tileEntityClass, String tileEntityName) {
+        GameRegistry.registerTileEntity(tileEntityClass, tileEntityName);
     }
 
     ServerHandler handler = new ServerHandler();
@@ -154,6 +155,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "back");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "halfright");
     	registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "halfleft");
+
         registerItem(new CameraCart.ItemCameraCart(), "cameracart");
     }
 

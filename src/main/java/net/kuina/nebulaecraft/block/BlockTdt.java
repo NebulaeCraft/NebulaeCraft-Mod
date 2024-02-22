@@ -4,24 +4,25 @@ package net.kuina.nebulaecraft.block;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
+import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.BlockStateContainer;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.init.Blocks;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.BlockRenderLayer;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.NonNullList;
+import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -29,7 +30,6 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
-
 import java.util.Random;
 
 @ElementsNebulaecraftMod.ModElement.Tag
@@ -57,7 +57,9 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
     }
 
     public static class BlockCustom extends Block {
-        public static final PropertyEnum PROPERTYCOUNTDOWN = PropertyEnum.create("countdown", BlockCustom.EnumTdt.class);
+        public static final PropertyEnum<EnumTdt> PROPERTYCOUNTDOWN = PropertyEnum.create("countdown", BlockCustom.EnumTdt.class);
+        public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
+        public static final PropertyEnum<EnumRange> PROPERTYCOUNTDOWNRANGE = PropertyEnum.create("range", BlockCustom.EnumRange.class);
 
         public boolean canCountdown;
 
@@ -70,7 +72,10 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             setLightLevel(0.8F);
             setLightOpacity(0);
             setCreativeTab(TabNebulaecraftMetro.tab);
-            setDefaultState(this.blockState.getBaseState().withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED));
+            setDefaultState(this.blockState.getBaseState()
+                    .withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED)
+                    .withProperty(FACING, EnumFacing.NORTH)
+                    .withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY));
             canCountdown = false;
         }
 
@@ -85,9 +90,24 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             return false;
         }
 
+//        @Override
+//        public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+//            return new AxisAlignedBB(0.21875, 0.15625, 0, 0.78125, 0.59375, 0.0625);
+//        }
+
         @Override
         public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-            return new AxisAlignedBB(0.21875, 0.15625, 0, 0.78125, 0.59375, 0.0625);
+            switch (state.getValue(BlockHorizontal.FACING)) {
+                case SOUTH :
+                default :
+                    return new AxisAlignedBB(0, 0, 0.375, 1.25, 2, 1);
+                case NORTH :
+                    return new AxisAlignedBB(-0.25, 0, 0, 1, 2, 0.625);
+                case EAST :
+                    return new AxisAlignedBB(0.375, 0, -0.25, 1, 2, 1);
+                case WEST :
+                    return new AxisAlignedBB(0, 0, 0, 0.625, 2, 1.25);
+            }
         }
 
         @Override
@@ -110,13 +130,19 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public IBlockState getStateFromMeta(int meta) {
-            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(meta));
+            int countdownModeMeta = (meta & 0b0100) >> 2; // store countdown mode meta at 0100;
+            int facingMeta = meta & 3; // 0011;
+            return this.getDefaultState()
+                    .withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED)
+                    .withProperty(FACING, EnumFacing.getHorizontal(facingMeta))
+                    .withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.byMetadata(countdownModeMeta));
         }
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            BlockCustom.EnumTdt countdown = (BlockCustom.EnumTdt) state.getValue(PROPERTYCOUNTDOWN);
-            return countdown.getMetadata();
+            int countdownModeMeta = state.getValue(PROPERTYCOUNTDOWNRANGE).getMetadata() << 2;
+            int facingMeta = state.getValue(FACING).getHorizontalIndex();
+            return countdownModeMeta | facingMeta;
         }
 
         @Override
@@ -126,21 +152,35 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         protected BlockStateContainer createBlockState() {
-            return new BlockStateContainer(this, PROPERTYCOUNTDOWN);
+            return new BlockStateContainer(this, PROPERTYCOUNTDOWN, FACING, PROPERTYCOUNTDOWNRANGE);
         }
 
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-            BlockCustom.EnumTdt countdown = BlockCustom.EnumTdt.byMetadata(meta);
-
-            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, countdown);
+            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING,placer.getHorizontalFacing().getOpposite()).withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY);
         }
 
         // Default blockstate is disabled
         @Override
         public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
+            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING,placer.getHorizontalFacing().getOpposite()), 3);
             worldIn.scheduleUpdate(pos, this, 5);
+        }
+
+        @Override
+        public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+        {
+            if (!worldIn.isRemote) {
+                if (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY) {
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.FORTY), 3);
+                    playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.FORTY.getName()));
+
+                } else {
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY), 3);
+                    playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.TWENTY.getName()));
+                }
+            }
+            return true;
         }
 
 
@@ -149,49 +189,52 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
             super.updateTick(worldIn, pos, state, rand);
             if (state.getBlock() == this) {
-                BlockCustom.EnumTdt countdown = (BlockCustom.EnumTdt) state.getValue(PROPERTYCOUNTDOWN);
+                    BlockCustom.EnumTdt countdown = state.getValue(PROPERTYCOUNTDOWN);
 
-                if(!worldIn.isBlockPowered(pos)){
-                    if (countdown != EnumTdt.DISABLED) {
-                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
+                    if(!worldIn.isBlockPowered(pos)){
+                        if (countdown != EnumTdt.DISABLED) {
+                            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
+                        }
+                        // detect if block is powered every 5 ticks
+                        worldIn.scheduleUpdate(pos, this, 5);
+                        canCountdown = true;
+                        return;
                     }
-                    // detect if block is powered every 5 ticks
+
+                    // if block is newly powered, start countdown
+                    if(countdown == EnumTdt.DISABLED && canCountdown && worldIn.isBlockPowered(pos)){
+                        if(state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY)
+                            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.NINETEEN), 3);
+                        else
+                            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.THIRTY_NINE), 3);
+                        worldIn.scheduleUpdate(pos, this, 20);
+                        return;
+                    }
+
+                    // display ZERO state for 3 seconds
+                    if(countdown == EnumTdt.ONE){
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.ZERO), 3);
+                        worldIn.scheduleUpdate(pos, this, 3*20);
+                        return;
+                    }
+
+                    // end countdown, detect isBlockPowered every 5 ticks
+                    if(countdown == EnumTdt.ZERO){
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
+                        canCountdown = false;
+                        worldIn.scheduleUpdate(pos, this, 5);
+                        return;
+                    }
+
+                    // countdown-=1
+                    if(countdown.getMetadata()>=2&&countdown.getMetadata()<=(state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY ? 20 : 40)){
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(countdown.getMetadata()-1)), 3);
+                        worldIn.scheduleUpdate(pos, this, 20);
+                        return;
+                    }
+
+                    // default schedule update
                     worldIn.scheduleUpdate(pos, this, 5);
-                    canCountdown = true;
-                    return;
-                }
-
-                // if block is newly powered, start countdown
-                if(countdown == EnumTdt.DISABLED && canCountdown && worldIn.isBlockPowered(pos)){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.FOURTEEN), 3);
-                    worldIn.scheduleUpdate(pos, this, 20);
-                    return;
-                }
-
-                // display ZERO state for 3 seconds
-                if(countdown == EnumTdt.ONE){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.ZERO), 3);
-                    worldIn.scheduleUpdate(pos, this, 3*20);
-                    return;
-                }
-
-                // end countdown, detect isBlockPowered every 5 ticks
-                if(countdown == EnumTdt.ZERO){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
-                    canCountdown = false;
-                    worldIn.scheduleUpdate(pos, this, 5);
-                    return;
-                }
-
-                // countdown-=1
-                if(countdown.getMetadata()>=2&&countdown.getMetadata()<=14){
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(countdown.getMetadata()-1)), 3);
-                    worldIn.scheduleUpdate(pos, this, 20);
-                    return;
-                }
-
-                // default schedule update
-                worldIn.scheduleUpdate(pos, this, 5);
             }
         }
 
@@ -211,7 +254,34 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             TWELVE(12, "12"),
             THIRTEEN(13, "13"),
             FOURTEEN(14, "14"),
-            DISABLED(15, "disabled");
+            FIFTEEN(15, "15"),
+            SIXTEEN(16, "16"),
+            SEVENTEEN(17, "17"),
+            EIGHTEEN(18, "18"),
+            NINETEEN(19, "19"),
+            TWENTY(20, "20"),
+            TWENTY_ONE(21, "21"),
+            TWENTY_TWO(22, "22"),
+            TWENTY_THREE(23, "23"),
+            TWENTY_FOUR(24, "24"),
+            TWENTY_FIVE(25, "25"),
+            TWENTY_SIX(26, "26"),
+            TWENTY_SEVEN(27, "27"),
+            TWENTY_EIGHT(28, "28"),
+            TWENTY_NINE(29, "29"),
+            THIRTY(30, "30"),
+            THIRTY_ONE(31, "31"),
+            THIRTY_TWO(32, "32"),
+            THIRTY_THREE(33, "33"),
+            THIRTY_FOUR(34, "34"),
+            THIRTY_FIVE(35, "35"),
+            THIRTY_SIX(36, "36"),
+            THIRTY_SEVEN(37, "37"),
+            THIRTY_EIGHT(38, "38"),
+            THIRTY_NINE(39, "39"),
+            FORTY(40, "40"),
+
+            DISABLED(41, "disabled");
 
 
             private static final BlockCustom.EnumTdt[] META_LOOKUP = new BlockCustom.EnumTdt[values().length];
@@ -231,6 +301,49 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             }
 
             public static BlockCustom.EnumTdt byMetadata(int meta) {
+                if (meta < 0 || meta >= META_LOOKUP.length) {
+                    meta = 0;
+                }
+
+                return META_LOOKUP[meta];
+            }
+
+            public int getMetadata() {
+                return this.meta;
+            }
+
+            @Override
+            public String toString() {
+                return this.name;
+            }
+
+            public String getName() {
+                return this.name;
+            }
+        }
+
+        public enum EnumRange implements IStringSerializable {
+            TWENTY(0, "20"),
+            FORTY(1, "40");
+
+
+            private static final BlockCustom.EnumRange[] META_LOOKUP = new BlockCustom.EnumRange[values().length];
+
+            static {
+                for (BlockCustom.EnumRange countdown : values()) {
+                    META_LOOKUP[countdown.getMetadata()] = countdown;
+                }
+            }
+
+            private final int meta;
+            private final String name;
+
+            EnumRange(int i_meta, String i_name) {
+                this.meta = i_meta;
+                this.name = i_name;
+            }
+
+            public static BlockCustom.EnumRange byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }
