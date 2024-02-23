@@ -30,6 +30,7 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
 import java.util.Random;
 
 @ElementsNebulaecraftMod.ModElement.Tag
@@ -89,23 +90,17 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         public boolean isFullCube(IBlockState state) {
             return false;
         }
-
-//        @Override
-//        public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-//            return new AxisAlignedBB(0.21875, 0.15625, 0, 0.78125, 0.59375, 0.0625);
-//        }
-
         @Override
         public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
             switch (state.getValue(BlockHorizontal.FACING)) {
-                case SOUTH :
-                default :
+                case SOUTH:
+                default:
                     return new AxisAlignedBB(0.21875, 0.15625, 0, 0.78125, 0.59375, 0.0625);
-                case NORTH :
+                case NORTH:
                     return new AxisAlignedBB(0.21875, 0.15625, 0.9375, 0.78125, 0.59375, 1);
-                case EAST :
+                case EAST:
                     return new AxisAlignedBB(0, 0.15625, 0.21875, 0.0625, 0.59375, 0.78125);
-                case WEST :
+                case WEST:
                     return new AxisAlignedBB(0.9375, 0.15625, 0.21875, 1, 0.59375, 0.78125);
             }
         }
@@ -123,8 +118,7 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         @SideOnly(Side.CLIENT)
-        public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items)
-        {
+        public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
             items.add(new ItemStack(this, 1, EnumTdt.DISABLED.getMetadata()));
         }
 
@@ -157,27 +151,28 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING,placer.getHorizontalFacing().getOpposite()).withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY);
+            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING, placer.getHorizontalFacing().getOpposite()).withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY);
         }
 
         // Default blockstate is disabled
         @Override
         public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING,placer.getHorizontalFacing().getOpposite()), 3);
+            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 3);
             worldIn.scheduleUpdate(pos, this, 5);
         }
 
         @Override
-        public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
-        {
+        public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
             if (!worldIn.isRemote) {
-                if (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY) {
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.FORTY), 3);
-                    playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.FORTY.getName()));
+                if(playerIn.isSneaking()){
+                    if (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY) {
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.FORTY), 3);
+                        playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.FORTY.getName()));
 
-                } else {
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY), 3);
-                    playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.TWENTY.getName()));
+                    } else {
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY), 3);
+                        playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.TWENTY.getName()));
+                    }
                 }
             }
             return true;
@@ -189,52 +184,52 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
             super.updateTick(worldIn, pos, state, rand);
             if (state.getBlock() == this) {
-                    BlockCustom.EnumTdt countdown = state.getValue(PROPERTYCOUNTDOWN);
+                BlockCustom.EnumTdt countdown = state.getValue(PROPERTYCOUNTDOWN);
 
-                    if(!worldIn.isBlockPowered(pos)){
-                        if (countdown != EnumTdt.DISABLED) {
-                            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
-                        }
-                        // detect if block is powered every 5 ticks
-                        worldIn.scheduleUpdate(pos, this, 5);
-                        canCountdown = true;
-                        return;
-                    }
-
-                    // if block is newly powered, start countdown
-                    if(countdown == EnumTdt.DISABLED && canCountdown && worldIn.isBlockPowered(pos)){
-                        if(state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY)
-                            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.NINETEEN), 3);
-                        else
-                            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.THIRTY_NINE), 3);
-                        worldIn.scheduleUpdate(pos, this, 20);
-                        return;
-                    }
-
-                    // display ZERO state for 3 seconds
-                    if(countdown == EnumTdt.ONE){
-                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.ZERO), 3);
-                        worldIn.scheduleUpdate(pos, this, 3*20);
-                        return;
-                    }
-
-                    // end countdown, detect isBlockPowered every 5 ticks
-                    if(countdown == EnumTdt.ZERO){
+                if (!worldIn.isBlockPowered(pos)) {
+                    if (countdown != EnumTdt.DISABLED) {
                         worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
-                        canCountdown = false;
-                        worldIn.scheduleUpdate(pos, this, 5);
-                        return;
                     }
-
-                    // countdown-=1
-                    if(countdown.getMetadata()>=2&&countdown.getMetadata()<=(state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY ? 20 : 40)){
-                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(countdown.getMetadata()-1)), 3);
-                        worldIn.scheduleUpdate(pos, this, 20);
-                        return;
-                    }
-
-                    // default schedule update
+                    // detect if block is powered every 5 ticks
                     worldIn.scheduleUpdate(pos, this, 5);
+                    canCountdown = true;
+                    return;
+                }
+
+                // if block is newly powered, start countdown
+                if (countdown == EnumTdt.DISABLED && canCountdown && worldIn.isBlockPowered(pos)) {
+                    if (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY)
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.TWENTY), 3);
+                    else
+                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.FORTY), 3);
+                    worldIn.scheduleUpdate(pos, this, 10);
+                    return;
+                }
+
+                // display ZERO state for 3 seconds
+                if (countdown == EnumTdt.ONE) {
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.ZERO), 3);
+                    worldIn.scheduleUpdate(pos, this, 3 * 20);
+                    return;
+                }
+
+                // end countdown, detect isBlockPowered every 5 ticks
+                if (countdown == EnumTdt.ZERO) {
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
+                    canCountdown = false;
+                    worldIn.scheduleUpdate(pos, this, 5);
+                    return;
+                }
+
+                // countdown-=1
+                if (countdown.getMetadata() >= 2 && countdown.getMetadata() <= (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY ? 20 : 40)) {
+                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(countdown.getMetadata() - 1)), 3);
+                    worldIn.scheduleUpdate(pos, this, 10);
+                    return;
+                }
+
+                // default schedule update
+                worldIn.scheduleUpdate(pos, this, 5);
             }
         }
 
