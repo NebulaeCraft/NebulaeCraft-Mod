@@ -100,13 +100,13 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             switch (state.getValue(BlockHorizontal.FACING)) {
                 case SOUTH :
                 default :
-                    return new AxisAlignedBB(0, 0, 0.375, 1.25, 2, 1);
+                    return new AxisAlignedBB(0.21875, 0.15625, 0, 0.78125, 0.59375, 0.0625);
                 case NORTH :
-                    return new AxisAlignedBB(-0.25, 0, 0, 1, 2, 0.625);
+                    return new AxisAlignedBB(0.21875, 0.15625, 0.9375, 0.78125, 0.59375, 1);
                 case EAST :
-                    return new AxisAlignedBB(0.375, 0, -0.25, 1, 2, 1);
+                    return new AxisAlignedBB(0, 0.15625, 0.21875, 0.0625, 0.59375, 0.78125);
                 case WEST :
-                    return new AxisAlignedBB(0, 0, 0, 0.625, 2, 1.25);
+                    return new AxisAlignedBB(0.9375, 0.15625, 0.21875, 1, 0.59375, 0.78125);
             }
         }
 

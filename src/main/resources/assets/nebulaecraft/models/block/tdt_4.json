@@ -3,7 +3,7 @@
 	"textures": {
 		"0": "nebulaecraft:blocks/signal",
 		"1": "nebulaecraft:blocks/screen_door_metal",
-		"2": "nebulaecraft:blocks/tdt",
+		"2": "nebulaecraft:blocks/tdt_3",
 		"particle": "nebulaecraft:blocks/signal"
 	},
 	"elements": [
