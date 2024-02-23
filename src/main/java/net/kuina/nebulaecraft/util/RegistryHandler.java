@@ -3,6 +3,7 @@ package net.kuina.nebulaecraft.util;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.block.*;
 import net.kuina.nebulaecraft.entities.*;
+import net.kuina.nebulaecraft.tileentity.TileEntityTdt;
 import net.kuina.nebulaecraft.util.ServerHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
@@ -64,11 +65,11 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         GameRegistry.registerTileEntity(tileEntityClass, tileEntityName);
     }
 
-    ServerHandler handler = new ServerHandler();
+//    ServerHandler handler = new ServerHandler();
 
     @Override
     public void initElements() {
-        System.out.println(ServerHandler.CornField);
+//        System.out.println(ServerHandler.CornField);
         for (int i = ScreenDoorBigIDStart; i <= ScreenDoorBigIDEnd; i++) {
             registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
         }
@@ -158,6 +159,13 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
     	registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_" + "halfleft");
 
         registerItem(new CameraCart.ItemCameraCart(), "cameracart");
+
+        for(int i = 0; i <= 40; i++) {
+        	registerBlock(new BlockTdt.BlockCustom(), "tdt_" + i);
+        }
+        registerBlock(new BlockTdt.BlockCustom(), "tdt_disabled");
+
+        registerTileEntity(TileEntityTdt.class, "nebulaecraft:tdt");
     }
 
 

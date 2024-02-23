@@ -3,6 +3,7 @@ package net.kuina.nebulaecraft.block;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
+import net.kuina.nebulaecraft.tileentity.TileEntityTdt;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
@@ -19,6 +20,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
@@ -35,30 +37,29 @@ import java.util.Random;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:tdt")
-    public static final Block block = null;
-
+    //    @GameRegistry.ObjectHolder("nebulaecraft:tdt")
+//    public static final Block block = null;
+//
     public BlockTdt(ElementsNebulaecraftMod instance) {
         super(instance, 108);
     }
+//
+//    @Override
+//    public void initElements() {
+//        elements.blocks.add(() -> new BlockCustom().setRegistryName("tdt"));
+//        elements.items.add(() -> new ItemBlock(block).setRegistryName(block.getRegistryName()));
+//    }
 
-    @Override
-    public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("tdt"));
-        elements.items.add(() -> new ItemBlock(block).setRegistryName(block.getRegistryName()));
-    }
-
-    @SideOnly(Side.CLIENT)
-    @Override
-    public void registerModels(ModelRegistryEvent event) {
-        BlockCustom.EnumTdt[] allTdts = BlockCustom.EnumTdt.values();
-        for (BlockCustom.EnumTdt countdown : allTdts) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), countdown.getMetadata(), new ModelResourceLocation("nebulaecraft:tdt_" + countdown.getName(), "inventory"));
-        }
-    }
+//    @SideOnly(Side.CLIENT)
+//    @Override
+//    public void registerModels(ModelRegistryEvent event) {
+//        BlockCustom.EnumTdt[] allTdts = BlockCustom.EnumTdt.values();
+//        for (BlockCustom.EnumTdt countdown : allTdts) {
+//            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), countdown.getMetadata(), new ModelResourceLocation("nebulaecraft:tdt_" + countdown.getName(), "inventory"));
+//        }
+//    }
 
     public static class BlockCustom extends Block {
-        public static final PropertyEnum<EnumTdt> PROPERTYCOUNTDOWN = PropertyEnum.create("countdown", BlockCustom.EnumTdt.class);
         public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
         public static final PropertyEnum<EnumRange> PROPERTYCOUNTDOWNRANGE = PropertyEnum.create("range", BlockCustom.EnumRange.class);
 
@@ -74,7 +75,6 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             setLightOpacity(0);
             setCreativeTab(TabNebulaecraftMetro.tab);
             setDefaultState(this.blockState.getBaseState()
-                    .withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED)
                     .withProperty(FACING, EnumFacing.NORTH)
                     .withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY));
             canCountdown = false;
@@ -90,6 +90,7 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         public boolean isFullCube(IBlockState state) {
             return false;
         }
+
         @Override
         public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
             switch (state.getValue(BlockHorizontal.FACING)) {
@@ -112,8 +113,7 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public int damageDropped(IBlockState state) {
-            BlockCustom.EnumTdt enumTdt = (BlockCustom.EnumTdt) state.getValue(PROPERTYCOUNTDOWN);
-            return enumTdt.getMetadata();
+            return 0;
         }
 
         @Override
@@ -127,7 +127,6 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             int countdownModeMeta = (meta & 0b0100) >> 2; // store countdown mode meta at 0100;
             int facingMeta = meta & 3; // 0011;
             return this.getDefaultState()
-                    .withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED)
                     .withProperty(FACING, EnumFacing.getHorizontal(facingMeta))
                     .withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.byMetadata(countdownModeMeta));
         }
@@ -146,25 +145,25 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         protected BlockStateContainer createBlockState() {
-            return new BlockStateContainer(this, PROPERTYCOUNTDOWN, FACING, PROPERTYCOUNTDOWNRANGE);
+            return new BlockStateContainer(this, FACING, PROPERTYCOUNTDOWNRANGE);
         }
 
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing blockFaceClickedOn, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-            return this.getDefaultState().withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING, placer.getHorizontalFacing().getOpposite()).withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY);
+            return this.getDefaultState().withProperty(FACING, placer.getHorizontalFacing().getOpposite()).withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY);
         }
 
         // Default blockstate is disabled
         @Override
         public void onBlockPlacedBy(World worldIn, BlockPos pos, IBlockState state, EntityLivingBase placer, ItemStack stack) {
-            worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED).withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 3);
+            worldIn.setBlockState(pos, state.withProperty(FACING, placer.getHorizontalFacing().getOpposite()), 3);
             worldIn.scheduleUpdate(pos, this, 5);
         }
 
         @Override
         public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
             if (!worldIn.isRemote) {
-                if(playerIn.isSneaking()){
+                if (playerIn.isSneaking()) {
                     if (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY) {
                         worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.FORTY), 3);
                         playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.FORTY.getName()));
@@ -178,59 +177,51 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             return true;
         }
 
+        public static String getCountdown(World worldIn, BlockPos pos) {
+            IBlockState state = worldIn.getBlockState(pos);
+            Block block = state.getBlock();
+            return block.getRegistryName().getResourcePath().split("_")[1];
+        }
 
-        // Callback on World#scheduleUpdate
-        @Override
-        public void updateTick(World worldIn, BlockPos pos, IBlockState state, Random rand) {
-            super.updateTick(worldIn, pos, state, rand);
-            if (state.getBlock() == this) {
-                BlockCustom.EnumTdt countdown = state.getValue(PROPERTYCOUNTDOWN);
+        public static int getCountdownInt(World worldIn, BlockPos pos) {
+            String countdown = getCountdown(worldIn, pos);
+            if (countdown.equals(EnumTdt.DISABLED.getName()))
+                return -1;
+            return Integer.parseInt(countdown);
+        }
 
-                if (!worldIn.isBlockPowered(pos)) {
-                    if (countdown != EnumTdt.DISABLED) {
-                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
-                    }
-                    // detect if block is powered every 5 ticks
-                    worldIn.scheduleUpdate(pos, this, 5);
-                    canCountdown = true;
-                    return;
-                }
-
-                // if block is newly powered, start countdown
-                if (countdown == EnumTdt.DISABLED && canCountdown && worldIn.isBlockPowered(pos)) {
-                    if (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY)
-                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.TWENTY), 3);
-                    else
-                        worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.FORTY), 3);
-                    worldIn.scheduleUpdate(pos, this, 10);
-                    return;
-                }
-
-                // display ZERO state for 3 seconds
-                if (countdown == EnumTdt.ONE) {
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.ZERO), 3);
-                    worldIn.scheduleUpdate(pos, this, 3 * 20);
-                    return;
-                }
-
-                // end countdown, detect isBlockPowered every 5 ticks
-                if (countdown == EnumTdt.ZERO) {
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, EnumTdt.DISABLED), 3);
-                    canCountdown = false;
-                    worldIn.scheduleUpdate(pos, this, 5);
-                    return;
-                }
-
-                // countdown-=1
-                if (countdown.getMetadata() >= 2 && countdown.getMetadata() <= (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY ? 20 : 40)) {
-                    worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWN, BlockCustom.EnumTdt.byMetadata(countdown.getMetadata() - 1)), 3);
-                    worldIn.scheduleUpdate(pos, this, 10);
-                    return;
-                }
-
-                // default schedule update
-                worldIn.scheduleUpdate(pos, this, 5);
+        public static void setState(World worldIn, BlockPos pos, String next) {
+            TileEntityTdt tileentity = (TileEntityTdt) worldIn.getTileEntity(pos);
+            IBlockState state = worldIn.getBlockState(pos);
+            worldIn.setBlockState(pos,
+                    Block.getBlockFromName("nebulaecraft:tdt_" + next)
+                            .getDefaultState()
+                            .withProperty(FACING, state.getValue(FACING))
+                            .withProperty(PROPERTYCOUNTDOWNRANGE, state.getValue(PROPERTYCOUNTDOWNRANGE))
+                    , 3);
+            if (tileentity != null) {
+                tileentity.validate();
+                worldIn.setTileEntity(pos, tileentity);
             }
+        }
+
+        public static boolean isPowered(World worldIn, BlockPos pos) {
+            return worldIn.isBlockPowered(pos);
+        }
+
+        public static EnumRange getRange(World worldIn, BlockPos pos) {
+            IBlockState state = worldIn.getBlockState(pos);
+            return state.getValue(PROPERTYCOUNTDOWNRANGE);
+        }
+
+        @Override
+        public boolean hasTileEntity(IBlockState state) {
+            return true;
+        }
+
+        @Override
+        public TileEntity createTileEntity(World world, IBlockState state) {
+            return new TileEntityTdt();
         }
 
         public enum EnumTdt implements IStringSerializable {
