@@ -2,6 +2,7 @@ package net.kuina.nebulaecraft.util;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.block.*;
+import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.kuina.nebulaecraft.entities.*;
 import net.kuina.nebulaecraft.tileentity.TileEntityTdt;
 import net.kuina.nebulaecraft.util.ServerHandler;
@@ -163,7 +164,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         for(int i = 0; i <= 40; i++) {
         	registerBlock(new BlockTdt.BlockCustom(), "tdt_" + i);
         }
-        registerBlock(new BlockTdt.BlockCustom(), "tdt_disabled");
+        registerBlock(new BlockTdt.BlockCustom().setCreativeTab(TabNebulaecraftMetro.tab), "tdt");
 
         registerTileEntity(TileEntityTdt.class, "nebulaecraft:tdt");
     }

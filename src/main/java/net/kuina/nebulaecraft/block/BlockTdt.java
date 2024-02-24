@@ -25,6 +25,7 @@ import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -37,27 +38,9 @@ import java.util.Random;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
-    //    @GameRegistry.ObjectHolder("nebulaecraft:tdt")
-//    public static final Block block = null;
-//
     public BlockTdt(ElementsNebulaecraftMod instance) {
         super(instance, 108);
     }
-//
-//    @Override
-//    public void initElements() {
-//        elements.blocks.add(() -> new BlockCustom().setRegistryName("tdt"));
-//        elements.items.add(() -> new ItemBlock(block).setRegistryName(block.getRegistryName()));
-//    }
-
-//    @SideOnly(Side.CLIENT)
-//    @Override
-//    public void registerModels(ModelRegistryEvent event) {
-//        BlockCustom.EnumTdt[] allTdts = BlockCustom.EnumTdt.values();
-//        for (BlockCustom.EnumTdt countdown : allTdts) {
-//            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), countdown.getMetadata(), new ModelResourceLocation("nebulaecraft:tdt_" + countdown.getName(), "inventory"));
-//        }
-//    }
 
     public static class BlockCustom extends Block {
         public static final PropertyDirection FACING = PropertyDirection.create("facing", EnumFacing.Plane.HORIZONTAL);
@@ -73,7 +56,6 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             setResistance(10F);
             setLightLevel(0.8F);
             setLightOpacity(0);
-            setCreativeTab(TabNebulaecraftMetro.tab);
             setDefaultState(this.blockState.getBaseState()
                     .withProperty(FACING, EnumFacing.NORTH)
                     .withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY));
@@ -166,20 +148,23 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
                 if (playerIn.isSneaking()) {
                     if (state.getValue(PROPERTYCOUNTDOWNRANGE) == EnumRange.TWENTY) {
                         worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.FORTY), 3);
-                        playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.FORTY.getName()));
+                        playerIn.sendMessage(new TextComponentTranslation("message.tdt_mode_switch.name").appendText(": " + EnumRange.FORTY.getName()));
 
                     } else {
                         worldIn.setBlockState(pos, state.withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY), 3);
-                        playerIn.sendMessage(new TextComponentString(I18n.format("message.tdt_mode_switch.name") + ": " + EnumRange.TWENTY.getName()));
+                        playerIn.sendMessage(new TextComponentTranslation("message.tdt_mode_switch.name").appendText(": " + EnumRange.TWENTY.getName()));
                     }
                 }
             }
             return true;
         }
 
+
         public static String getCountdown(World worldIn, BlockPos pos) {
             IBlockState state = worldIn.getBlockState(pos);
             Block block = state.getBlock();
+            if (!block.getRegistryName().getResourcePath().contains("_"))
+                return EnumTdt.DISABLED.getName();
             return block.getRegistryName().getResourcePath().split("_")[1];
         }
 
@@ -193,12 +178,21 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         public static void setState(World worldIn, BlockPos pos, String next) {
             TileEntityTdt tileentity = (TileEntityTdt) worldIn.getTileEntity(pos);
             IBlockState state = worldIn.getBlockState(pos);
-            worldIn.setBlockState(pos,
-                    Block.getBlockFromName("nebulaecraft:tdt_" + next)
-                            .getDefaultState()
-                            .withProperty(FACING, state.getValue(FACING))
-                            .withProperty(PROPERTYCOUNTDOWNRANGE, state.getValue(PROPERTYCOUNTDOWNRANGE))
-                    , 3);
+            if (!next.equals(EnumTdt.DISABLED.getName())) {
+                worldIn.setBlockState(pos,
+                        Block.getBlockFromName("nebulaecraft:tdt_" + next)
+                                .getDefaultState()
+                                .withProperty(FACING, state.getValue(FACING))
+                                .withProperty(PROPERTYCOUNTDOWNRANGE, state.getValue(PROPERTYCOUNTDOWNRANGE))
+                        , 3);
+            } else {
+                worldIn.setBlockState(pos,
+                        Block.getBlockFromName("nebulaecraft:tdt")
+                                .getDefaultState()
+                                .withProperty(FACING, state.getValue(FACING))
+                                .withProperty(PROPERTYCOUNTDOWNRANGE, state.getValue(PROPERTYCOUNTDOWNRANGE))
+                        , 3);
+            }
             if (tileentity != null) {
                 tileentity.validate();
                 worldIn.setTileEntity(pos, tileentity);

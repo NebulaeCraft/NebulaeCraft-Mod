@@ -30,7 +30,7 @@ public class TileEntityTdt extends TileEntity implements ITickable {
 
             // if block is newly powered, start countdown
             if (countdown.equals(BlockTdt.BlockCustom.EnumTdt.DISABLED.getName()) && canCountdown && BlockTdt.BlockCustom.isPowered(world, pos)) {
-                if(ticksCount >= 10){
+                if (ticksCount >= 10) {
                     if (BlockTdt.BlockCustom.getRange(world, pos) == BlockTdt.BlockCustom.EnumRange.TWENTY)
                         BlockTdt.BlockCustom.setState(world, pos, BlockTdt.BlockCustom.EnumTdt.TWENTY.getName());
                     else
@@ -42,7 +42,7 @@ public class TileEntityTdt extends TileEntity implements ITickable {
             // display ZERO state for 3 seconds
             // end countdown, detect isBlockPowered every tick
             if (countdown.equals(BlockTdt.BlockCustom.EnumTdt.ZERO.getName())) {
-                if(ticksCount >= 3 * 20){
+                if (ticksCount >= 3 * 20) {
                     BlockTdt.BlockCustom.setState(world, pos, BlockTdt.BlockCustom.EnumTdt.DISABLED.getName());
                     canCountdown = false;
                     ticksCount = 0;
@@ -51,8 +51,8 @@ public class TileEntityTdt extends TileEntity implements ITickable {
             }
 
             // countdown-=1
-            if (countdownNumber >= 1 && countdownNumber <= (BlockTdt.BlockCustom.getRange(world,pos) == BlockTdt.BlockCustom.EnumRange.TWENTY ? 20 : 40)) {
-                if(ticksCount >= 10){
+            if (countdownNumber >= 1 && countdownNumber <= (BlockTdt.BlockCustom.getRange(world, pos) == BlockTdt.BlockCustom.EnumRange.TWENTY ? 20 : 40)) {
+                if (ticksCount >= 10) {
                     BlockTdt.BlockCustom.setState(world, pos, BlockTdt.BlockCustom.EnumTdt.byMetadata(countdownNumber - 1).getName());
                     ticksCount = 0;
                     return;
