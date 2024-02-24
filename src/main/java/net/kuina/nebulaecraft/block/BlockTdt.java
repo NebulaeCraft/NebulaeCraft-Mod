@@ -99,12 +99,6 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         }
 
         @Override
-        @SideOnly(Side.CLIENT)
-        public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            items.add(new ItemStack(this, 1, EnumTdt.DISABLED.getMetadata()));
-        }
-
-        @Override
         public IBlockState getStateFromMeta(int meta) {
             int countdownModeMeta = (meta & 0b0100) >> 2; // store countdown mode meta at 0100;
             int facingMeta = meta & 3; // 0011;
