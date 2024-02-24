@@ -3,6 +3,7 @@ package net.kuina.nebulaecraft.tileentity;
 import net.kuina.nebulaecraft.block.BlockTdt;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 
@@ -60,5 +61,19 @@ public class TileEntityTdt extends TileEntity implements ITickable {
             }
             ticksCount++;
         }
+    }
+
+    @Override
+    public void readFromNBT(NBTTagCompound tag) {
+        super.readFromNBT(tag);
+        this.ticksCount = tag.getInteger("ticksCount");
+        this.canCountdown = tag.getBoolean("canCountdown");
+    }
+
+    @Override
+    public NBTTagCompound writeToNBT(NBTTagCompound tag) {
+        tag.setInteger("ticksCount", this.ticksCount);
+        tag.setBoolean("canCountdown", this.canCountdown);
+        return super.writeToNBT(tag);
     }
 }

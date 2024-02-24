@@ -17,6 +17,7 @@ import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
@@ -57,8 +58,7 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             setLightLevel(0.8F);
             setLightOpacity(0);
             setDefaultState(this.blockState.getBaseState()
-                    .withProperty(FACING, EnumFacing.NORTH)
-                    .withProperty(PROPERTYCOUNTDOWNRANGE, EnumRange.TWENTY));
+                    .withProperty(FACING, EnumFacing.NORTH));
             canCountdown = false;
         }
 
@@ -216,6 +216,11 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         @Override
         public TileEntity createTileEntity(World world, IBlockState state) {
             return new TileEntityTdt();
+        }
+
+        public ItemStack getItem(World worldIn, BlockPos pos, IBlockState state)
+        {
+            return new ItemStack(Block.getBlockFromName("nebulaecraft:tdt"));
         }
 
         public enum EnumTdt implements IStringSerializable {
