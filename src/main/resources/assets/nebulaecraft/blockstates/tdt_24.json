@@ -1,0 +1,12 @@
+{
+	"variants": {
+		"facing=south,range=20": {"model": "nebulaecraft:tdt_24", "y": 0},
+		"facing=west,range=20": {"model": "nebulaecraft:tdt_24", "y": 90},
+		"facing=north,range=20": {"model": "nebulaecraft:tdt_24", "y": 180},
+		"facing=east,range=20": {"model": "nebulaecraft:tdt_24", "y": 270},
+		"facing=south,range=40": {"model": "nebulaecraft:tdt_24", "y": 0},
+		"facing=west,range=40": {"model": "nebulaecraft:tdt_24", "y": 90},
+		"facing=north,range=40": {"model": "nebulaecraft:tdt_24", "y": 180},
+		"facing=east,range=40": {"model": "nebulaecraft:tdt_24", "y": 270}
+	}
+}

@@ -24,6 +24,7 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.*;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.RayTraceResult;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
@@ -222,6 +223,12 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
         @Override
         public TileEntity createTileEntity(World world, IBlockState state) {
             return new TileEntityTdt();
+        }
+
+        @Override
+        public ItemStack getPickBlock(IBlockState state, RayTraceResult target, World world, BlockPos pos, EntityPlayer player) {
+            super.getPickBlock(state, target, world, pos, player);
+            return new ItemStack(this,1,0);
         }
 
         public enum EnumTdt implements IStringSerializable {
