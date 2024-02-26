@@ -147,15 +147,15 @@
 		},
 		{
 			"from": [11.245, 0, 7],
-			"to": [19.5, 1, 9],
+			"to": [18, 1, 9],
 			"rotation": {"angle": 0, "axis": "z", "origin": [5, 2, 0]},
 			"faces": {
-				"north": {"uv": [0, 0, 1, 8.755], "rotation": 90, "texture": "#1"},
-				"east": {"uv": [0, 0, 1, 2], "rotation": 270, "texture": "#1"},
-				"south": {"uv": [0, 0, 1, 8.755], "rotation": 270, "texture": "#1"},
-				"west": {"uv": [0, 0, 1, 2], "rotation": 270, "texture": "#1"},
-				"up": {"uv": [1, 1, 3, 9.755], "rotation": 270, "texture": "#1"},
-				"down": {"uv": [1, 1, 3, 9.755], "rotation": 270, "texture": "#1"}
+				"north": {"uv": [0, 15, 4.755, 16], "rotation": 90, "texture": "#1"},
+				"east": {"uv": [7, 15, 9, 16], "rotation": 270, "texture": "#1"},
+				"south": {"uv": [11.245, 15, 16, 16], "rotation": 270, "texture": "#1"},
+				"west": {"uv": [7, 15, 9, 16], "rotation": 270, "texture": "#1"},
+				"up": {"uv": [11.245, 7, 16, 9], "rotation": 270, "texture": "#1"},
+				"down": {"uv": [11.245, 7, 16, 9], "rotation": 270, "texture": "#1"}
 			}
 		},
 		{
@@ -230,21 +230,25 @@
 		{
 			"name": "NebulaeCraft@Srcphy",
 			"origin": [0, 0, 0],
+			"color": 0,
 			"children": []
 		},
 		{
 			"name": "Cover",
 			"origin": [0, 0, 0],
+			"color": 0,
 			"children": [0, 1, 2, 3, 4]
 		},
 		{
 			"name": "Bracket",
 			"origin": [0, 0, 0],
+			"color": 0,
 			"children": [5, 6, 7, 8, 9, 10, 11, 12, 13]
 		},
 		{
 			"name": "Catenary",
 			"origin": [0, 0, 0],
+			"color": 0,
 			"children": [14, 15, 16]
 		}
 	]

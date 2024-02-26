@@ -1,0 +1,16 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:trackbed_elevated","y": 90},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:trackbed_elevated"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:trackbed_elevated","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:trackbed_elevated"},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:trackbed_elevated_curved","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:trackbed_elevated_curved"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:trackbed_elevated_curved","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:trackbed_elevated_curved","y": 180},
+	"facing=east,subtype=subtype2": { "model": "nebulaecraft:trackbed_elevated_gap","y": 270},
+	"facing=south,subtype=subtype2": { "model": "nebulaecraft:trackbed_elevated_gap"},
+	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:trackbed_elevated_gap","y": 90},
+	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:trackbed_elevated_gap","y": 180}
+  }
+}

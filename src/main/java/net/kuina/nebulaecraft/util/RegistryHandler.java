@@ -52,11 +52,11 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         GameRegistry.registerTileEntity(tileEntityClass, tileEntityName);
     }
 
-//    ServerHandler handler = new ServerHandler();
+    ServerHandler handler = new ServerHandler();
 
     @Override
     public void initElements() {
-//        System.out.println(ServerHandler.CornField);
+        System.out.println(ServerHandler.CornField);
         for (int i = 1; i <= 4; i++) {
             registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
         }

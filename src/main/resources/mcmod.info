@@ -3,14 +3,14 @@
     "modid": "nebulaecraft",
     "name": "NebulaeCraft",
     "description": "This mod is designed for NebulaeCraft 5th Server only.",
-    "version": "2.15.1",
+    "version": "2.15.2",
     "credits": "(c)2017-2024 NebulaeCraft  All Rights Reserved.",
     "logoFile": "assets/nebulaecraft/textures/logo.png",
     "mcversion": "1.12.2",
     "url": "https://wiki.knebulae.com",
     "updateUrl": "",
     "authorList": [
-      "Kuina, Ishirai"
+      "Kuina, Ishirai, Srcphy"
     ],
     "dependencies": [],
     "dependants": [],
