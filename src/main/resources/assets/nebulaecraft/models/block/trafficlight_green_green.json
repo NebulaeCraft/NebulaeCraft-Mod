@@ -3,7 +3,7 @@
 	"textures": {
 		"1": "nebulaecraft:blocks/device_ms_surfacegray",
 		"2": "nebulaecraft:blocks/device_ms_surfaceblack",
-		"4": "nebulaecraft:blocks/signal_white",
+		"4": "nebulaecraft:blocks/thirdrail_white",
 		"5": "nebulaecraft:blocks/signal_green",
 		"6": "nebulaecraft:blocks/trafficlight_left_green",
 		"7": "nebulaecraft:blocks/roadsign_back_5",
