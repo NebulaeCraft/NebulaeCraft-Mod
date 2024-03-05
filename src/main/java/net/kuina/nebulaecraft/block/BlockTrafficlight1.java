@@ -61,7 +61,7 @@ public class BlockTrafficlight1 extends ElementsNebulaecraftMod.ModElement {
             setSoundType(SoundType.METAL);
             setHardness(1F);
             setResistance(10F);
-            setLightLevel(0.5F);
+            setLightLevel(0F);
             setLightOpacity(0);
             setCreativeTab(TabNebulaecraftRoad.tab);
             this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));

@@ -55,7 +55,7 @@ public class BlockTdt extends ElementsNebulaecraftMod.ModElement {
             setSoundType(SoundType.METAL);
             setHardness(1F);
             setResistance(10F);
-            setLightLevel(0.8F);
+            setLightLevel(0F);
             setLightOpacity(0);
             setDefaultState(this.blockState.getBaseState()
                     .withProperty(FACING, EnumFacing.NORTH));
