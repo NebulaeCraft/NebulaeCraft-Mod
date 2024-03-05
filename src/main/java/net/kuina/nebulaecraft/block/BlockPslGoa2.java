@@ -61,7 +61,7 @@ public class BlockPslGoa2 extends ElementsNebulaecraftMod.ModElement {
             setSoundType(SoundType.STONE);
             setHardness(1F);
             setResistance(10F);
-            setLightLevel(0.5F);
+            setLightLevel(0F);
             setLightOpacity(0);
             setCreativeTab(TabNebulaecraftMetro.tab);
             this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
