@@ -28,26 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockCatenaryWireSupport extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:catenary_wire_support")
+public class BlockCatenaryWireFrame extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:catenary_wire_frame")
     public static final Block block = null;
 
-    public BlockCatenaryWireSupport(ElementsNebulaecraftMod instance) {
-        super(instance, 3);
+    public BlockCatenaryWireFrame(ElementsNebulaecraftMod instance) {
+        super(instance, 110);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("catenary_wire_support"));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("catenary_wire_frame"));
         elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockCatenaryWireSupport.BlockCustom.EnumType[] allSubtypes = BlockCatenaryWireSupport.BlockCustom.EnumType.values();
-        for (BlockCatenaryWireSupport.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:catenary_wire_support_" + subtype.getName(), "inventory"));
+        BlockCatenaryWireFrame.BlockCustom.EnumType[] allSubtypes = BlockCatenaryWireFrame.BlockCustom.EnumType.values();
+        for (BlockCatenaryWireFrame.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:catenary_wire_frame_" + subtype.getName(), "inventory"));
         }
     }
 
@@ -57,7 +57,7 @@ public class BlockCatenaryWireSupport extends ElementsNebulaecraftMod.ModElement
 
         public BlockCustom() {
             super(Material.IRON);
-            setUnlocalizedName("catenary_wire_support");
+            setUnlocalizedName("catenary_wire_frame");
             setSoundType(SoundType.METAL);
 			setHardness(1F);
 			setResistance(10F);
@@ -70,8 +70,8 @@ public class BlockCatenaryWireSupport extends ElementsNebulaecraftMod.ModElement
         @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockCatenaryWireSupport.BlockCustom.EnumType[] allSubtypes = BlockCatenaryWireSupport.BlockCustom.EnumType.values();
-            for (BlockCatenaryWireSupport.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockCatenaryWireFrame.BlockCustom.EnumType[] allSubtypes = BlockCatenaryWireFrame.BlockCustom.EnumType.values();
+            for (BlockCatenaryWireFrame.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
@@ -97,38 +97,38 @@ public class BlockCatenaryWireSupport extends ElementsNebulaecraftMod.ModElement
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.4375, 0, -0.375, 0.5625, 0.8, 1);
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 0.625, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0.4375, 0, 0, 0.5625, 0.8, 1.375);
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 0.625, 1);
                     case EAST:
-                        return new AxisAlignedBB(-0.375, 0, 0.4375, 1, 0.8, 0.5625);
+                        return new AxisAlignedBB(0, 0, 0.25, 1, 0.625, 0.75);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0.4375, 1.375, 0.8, 0.5625);
+                        return new AxisAlignedBB(0, 0, 0.25, 1, 0.625, 0.75);
                 }
             } else if (state.getValue(SUBTYPE).getMetadata() == 1) {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.4375, 0, -0.375, 0.5625, 0.8, 0.6);
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 0.625, 1);
                     case NORTH:
-                        return new AxisAlignedBB(0.4375, 0, 0.4, 0.5625, 0.8, 1.375);
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 0.625, 1);
                     case EAST:
-                        return new AxisAlignedBB(-0.375, 0, 0.4375, 0.6, 0.8, 0.5625);
+                        return new AxisAlignedBB(0, 0, 0.25, 1, 0.625, 0.75);
                     case WEST:
-                        return new AxisAlignedBB(0.4, 0, 0.4375, 1.375, 0.8, 0.5625);
+                        return new AxisAlignedBB(0, 0, 0.25, 1, 0.625, 0.75);
 
                 }
             } else{
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
-                        return new AxisAlignedBB(0.4375, 0, -0.375, 0.5625, 0.8, 1);
+                        return new AxisAlignedBB(0, 0, 0.25, 1, 1, 0.75);
                     case NORTH:
-                        return new AxisAlignedBB(0.4375, 0, 0, 0.5625, 0.8, 1.375);
+                        return new AxisAlignedBB(0, 0, 0.25, 1, 1, 0.75);
                     case EAST:
-                        return new AxisAlignedBB(-0.375, 0, 0.4375, 1, 0.8, 0.5625);
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 1);
                     case WEST:
-                        return new AxisAlignedBB(0, 0, 0.4375, 1.375, 0.8, 0.5625);
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 1);
                 }
             }
 		}
@@ -176,10 +176,10 @@ public class BlockCatenaryWireSupport extends ElementsNebulaecraftMod.ModElement
             SUBTYPE1(1, "subtype1"),
             SUBTYPE2(2, "subtype2");
 
-            private static final BlockCatenaryWireSupport.BlockCustom.EnumType[] META_LOOKUP = new BlockCatenaryWireSupport.BlockCustom.EnumType[values().length];
+            private static final BlockCatenaryWireFrame.BlockCustom.EnumType[] META_LOOKUP = new BlockCatenaryWireFrame.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockCatenaryWireSupport.BlockCustom.EnumType type : values()) {
+                for (BlockCatenaryWireFrame.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -192,7 +192,7 @@ public class BlockCatenaryWireSupport extends ElementsNebulaecraftMod.ModElement
                 this.name = i_name;
             }
 
-            public static BlockCatenaryWireSupport.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockCatenaryWireFrame.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }

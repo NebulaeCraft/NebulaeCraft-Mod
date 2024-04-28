@@ -80,13 +80,13 @@ public class BlockCatenaryWireDropper extends ElementsNebulaecraftMod.ModElement
 			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
-					return new AxisAlignedBB(0.375, 0, 0, 0.625, 0.6875, 1);
+					return new AxisAlignedBB(0.375, 0, 0, 0.625, 0.8, 1);
 				case NORTH :
-					return new AxisAlignedBB(0.375, 0, 0, 0.625, 0.6875, 1);
+					return new AxisAlignedBB(0.375, 0, 0, 0.625, 0.8, 1);
 				case EAST :
-					return new AxisAlignedBB(0, 0, 0.375, 1, 0.6875, 0.625);
+					return new AxisAlignedBB(0, 0, 0.375, 1, 0.8, 0.625);
 				case WEST :
-					return new AxisAlignedBB(0, 0, 0.375, 1, 0.6875, 0.625);
+					return new AxisAlignedBB(0, 0, 0.375, 1, 0.8, 0.625);
 			}
 		}
 

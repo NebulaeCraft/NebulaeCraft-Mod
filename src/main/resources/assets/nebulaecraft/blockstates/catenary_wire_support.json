@@ -7,6 +7,11 @@
 	"facing=east,subtype=subtype1": { "model": "nebulaecraft:catenary_wire_support_2","y": 180},
 	"facing=south,subtype=subtype1": { "model": "nebulaecraft:catenary_wire_support_2","y": 270},
 	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:catenary_wire_support_2"},
-	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:catenary_wire_support_2","y": 90}
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:catenary_wire_support_2","y": 90},
+	"facing=east,subtype=subtype2": { "model": "nebulaecraft:catenary_wire_support_3","y": 180},
+	"facing=south,subtype=subtype2": { "model": "nebulaecraft:catenary_wire_support_3","y": 270},
+	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:catenary_wire_support_3"},
+	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:catenary_wire_support_3","y": 90}
+
   }
 }
