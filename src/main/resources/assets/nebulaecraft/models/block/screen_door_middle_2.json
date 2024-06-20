@@ -73,9 +73,8 @@
 			"to": [16, 0.05, 0],
 			"rotation": {"angle": 0, "axis": "y", "origin": [8, 8, 7]},
 			"faces": {
-				"up": {"uv": [8, 12, 0, 4], "texture": "#8"}
+				"up": {"uv": [8, 13.25, 0, 5.25], "texture": "#8"}
 			}
 		}
-	],
-	"display": {}
+	]
 }
