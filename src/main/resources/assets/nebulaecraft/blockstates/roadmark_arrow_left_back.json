@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:roadmark_arrow_left_back","y": 270},
+	"facing=west":  { "model": "nebulaecraft:roadmark_arrow_left_back","y": 90},
+	"facing=south": { "model": "nebulaecraft:roadmark_arrow_left_back","y": 0},
+	"facing=north":  { "model": "nebulaecraft:roadmark_arrow_left_back","y": 180}
+  }
+}

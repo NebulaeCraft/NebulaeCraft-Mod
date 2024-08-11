@@ -1,0 +1,18 @@
+{
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nebulaecraft:blocks/roadmark_arrow_noback",
+		"particle": "nebulaecraft:blocks/roadmark_arrow_noback"
+	},
+	"elements": [
+		{
+			"from": [-16, 0.05, -16],
+			"to": [32, 0.05, 32],
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 0, -8]},
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#0"},
+				"down": {"uv": [0, 16, 16, 0], "texture": "#0"}
+			}
+		}
+	]
+}
