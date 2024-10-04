@@ -122,13 +122,9 @@ public class BlockAsphaltStopLineConnected extends ElementsNebulaecraftMod.ModEl
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
             BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
-
-            if (facing == EnumFacing.UP || facing == EnumFacing.DOWN)
-                return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
-
-            System.out.println(EnumFacing.getFront(facing.getIndex() - 2).getName2());
-            return this.getDefaultState().withProperty(FACING, facing).withProperty(SUBTYPE, subtype);
+            return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
+
 
         public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),

@@ -5,7 +5,7 @@ import net.kuina.nebulaecraft.block.*;
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.kuina.nebulaecraft.entities.*;
 import net.kuina.nebulaecraft.tileentity.TileEntityTdt;
-//import net.kuina.nebulaecraft.util.ServerHandler;
+import net.kuina.nebulaecraft.util.ServerHandler;
 import net.minecraft.block.Block;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.item.Item;
@@ -52,11 +52,11 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         GameRegistry.registerTileEntity(tileEntityClass, tileEntityName);
     }
 
-//    ServerHandler handler = new ServerHandler();
+    ServerHandler handler = new ServerHandler();
 
     @Override
     public void initElements() {
-//        System.out.println(ServerHandler.CornField);
+        System.out.println(ServerHandler.CornField);
         for (int i = 1; i <= 4; i++) {
             registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
         }
