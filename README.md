@@ -3,6 +3,6 @@
 
 Using Forge Version: `forge:1.12.2-14.23.5.2855`
 
-(c)2017-2022 NebulaeCraft.  All Rights Reserved.
+(c)2017-2025 NebulaeCraft.  All Rights Reserved.
 
 To Download a Artifact, please view [Releases](https://github.com/NebulaeCraft/NebulaeCraft-Mod/releases).
