@@ -37,7 +37,7 @@ public class BlockColor1 extends ElementsNebulaecraftMod.ModElement {
 	public static final Block block = null;
 	
 	public BlockColor1(ElementsNebulaecraftMod instance) {
-		super(instance, 91);
+		super(instance, 1);
 	}
 
 	@Override

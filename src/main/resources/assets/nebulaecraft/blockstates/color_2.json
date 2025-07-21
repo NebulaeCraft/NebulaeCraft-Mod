@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"subtype=subtype0": {"model": "nebulaecraft:color_nebulaeworld"},
+	"subtype=subtype1": {"model": "nebulaecraft:color_ns"},
+	"subtype=subtype2": {"model": "nebulaecraft:color_outerring"},
+	"subtype=subtype3": {"model": "nebulaecraft:color_westrail"}
+  }
+}

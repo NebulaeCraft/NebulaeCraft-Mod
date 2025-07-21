@@ -2,8 +2,8 @@
 	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "nebulaecraft:blocks/roadsign_63",
-		"1": "nebulaecraft:blocks/roadsign_back_4",
-		"particle": "nebulaecraft:blocks/roadsign_back_4"
+		"1": "nebulaecraft:blocks/roadsign_back_7",
+		"particle": "nebulaecraft:blocks/roadsign_back_7"
 	},
 	"elements": [
 		{

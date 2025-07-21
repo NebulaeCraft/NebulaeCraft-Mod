@@ -1,0 +1,11 @@
+{
+  "variants": {
+	"subtype=subtype0": {"model": "nebulaecraft:color_chinyuhsing"},
+	"subtype=subtype1": {"model": "nebulaecraft:color_cl1"},
+	"subtype=subtype2": {"model": "nebulaecraft:color_cl2"},
+	"subtype=subtype3": {"model": "nebulaecraft:color_cl3"},
+	"subtype=subtype4": {"model": "nebulaecraft:color_cl4"},
+	"subtype=subtype5": {"model": "nebulaecraft:color_cl5"},
+	"subtype=subtype6": {"model": "nebulaecraft:color_cl6"}
+  }
+}
