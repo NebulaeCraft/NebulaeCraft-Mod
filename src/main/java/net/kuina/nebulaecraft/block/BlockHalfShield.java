@@ -68,12 +68,6 @@ public class BlockHalfShield extends ElementsNebulaecraftMod.ModElement {
         }
 
         @Override
-        @javax.annotation.Nullable
-        public AxisAlignedBB getCollisionBoundingBox(IBlockState blockState, IBlockAccess worldIn, BlockPos pos) {
-            return NULL_AABB;
-        }
-
-        @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
             BlockHalfShield.BlockCustom.EnumType[] allSubtypes = BlockHalfShield.BlockCustom.EnumType.values();
