@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/half_shield_corner_r",
+  "parent": "nebulaecraft:block/cl_half_shield_corner_r",
   "display": {
 		"thirdperson_righthand": {
 			"rotation": [0, -180, 0],

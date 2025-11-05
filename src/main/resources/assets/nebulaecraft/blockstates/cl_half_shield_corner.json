@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:cl_half_shield_corner_l","y": 180},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:cl_half_shield_corner_l","y": 270},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:cl_half_shield_corner_l"},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:cl_half_shield_corner_l","y": 90},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:cl_half_shield_corner_r"},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:cl_half_shield_corner_r","y": 90},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:cl_half_shield_corner_r","y": 180},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:cl_half_shield_corner_r","y": 270}
+  }
+}
