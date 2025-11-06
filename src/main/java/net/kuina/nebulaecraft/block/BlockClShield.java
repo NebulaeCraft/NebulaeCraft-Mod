@@ -28,26 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockHalfShield extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:half_shield")
+public class BlockClShield extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:cl_shield")
     public static final Block block = null;
 
-    public BlockHalfShield(ElementsNebulaecraftMod instance) {
-        super(instance, 112);
+    public BlockClShield(ElementsNebulaecraftMod instance) {
+        super(instance, 114);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("half_shield"));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("cl_shield"));
         elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockHalfShield.BlockCustom.EnumType[] allSubtypes = BlockHalfShield.BlockCustom.EnumType.values();
-        for (BlockHalfShield.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:half_shield_" + subtype.getName(), "inventory"));
+        BlockClShield.BlockCustom.EnumType[] allSubtypes = BlockClShield.BlockCustom.EnumType.values();
+        for (BlockClShield.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:cl_shield_" + subtype.getName(), "inventory"));
         }
     }
 
@@ -58,7 +58,7 @@ public class BlockHalfShield extends ElementsNebulaecraftMod.ModElement {
         public BlockCustom() {
             super(Material.IRON);
 			setSoundType(SoundType.METAL);
-			setUnlocalizedName("half_shield");
+			setUnlocalizedName("cl_shield");
 			setHardness(1F);
 			setResistance(10F);
 			setLightLevel(0F);
@@ -70,8 +70,8 @@ public class BlockHalfShield extends ElementsNebulaecraftMod.ModElement {
         @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockHalfShield.BlockCustom.EnumType[] allSubtypes = BlockHalfShield.BlockCustom.EnumType.values();
-            for (BlockHalfShield.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockClShield.BlockCustom.EnumType[] allSubtypes = BlockClShield.BlockCustom.EnumType.values();
+            for (BlockClShield.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
@@ -96,13 +96,13 @@ public class BlockHalfShield extends ElementsNebulaecraftMod.ModElement {
 			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
-					return new AxisAlignedBB(0, 0, 0.75, 1, 1.4375, 1.125);
+					return new AxisAlignedBB(0, 0, 0.8, 1, 2, 1);
 				case NORTH :
-					return new AxisAlignedBB(0, 0, -0.125, 1, 1.4375, 0.25);
+					return new AxisAlignedBB(0, 0, 0, 1, 2, 0.2);
 				case EAST :
-					return new AxisAlignedBB(0.75, 0, 0, 1.125, 1.4375, 1);
+					return new AxisAlignedBB(0.8, 0, 0, 1, 2, 1);
 				case WEST :
-					return new AxisAlignedBB(-0.125, 0, 0, 0.25, 1.4375, 1);
+					return new AxisAlignedBB(0, 0, 0, 0.2, 2, 1);
 			}
 		}
 
@@ -150,10 +150,10 @@ public class BlockHalfShield extends ElementsNebulaecraftMod.ModElement {
             SUBTYPE2(2, "subtype2"),
             SUBTYPE3(3, "subtype3");
 
-            private static final BlockHalfShield.BlockCustom.EnumType[] META_LOOKUP = new BlockHalfShield.BlockCustom.EnumType[values().length];
+            private static final BlockClShield.BlockCustom.EnumType[] META_LOOKUP = new BlockClShield.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockHalfShield.BlockCustom.EnumType type : values()) {
+                for (BlockClShield.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -166,7 +166,7 @@ public class BlockHalfShield extends ElementsNebulaecraftMod.ModElement {
                 this.name = i_name;
             }
 
-            public static BlockHalfShield.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockClShield.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }

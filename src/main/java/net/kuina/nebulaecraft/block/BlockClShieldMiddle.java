@@ -28,26 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockHalfShieldCorner extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:half_shield_corner")
+public class BlockClShieldMiddle extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:cl_shield_middle")
     public static final Block block = null;
 
-    public BlockHalfShieldCorner(ElementsNebulaecraftMod instance) {
-        super(instance, 113);
+    public BlockClShieldMiddle(ElementsNebulaecraftMod instance) {
+        super(instance, 116);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("half_shield_corner"));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("cl_shield_middle"));
         elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockHalfShieldCorner.BlockCustom.EnumType[] allSubtypes = BlockHalfShieldCorner.BlockCustom.EnumType.values();
-        for (BlockHalfShieldCorner.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:half_shield_corner_" + subtype.getName(), "inventory"));
+        BlockClShieldMiddle.BlockCustom.EnumType[] allSubtypes = BlockClShieldMiddle.BlockCustom.EnumType.values();
+        for (BlockClShieldMiddle.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:cl_shield_middle_" + subtype.getName(), "inventory"));
         }
     }
 
@@ -58,7 +58,7 @@ public class BlockHalfShieldCorner extends ElementsNebulaecraftMod.ModElement {
         public BlockCustom() {
             super(Material.IRON);
 			setSoundType(SoundType.METAL);
-			setUnlocalizedName("half_shield_corner");
+			setUnlocalizedName("cl_shield_middle");
 			setHardness(1F);
 			setResistance(10F);
 			setLightLevel(0F);
@@ -70,8 +70,8 @@ public class BlockHalfShieldCorner extends ElementsNebulaecraftMod.ModElement {
         @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockHalfShieldCorner.BlockCustom.EnumType[] allSubtypes = BlockHalfShieldCorner.BlockCustom.EnumType.values();
-            for (BlockHalfShieldCorner.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockClShieldMiddle.BlockCustom.EnumType[] allSubtypes = BlockClShieldMiddle.BlockCustom.EnumType.values();
+            for (BlockClShieldMiddle.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
@@ -92,19 +92,35 @@ public class BlockHalfShieldCorner extends ElementsNebulaecraftMod.ModElement {
         }
 
         @Override
-		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {  //TODO Input AABB data SMALL
-			switch (state.getValue(BlockHorizontal.FACING)) {
-				case SOUTH :
-				default :
-					return new AxisAlignedBB(0, 0, 0, 1, 1.4375, 1.125);
-				case NORTH :
-					return new AxisAlignedBB(0, 0, -0.125, 1, 1.4375, 1);
-				case EAST :
-					return new AxisAlignedBB(0, 0, 0, 1.125, 1.4375, 1);
-				case WEST :
-					return new AxisAlignedBB(-0.125, 0, 0, 1, 1.4375, 1);
-			}
-		}
+        public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+            if (state.getValue(SUBTYPE).getMetadata() == 0) {
+                switch (state.getValue(BlockHorizontal.FACING)) {
+                    case SOUTH :
+						default :
+							return new AxisAlignedBB(0, 0, 0.8, 1, 2, 1);
+						case NORTH :
+							return new AxisAlignedBB(0, 0, 0, 1, 2, 0.2);
+						case EAST :
+							return new AxisAlignedBB(0.8, 0, 0, 1, 2, 1);
+						case WEST :
+							return new AxisAlignedBB(0, 0, 0, 0.2, 2, 1);
+
+                }
+            } else {
+                switch (state.getValue(BlockHorizontal.FACING)) {
+                    case SOUTH :
+						default :
+							return new AxisAlignedBB(0, 0, 0.75, 1, 1.4375, 1.125);
+						case NORTH :
+							return new AxisAlignedBB(0, 0, -0.125, 1, 1.4375, 0.25);
+						case EAST :
+							return new AxisAlignedBB(0.75, 0, 0, 1.125, 1.4375, 1);
+						case WEST :
+							return new AxisAlignedBB(-0.125, 0, 0, 0.25, 1.4375, 1);
+
+                }
+            }
+        }
 
         @Override
         protected net.minecraft.block.state.BlockStateContainer createBlockState() {
@@ -148,10 +164,10 @@ public class BlockHalfShieldCorner extends ElementsNebulaecraftMod.ModElement {
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1");
 
-            private static final BlockHalfShieldCorner.BlockCustom.EnumType[] META_LOOKUP = new BlockHalfShieldCorner.BlockCustom.EnumType[values().length];
+            private static final BlockClShieldMiddle.BlockCustom.EnumType[] META_LOOKUP = new BlockClShieldMiddle.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockHalfShieldCorner.BlockCustom.EnumType type : values()) {
+                for (BlockClShieldMiddle.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -164,7 +180,7 @@ public class BlockHalfShieldCorner extends ElementsNebulaecraftMod.ModElement {
                 this.name = i_name;
             }
 
-            public static BlockHalfShieldCorner.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockClShieldMiddle.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }

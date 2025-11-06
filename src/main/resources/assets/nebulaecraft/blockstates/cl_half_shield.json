@@ -16,6 +16,5 @@
 	"facing=south,subtype=subtype3": { "model": "nebulaecraft:cl_half_shield_door_r","y": 180},
 	"facing=west,subtype=subtype3":  { "model": "nebulaecraft:cl_half_shield_door_r","y": 270},
 	"facing=north,subtype=subtype3":  { "model": "nebulaecraft:cl_half_shield_door_r"}
-
   }
 }
