@@ -93,7 +93,8 @@ public class BlockTrafficlight3 extends ElementsNebulaecraftMod.ModElement {
 
         @Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			switch (state.getValue(BlockHorizontal.FACING)) {
+            if (state.getValue(SUBTYPE).getMetadata() == 0 || state.getValue(SUBTYPE).getMetadata() == 1) {
+                switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
 					return new AxisAlignedBB(0.3125, 0, 0, 0.6875, 1, 0.25);
@@ -103,7 +104,21 @@ public class BlockTrafficlight3 extends ElementsNebulaecraftMod.ModElement {
 					return new AxisAlignedBB(0, 0, 0.3125, 0.25, 1, 0.6875);
 				case WEST :
 					return new AxisAlignedBB(0.75, 0, 0.3125, 1, 1, 0.6875);
-			}
+                }
+            }
+            else {
+                switch (state.getValue(BlockHorizontal.FACING)) {
+                    case SOUTH :
+                    default :
+                        return new AxisAlignedBB(0.125, 0, 0, 0.75, 1, 0.25);
+                    case NORTH :
+                        return new AxisAlignedBB(0.25, 0, 0.75, 0.875, 1, 1);
+                    case EAST :
+                        return new AxisAlignedBB(0, 0, 0.25, 0.25, 1, 0.875);
+                    case WEST :
+                        return new AxisAlignedBB(0.75, 0, 0.125, 1, 1, 0.75);
+                }
+            }
 		}
 
         @Override

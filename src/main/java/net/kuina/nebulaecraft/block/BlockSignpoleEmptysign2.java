@@ -28,36 +28,36 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:signpole_emptysign")
+public class BlockSignpoleEmptysign2 extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:signpole_emptysign_2")
     public static final Block block = null;
 
-    public BlockSignpoleEmptysign(ElementsNebulaecraftMod instance) {
+    public BlockSignpoleEmptysign2(ElementsNebulaecraftMod instance) {
         super(instance, 32);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockCustom().setRegistryName("signpole_emptysign"));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("signpole_emptysign_2"));
         elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockSignpoleEmptysign.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign.BlockCustom.EnumType.values();
-        for (BlockSignpoleEmptysign.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:signpole_emptysign_" + subtype.getName(), "inventory"));
+        BlockSignpoleEmptysign2.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign2.BlockCustom.EnumType.values();
+        for (BlockSignpoleEmptysign2.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:signpole_emptysign_2_" + subtype.getName(), "inventory"));
         }
     }
 
     public static class BlockCustom extends Block {
         public static final PropertyDirection FACING = BlockHorizontal.FACING;
-        public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
+        public static final PropertyEnum<EnumType> SUBTYPE = PropertyEnum.create("subtype", EnumType.class);
 
         public BlockCustom() {
             super(Material.IRON);
-            setUnlocalizedName("signpole_emptysign");
+            setUnlocalizedName("signpole_emptysign_2");
             setSoundType(SoundType.METAL);
 			setHardness(1F);
 			setResistance(10F);
@@ -70,8 +70,8 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
         @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockSignpoleEmptysign.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign.BlockCustom.EnumType.values();
-            for (BlockSignpoleEmptysign.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockSignpoleEmptysign2.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign2.BlockCustom.EnumType.values();
+            for (BlockSignpoleEmptysign2.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
@@ -97,13 +97,13 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
-						return new AxisAlignedBB(-0.375, 0, -0.1, 1.375, 1.3125, 0.1);
+						return new AxisAlignedBB(0, 0, 0, 1, 1.25, 0.15);
 					case NORTH :
-						return new AxisAlignedBB(-0.375, 0, 0.9, 1.375, 1.3125, 1.1);
+						return new AxisAlignedBB(0, 0, 0.85, 1, 1.25, 1);
 					case EAST :
-						return new AxisAlignedBB(-0.1, 0, -0.375, 0.1, 1.3125, 1.375);
+						return new AxisAlignedBB(0, 0, 0, 0.15, 1.25, 1);
 					case WEST :
-						return new AxisAlignedBB(0.9, 0, -0.375, 1.1, 1.3125, 1.375);
+						return new AxisAlignedBB(0.85, 0, 0, 1, 1.25, 1);
 
                 }
             }
@@ -111,13 +111,13 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
 					default :
-						return new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 0.15);
+						return new AxisAlignedBB(0, 0, 0, 1, 1, 0.15);
 					case NORTH :
-						return new AxisAlignedBB(0.25, 0, 0.85, 0.75, 1, 1);
+						return new AxisAlignedBB(0, 0, 0.85, 1, 1, 1);
 					case EAST :
-						return new AxisAlignedBB(0, 0, 0.25, 0.15, 1, 0.75);
+						return new AxisAlignedBB(0, 0, 0, 0.15, 1, 1);
 					case WEST :
-						return new AxisAlignedBB(0.85, 0, 0.25, 1, 1, 0.75);
+						return new AxisAlignedBB(0.85, 0, 0, 1, 1, 1);
 
                 }
             }
@@ -125,13 +125,13 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
                     default :
-                        return new AxisAlignedBB(0.125, 0, 0, 0.875, 1.5, 0.15);
+                        return new AxisAlignedBB(0, 0, 0, 1, 0.75, 0.15);
                     case NORTH :
-                        return new AxisAlignedBB(0.125, 0, 0.85, 0.875, 1.5, 1);
+                        return new AxisAlignedBB(0, 0, 0.85, 1, 0.75, 1);
                     case EAST :
-                        return new AxisAlignedBB(0, 0, 0.125, 0.15, 1.5, 0.875);
+                        return new AxisAlignedBB(0, 0, 0, 0.15, 0.75, 1);
                     case WEST :
-                        return new AxisAlignedBB(0.85, 0, 0.125, 1, 1.5, 0.875);
+                        return new AxisAlignedBB(0.85, 0, 0, 1, 0.75, 1);
 
                 }
             }
@@ -139,13 +139,13 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
                     default :
-                        return new AxisAlignedBB(0.0625, 0.5625, 0, 0.9375, 0.9375, 0.15);
+                        return new AxisAlignedBB(0, 0, 0, 1, 0.5, 0.15);
                     case NORTH :
-                        return new AxisAlignedBB(0.0625, 0.5625, 0.85, 0.9375, 0.9375, 1);
+                        return new AxisAlignedBB(0, 0, 0.85, 1, 0.5, 1);
                     case EAST :
-                        return new AxisAlignedBB(0, 0.5625, 0.0625, 0.15, 0.9375, 0.9375);
+                        return new AxisAlignedBB(0, 0, 0, 0.15, 0.5, 1);
                     case WEST :
-                        return new AxisAlignedBB(0.85, 0.5625, 0.0625, 1, 0.9375, 0.9375);
+                        return new AxisAlignedBB(0.85, 0, 0, 1, 0.5, 1);
 
                 }
             }
@@ -185,7 +185,7 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public IBlockState getStateForPlacement(World worldIn, BlockPos pos, EnumFacing facing, float hitX, float hitY, float hitZ, int meta, EntityLivingBase placer) {
-            BlockCustom.EnumType subtype = BlockCustom.EnumType.byMetadata(meta);
+            EnumType subtype = EnumType.byMetadata(meta);
             return this.getDefaultState().withProperty(SUBTYPE, subtype).withProperty(FACING, placer.getHorizontalFacing().getOpposite());
         }
 
@@ -195,10 +195,10 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
             SUBTYPE2(2, "subtype2"),
             SUBTYPE3(3, "subtype3");
 
-            private static final BlockSignpoleEmptysign.BlockCustom.EnumType[] META_LOOKUP = new BlockSignpoleEmptysign.BlockCustom.EnumType[values().length];
+            private static final BlockSignpoleEmptysign2.BlockCustom.EnumType[] META_LOOKUP = new BlockSignpoleEmptysign2.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockSignpoleEmptysign.BlockCustom.EnumType type : values()) {
+                for (BlockSignpoleEmptysign2.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -211,7 +211,7 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
                 this.name = i_name;
             }
 
-            public static BlockSignpoleEmptysign.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockSignpoleEmptysign2.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }

@@ -128,11 +128,17 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_bicycle_half_line_diagonal_left");
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_bicycle_half_line_diagonal_left_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_parallel_full");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_parallel_full_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_parallel_half");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_parallel_half_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_parallel_fork_right");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_parallel_fork_right_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_parallel_fork_left");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_parallel_fork_left_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_parallel_merge_right");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_parallel_merge_right_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_parallel_merge_left");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_parallel_merge_left_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_white_line_small");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_yellow_line_small");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_light_red");

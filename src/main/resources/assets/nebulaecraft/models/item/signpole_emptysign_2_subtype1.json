@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/signpole_emptysign_s",
+  "parent": "nebulaecraft:block/signpole_emptysign_5",
 	"display": {
 		"thirdperson_righthand": {
 			"translation": [0, 2.5, 3.75],
