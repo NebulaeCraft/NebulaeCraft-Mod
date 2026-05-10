@@ -454,6 +454,7 @@ tile.trafficlight_3.subtype0.name=交通信号灯：左转红色
 tile.trafficlight_3.subtype1.name=交通信号灯：左转绿色
 tile.trafficlight_3.subtype2.name=交通信号灯：右转红色
 tile.trafficlight_3.subtype3.name=交通信号灯：右转绿色
+tile.trafficlight_counter.subtype0.name=交通信号灯：计时器
 tile.trafficlight_ped.subtype0.name=人行红绿灯(右)：红色
 tile.trafficlight_ped.subtype1.name=人行红绿灯(右)：绿色
 tile.trafficlight_ped.subtype2.name=人行红绿灯(左)：红色

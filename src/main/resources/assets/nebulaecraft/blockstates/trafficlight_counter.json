@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:trafficlight_counter","y": 90},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:trafficlight_counter","y": 180},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_counter","y": 270},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_counter"}
+  }
+}

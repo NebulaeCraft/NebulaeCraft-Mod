@@ -454,6 +454,7 @@ tile.trafficlight_3.subtype0.name=Traffic Signal: Left Turn Red
 tile.trafficlight_3.subtype1.name=Traffic Signal: Left Turn Green
 tile.trafficlight_3.subtype2.name=Traffic Signal: Right Turn Red
 tile.trafficlight_3.subtype3.name=Traffic Signal: Right Turn Green
+tile.trafficlight_counter.subtype0.name=Traffic Signal: Counter
 tile.trafficlight_ped.subtype0.name=Pedestrian Signal (Right): Red
 tile.trafficlight_ped.subtype1.name=Pedestrian Signal (Right): Green
 tile.trafficlight_ped.subtype2.name=Pedestrian Signal (Left): Red
