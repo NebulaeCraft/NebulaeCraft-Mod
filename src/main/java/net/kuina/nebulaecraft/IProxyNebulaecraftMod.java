@@ -13,4 +13,6 @@ public interface IProxyNebulaecraftMod {
 	void postInit(FMLPostInitializationEvent event);
 
 	void serverLoad(FMLServerStartingEvent event);
+
+	void openRoadmarkGui(net.minecraft.tileentity.TileEntity te);
 }

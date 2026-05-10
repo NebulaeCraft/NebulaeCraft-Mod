@@ -27,4 +27,13 @@ public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 	@Override
 	public void serverLoad(FMLServerStartingEvent event) {
 	}
+
+	@Override
+	public void openRoadmarkGui(net.minecraft.tileentity.TileEntity te) {
+		if (te instanceof net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText) {
+			net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
+					new net.kuina.nebulaecraft.gui.GuiRoadmarkText((net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText) te)
+			);
+		}
+	}
 }

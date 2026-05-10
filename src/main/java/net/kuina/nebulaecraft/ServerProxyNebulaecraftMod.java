@@ -21,4 +21,9 @@ public class ServerProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 	@Override
 	public void serverLoad(FMLServerStartingEvent event) {
 	}
+
+	@Override
+	public void openRoadmarkGui(net.minecraft.tileentity.TileEntity te) {
+		// 服务端留空，安全隔离
+	}
 }

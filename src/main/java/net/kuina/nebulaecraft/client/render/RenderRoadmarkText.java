@@ -35,91 +35,86 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
         }
     }
 
+    // 【新增】用于在客户端内存中缓存每个坐标的文字和生成的贴图
+    private static final java.util.Map<net.minecraft.util.math.BlockPos, String> textCache = new java.util.HashMap<>();
+    private static final java.util.Map<net.minecraft.util.math.BlockPos, DynamicTexture> textureCache = new java.util.HashMap<>();
+
     @Override
     public void render(TileEntityRoadmarkText te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
-        if (te.getText() == null || te.getText().isEmpty()) return;
+        String currentText = te.getText();
+        if (currentText == null || currentText.isEmpty()) return;
 
-        // 如果文字更改了，重新绘制贴图
-        if (te.needsUpdate || te.texture == null) {
-            generateTexture(te);
+        net.minecraft.util.math.BlockPos pos = te.getPos();
+        String cachedText = textCache.get(pos);
+        DynamicTexture tex = textureCache.get(pos);
+
+        // 如果该坐标还没贴图，或者文字发生了改变，就重新生成贴图
+        if (tex == null || !currentText.equals(cachedText)) {
+            tex = generateTexture(currentText);
+            // 清理旧内存
+            if (textureCache.containsKey(pos)) {
+                textureCache.get(pos).deleteGlTexture();
+            }
+            textureCache.put(pos, tex);
+            textCache.put(pos, currentText);
         }
 
-        if (te.texture != null) {
-            GlStateManager.pushMatrix();
-            // 移动到方块中心，稍微浮在表面上(0.06高度防止Z-fighting)
-            GlStateManager.translate(x + 0.5D, y + 0.01D, z + 0.5D);
+        // 渲染部分
+        GlStateManager.pushMatrix();
+        GlStateManager.translate(x + 0.5D, y + 0.01D, z + 0.5D);
 
-            // 读取方块朝向并旋转
-            EnumFacing facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockRoadmarkText.BlockCustom.FACING);
-            float angle = 0;
-            if (facing == EnumFacing.NORTH) angle = 180;
-            else if (facing == EnumFacing.EAST) angle = 90;
-            else if (facing == EnumFacing.WEST) angle = -90;
-            GlStateManager.rotate(angle, 0, 1, 0);
+        EnumFacing facing = te.getWorld().getBlockState(te.getPos()).getValue(BlockRoadmarkText.BlockCustom.FACING);
+        float angle = 0;
+        if (facing == EnumFacing.NORTH) angle = 180;
+        else if (facing == EnumFacing.EAST) angle = 90;
+        else if (facing == EnumFacing.WEST) angle = -90;
+        GlStateManager.rotate(angle, 0, 1, 0);
 
-            // 绑定生成的动态贴图
-            GlStateManager.bindTexture(te.texture.getGlTextureId());
+        GlStateManager.bindTexture(tex.getGlTextureId()); // 绑定缓存的贴图
+        GlStateManager.enableBlend();
+        GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-            GlStateManager.enableBlend();
-            GlStateManager.blendFunc(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.disableLighting();
 
-            GlStateManager.disableLighting();
+        Tessellator tessellator = Tessellator.getInstance();
+        BufferBuilder buffer = tessellator.getBuffer();
+        double w = 0.7;
+        double h = 1;
+        buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
+        buffer.pos(-w, 0, -h).tex(0, 0).endVertex();
+        buffer.pos(-w, 0, h).tex(0, 1).endVertex();
+        buffer.pos(w, 0, h).tex(1, 1).endVertex();
+        buffer.pos(w, 0, -h).tex(1, 0).endVertex();
+        tessellator.draw();
 
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-
-            // 根据 1.3x1.7 的尺寸，X半径为 0.65，Z半径为 0.85
-            double w = 0.7;
-            double h = 1.0;
-
-            buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
-            buffer.pos(-w, 0, -h).tex(0, 0).endVertex();
-            buffer.pos(-w, 0, h).tex(0, 1).endVertex();
-            buffer.pos(w, 0, h).tex(1, 1).endVertex();
-            buffer.pos(w, 0, -h).tex(1, 0).endVertex();
-            tessellator.draw();
-
-            GlStateManager.enableLighting();
-
-            GlStateManager.disableBlend();
-            GlStateManager.popMatrix();
-        }
+        GlStateManager.enableLighting();
+        GlStateManager.disableBlend();
+        GlStateManager.popMatrix();
     }
 
-    private void generateTexture(TileEntityRoadmarkText te) {
-        // 创建一个比例为 1.25 : 1.75 的画布 (相当于 500 x 700 像素)
+    // 生成贴图方法改为只接受 String 参数并返回 DynamicTexture
+    private DynamicTexture generateTexture(String text) {
         int width = 140;
         int height = 200;
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2d = image.createGraphics();
+        java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+        java.awt.Graphics2D g2d = image.createGraphics();
 
-        // 开启抗锯齿
-        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
+        g2d.setColor(new java.awt.Color(249, 249, 249));
 
-        // 设置 #F9F9F9 颜色
-        g2d.setColor(new Color(249, 249, 249));
-
-        Font font = trafficaFont.deriveFont(100f); // 基础大小
+        java.awt.Font font = trafficaFont.deriveFont(100f);
         g2d.setFont(font);
-        FontMetrics fm = g2d.getFontMetrics();
-        Rectangle2D rect = fm.getStringBounds(te.getText(), g2d);
+        java.awt.FontMetrics fm = g2d.getFontMetrics();
+        java.awt.geom.Rectangle2D rect = fm.getStringBounds(text, g2d);
 
-        // --- 核心：拉伸铺展逻辑 ---
-        // 计算 X 和 Y 的缩放比例，让文字恰好铺满 500x700 的画板
         double scaleX = width / rect.getWidth();
         double scaleY = height / rect.getHeight();
         g2d.scale(scaleX, scaleY);
 
-        // 绘制文字 (减去 XY 偏移以对齐左上角)
-        g2d.drawString(te.getText(), (float) -rect.getX(), (float) -rect.getY());
+        g2d.drawString(text, (float) -rect.getX(), (float) -rect.getY());
         g2d.dispose();
 
-        // 清理旧贴图防止内存泄漏，并上传新贴图
-        if (te.texture != null) {
-            te.texture.deleteGlTexture();
-        }
-        te.texture = new DynamicTexture(image);
-        te.needsUpdate = false;
+        return new DynamicTexture(image);
     }
 }

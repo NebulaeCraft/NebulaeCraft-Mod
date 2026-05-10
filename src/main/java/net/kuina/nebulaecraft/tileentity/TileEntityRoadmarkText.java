@@ -17,10 +17,10 @@ public class TileEntityRoadmarkText extends TileEntity {
 
     public void setText(String text) {
         this.text = text;
-        if (this.world != null && this.world.isRemote) {
+        /* if (this.world != null && this.world.isRemote) {
             this.needsUpdate = true; // 客户端收到新文字，标记需要刷新贴图
         }
-        this.markDirty();
+        this.markDirty(); */
     }
 
     // 1. 将数据写入 NBT 以保存到存档硬盘中
@@ -56,19 +56,14 @@ public class TileEntityRoadmarkText extends TileEntity {
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
         String oldText = this.text; // 记录旧文字
         this.readFromNBT(pkt.getNbtCompound()); // 读取新文字
-
-        // 【新增】如果是客户端，且文字发生了变化，标记重新生成贴图
-        if (this.world != null && this.world.isRemote && !this.text.equals(oldText)) {
-            this.needsUpdate = true;
-        }
     }
 
     // 追加在类内部
-    @net.minecraftforge.fml.relauncher.SideOnly(net.minecraftforge.fml.relauncher.Side.CLIENT)
+    /* @net.minecraftforge.fml.relauncher.SideOnly(net.minecraftforge.fml.relauncher.Side.CLIENT)
     public net.minecraft.client.renderer.texture.DynamicTexture texture;
 
     @net.minecraftforge.fml.relauncher.SideOnly(net.minecraftforge.fml.relauncher.Side.CLIENT)
-    public boolean needsUpdate = true;
+    public boolean needsUpdate = true; */
 
     // --- 突破原版渲染限制的代码 ---
 

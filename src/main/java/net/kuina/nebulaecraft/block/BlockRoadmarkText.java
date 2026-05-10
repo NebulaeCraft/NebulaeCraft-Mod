@@ -110,15 +110,10 @@ public class BlockRoadmarkText extends ElementsNebulaecraftMod.ModElement {
         // --- 核心交互逻辑：右键打开 GUI ---
         @Override
         public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-            // 注意这里：改成了 worldIn.isRemote (客户端执行)
             if (worldIn.isRemote) {
                 TileEntity te = worldIn.getTileEntity(pos);
-                if (te instanceof TileEntityRoadmarkText) {
-                    // 绕过原版的服务端容器限制，直接打开纯客户端输入界面
-                    net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
-                            new net.kuina.nebulaecraft.gui.GuiRoadmarkText((TileEntityRoadmarkText) te)
-                    );
-                }
+                // 交给代理处理，这样服务端加载这个类时就不会触发客户端类缺失的崩溃
+                NebulaecraftMod.proxy.openRoadmarkGui(te);
             }
             return true;
         }
