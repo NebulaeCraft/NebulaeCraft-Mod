@@ -1,4 +1,3 @@
-item.cameracart.name=Camera Cart
 itemGroup.tabnebulaecraft_color=Nebulae Craft | Color
 itemGroup.tabnebulaecraft_metro=Nebulae Craft | Metro
 itemGroup.tabnebulaecraft_optics=Nebulae Craft | Optics
@@ -465,3 +464,5 @@ tile.trafficlight_pole.subtype2.name=Traffic Signal Pole: Right Down-curved
 tile.trafficlight_pole_end.subtype0.name=Traffic Signal Pole: Right Default
 tile.trafficlight_pole_end.subtype1.name=Traffic Signal Pole: Left Default
 tile.tunnel_light.name=Tunnel Light
+item.cameracart.name=Camera Cart
+item.tree_killer.name=Tree Killer

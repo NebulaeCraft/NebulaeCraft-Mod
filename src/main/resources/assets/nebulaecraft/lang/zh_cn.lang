@@ -1,4 +1,3 @@
-item.cameracart.name=拍摄用车
 itemGroup.tabnebulaecraft_color=星云工艺 | 色彩
 itemGroup.tabnebulaecraft_metro=星云工艺 | 地铁
 itemGroup.tabnebulaecraft_optics=星云工艺 | 光学
@@ -465,3 +464,5 @@ tile.trafficlight_pole.subtype2.name=交通信号灯杆：右侧下弯
 tile.trafficlight_pole_end.subtype0.name=交通信号灯杆：右侧缺省
 tile.trafficlight_pole_end.subtype1.name=交通信号灯杆：左侧缺省
 tile.tunnel_light.name=隧道灯
+item.cameracart.name=拍摄用车
+item.tree_killer.name=树木杀手

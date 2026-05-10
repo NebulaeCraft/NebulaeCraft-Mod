@@ -164,6 +164,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerTileEntity(TileEntityTdt.class, "nebulaecraft:tdt");
 
         registerTileEntity(TileEntityRoadmarkText.class, "nebulaecraft:roadmark_text");
+        registerItem(new net.kuina.nebulaecraft.item.ItemTreeKiller(), "tree_killer");
     }
 
 
