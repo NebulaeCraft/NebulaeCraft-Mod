@@ -26,7 +26,7 @@ public class BlockAir extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:air")
 	public static final Block block = null;
 	public BlockAir(ElementsNebulaecraftMod instance) {
-		super(instance, 105);
+		super(instance, 0);
 	}
 
 	@Override

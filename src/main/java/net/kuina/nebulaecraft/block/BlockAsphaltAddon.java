@@ -34,7 +34,7 @@ import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 public class BlockAsphaltAddon extends ElementsNebulaecraftMod.ModElement {
 
 	public BlockAsphaltAddon(ElementsNebulaecraftMod instance) {
-		super(instance, 3);
+		super(instance, 2);
 	}
 
 	public static final class BlockCustom extends Block {

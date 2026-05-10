@@ -36,7 +36,7 @@ public class BlockAsphaltLightGreen extends ElementsNebulaecraftMod.ModElement {
 	@GameRegistry.ObjectHolder("nebulaecraft:asphalt_light_green")
 	public static final Block block = null;
 	public BlockAsphaltLightGreen(ElementsNebulaecraftMod instance) {
-		super(instance, 13);
+		super(instance, 3);
 	}
 
 	@Override
