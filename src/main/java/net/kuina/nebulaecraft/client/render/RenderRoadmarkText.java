@@ -70,8 +70,8 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
             BufferBuilder buffer = tessellator.getBuffer();
 
             // 根据 1.3x1.7 的尺寸，X半径为 0.65，Z半径为 0.85
-            double w = 0.65;
-            double h = 0.85;
+            double w = 0.7;
+            double h = 1.0;
 
             buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
             buffer.pos(-w, 0, -h).tex(0, 0).endVertex();
@@ -89,8 +89,8 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
 
     private void generateTexture(TileEntityRoadmarkText te) {
         // 创建一个比例为 1.25 : 1.75 的画布 (相当于 500 x 700 像素)
-        int width = 130;
-        int height = 170;
+        int width = 140;
+        int height = 200;
         BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
 
