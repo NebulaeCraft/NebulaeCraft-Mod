@@ -6,6 +6,9 @@
  */
 package net.kuina.nebulaecraft;
 
+import net.kuina.nebulaecraft.block.BlockRoadmarkText;
+import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.common.registry.EntityEntry;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -70,6 +73,7 @@ public class ElementsNebulaecraftMod implements IFuelHandler, IWorldGenerator {
 		elements.forEach(ElementsNebulaecraftMod.ModElement::initElements);
 		this.addNetworkMessage(NebulaecraftModVariables.WorldSavedDataSyncMessageHandler.class,
 				NebulaecraftModVariables.WorldSavedDataSyncMessage.class, Side.SERVER, Side.CLIENT);
+		this.addNetworkMessage(net.kuina.nebulaecraft.network.PacketRoadmarkText.Handler.class, net.kuina.nebulaecraft.network.PacketRoadmarkText.class, Side.SERVER);
 	}
 
 	public void registerSounds(RegistryEvent.Register<net.minecraft.util.SoundEvent> event) {
@@ -130,6 +134,12 @@ public class ElementsNebulaecraftMod implements IFuelHandler, IWorldGenerator {
 
 		@Override
 		public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z) {
+			if (id == BlockRoadmarkText.GUI_ID) { // 就是我们第二步写的那个 ID 1001
+				TileEntity te = world.getTileEntity(new BlockPos(x, y, z));
+				if (te instanceof net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText) {
+					return new net.kuina.nebulaecraft.gui.GuiRoadmarkText((net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText) te);
+				}
+			}
 			return null;
 		}
 	}

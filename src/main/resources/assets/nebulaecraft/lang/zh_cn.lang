@@ -241,6 +241,7 @@ tile.roadmark_special_7.name=路标：停
 tile.roadmark_special_8.name=路标：走
 tile.roadmark_special_9.name=路标：可
 tile.roadmark_special_10.name=路标：变
+tile.roadmark_text.name=路标：自定义文字
 tile.roadmark_variable.subtype0.name=路标：可变车道
 tile.roadmark_variable.subtype1.name=路标：可变车道
 tile.roadmark_variable.subtype2.name=路标：可变车道

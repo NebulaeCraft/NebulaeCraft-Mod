@@ -14,6 +14,10 @@ public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 	@Override
 	public void preInit(FMLPreInitializationEvent event) {
 		OBJLoader.INSTANCE.addDomain("nebulaecraft");
+		net.minecraftforge.fml.client.registry.ClientRegistry.bindTileEntitySpecialRenderer(
+				net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText.class,
+				new net.kuina.nebulaecraft.client.render.RenderRoadmarkText()
+		);
 	}
 
 	@Override

@@ -241,6 +241,7 @@ tile.roadmark_special_7.name=Road Mark: Stop
 tile.roadmark_special_8.name=Road Mark: Go
 tile.roadmark_special_9.name=Road Mark: Variable
 tile.roadmark_special_10.name=Road Mark: Change
+tile.roadmark_text.name=Road Mark: Variable Text
 tile.roadmark_variable.subtype0.name=Road Mark: Variable Lane
 tile.roadmark_variable.subtype1.name=Road Mark: Variable Lane
 tile.roadmark_variable.subtype2.name=Road Mark: Variable Lane
