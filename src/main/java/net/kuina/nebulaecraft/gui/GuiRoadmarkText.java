@@ -25,12 +25,12 @@ public class GuiRoadmarkText extends GuiScreen {
         super.initGui();
         Keyboard.enableRepeatEvents(true);
         // 在屏幕中央创建一个输入框
-        this.textField = new GuiTextField(0, this.fontRenderer, this.width / 2 - 100, this.height / 2 - 10, 200, 20);
-        this.textField.setMaxStringLength(20);
+        this.textField = new GuiTextField(0, this.fontRenderer, this.width / 2 - 62, this.height / 2 - 10, 100, 20);
+        this.buttonList.add(new GuiButton(1, this.width / 2 + 42, this.height / 2 -10, 20, 20, getColorButtonText()));
+        this.textField.setMaxStringLength(3);
         this.textField.setFocused(true);
         this.textField.setText(te.getText());
-        this.buttonList.add(new GuiButton(0, this.width / 2 - 50, this.height / 2 + 25, 100, 20, "保存"));
-        this.buttonList.add(new GuiButton(1, this.width / 2 + 55, this.height / 2 + 25, 80, 20, getColorButtonText()));
+        this.buttonList.add(new GuiButton(0, this.width / 2 - 30, this.height / 2 + 25, 60, 20, "保存"));
     }
 
     @Override
@@ -65,12 +65,12 @@ public class GuiRoadmarkText extends GuiScreen {
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
         this.drawDefaultBackground();
-        this.drawCenteredString(this.fontRenderer, "请输入路面文字", this.width / 2, this.height / 2 - 30, 0xFFFFFF);
+        this.drawCenteredString(this.fontRenderer, "请输入文本", this.width / 2, this.height / 2 - 30, 0xFFFFFF);
         this.textField.drawTextBox();
         super.drawScreen(mouseX, mouseY, partialTicks);
     }
 
     private String getColorButtonText() {
-        return this.selectedColor == TileEntityRoadmarkText.COLOR_YELLOW ? "颜色: 黄" : "颜色: 白";
+        return this.selectedColor == TileEntityRoadmarkText.COLOR_YELLOW ? "黄" : "白";
     }
 }
