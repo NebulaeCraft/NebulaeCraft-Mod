@@ -28,7 +28,7 @@ import java.util.function.Supplier;
 @Mod(modid = NebulaecraftMod.MODID, version = NebulaecraftMod.VERSION)
 public class NebulaecraftMod {
 	public static final String MODID = "nebulaecraft";
-	public static final String VERSION = "2.20";
+	public static final String VERSION = "2.21";
 	public static final SimpleNetworkWrapper PACKET_HANDLER = NetworkRegistry.INSTANCE.newSimpleChannel("nebulaecraft:a");
 	@SidedProxy(clientSide = "net.kuina.nebulaecraft.ClientProxyNebulaecraftMod", serverSide = "net.kuina.nebulaecraft.ServerProxyNebulaecraftMod")
 	public static IProxyNebulaecraftMod proxy;
