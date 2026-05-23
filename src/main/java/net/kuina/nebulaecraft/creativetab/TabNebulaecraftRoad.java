@@ -12,10 +12,14 @@ import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 
 import net.minecraft.util.NonNullList;
 import java.util.Comparator;
-import net.kuina.nebulaecraft.NebulaecraftMod;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class TabNebulaecraftRoad extends ElementsNebulaecraftMod.ModElement {
+	private static final int[] WARNING_ROADSIGNS = range(39, 62, 65, 66, 91);
+	private static final int[] GUIDE_ROADSIGNS = {63, 64};
+	private static final int[] DIRECTION_ROADSIGNS = range(67, 84, 87, 89, 90);
+	private static final int[] PROHIBITION_ROADSIGNS = range(1, 33, 85, 86, 34, 35, 36, 37, 88, 38);
+
 	public TabNebulaecraftRoad(ElementsNebulaecraftMod instance) {
 		super(instance, 3);
 	}
@@ -37,47 +41,118 @@ public class TabNebulaecraftRoad extends ElementsNebulaecraftMod.ModElement {
 			@SideOnly(Side.CLIENT)
 			@Override
 			public void displayAllRelevantItems(NonNullList<ItemStack> items) {
-				// 1. 先让原版把所有东西都老老实实放进来
 				super.displayAllRelevantItems(items);
 
-				// 2. 启用“自然排序（智能识别数字）”进行排序
 				items.sort(new Comparator<ItemStack>() {
 					@Override
 					public int compare(ItemStack s1, ItemStack s2) {
 						String name1 = s1.getItem().getRegistryName() != null ? s1.getItem().getRegistryName().toString() : "";
 						String name2 = s2.getItem().getRegistryName() != null ? s2.getItem().getRegistryName().toString() : "";
 
-						// 使用正则表达式，将字符串在“字母”和“数字”的交界处切开
-						// 例如 "roadsign_4" 会变成 ["nebulaecraft:roadsign_", "4"]
-						String[] parts1 = name1.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
-						String[] parts2 = name2.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
-
-						int minLength = Math.min(parts1.length, parts2.length);
-						for (int i = 0; i < minLength; i++) {
-							String p1 = parts1[i];
-							String p2 = parts2[i];
-
-							// 如果切出来的两段都是数字，就把它们当成真正的整数来比较！
-							if (p1.matches("\\d+") && p2.matches("\\d+")) {
-								int num1 = Integer.parseInt(p1);
-								int num2 = Integer.parseInt(p2);
-								if (num1 != num2) {
-									return Integer.compare(num1, num2); // 数字 4 就会小于数字 39 了
-								}
-							} else {
-								// 如果是字母部分（比如 asphalt 和 roadsign），就按老规矩普通字母比较
-								int cmp = p1.compareTo(p2);
-								if (cmp != 0) {
-									return cmp;
-								}
+						int roadsignNumber1 = getRoadsignNumber(name1);
+						int roadsignNumber2 = getRoadsignNumber(name2);
+						if (roadsignNumber1 >= 0 && roadsignNumber2 >= 0) {
+							int roadsignOrder1 = getRoadsignOrder(roadsignNumber1);
+							int roadsignOrder2 = getRoadsignOrder(roadsignNumber2);
+							if (roadsignOrder1 != roadsignOrder2) {
+								return Integer.compare(roadsignOrder1, roadsignOrder2);
 							}
 						}
-						// 如果前面都一模一样，谁的段数短谁排前面
-						return Integer.compare(parts1.length, parts2.length);
+
+						int cmp = compareNaturally(name1, name2);
+						if (cmp != 0) {
+							return cmp;
+						}
+						return Integer.compare(s1.getMetadata(), s2.getMetadata());
 					}
 				});
 			}
 		};
 	}
+
+	private static int getRoadsignOrder(int roadsignNumber) {
+		int index = indexOf(WARNING_ROADSIGNS, roadsignNumber);
+		if (index >= 0) {
+			return index;
+		}
+
+		index = indexOf(GUIDE_ROADSIGNS, roadsignNumber);
+		if (index >= 0) {
+			return 100 + index;
+		}
+
+		index = indexOf(DIRECTION_ROADSIGNS, roadsignNumber);
+		if (index >= 0) {
+			return 200 + index;
+		}
+
+		index = indexOf(PROHIBITION_ROADSIGNS, roadsignNumber);
+		if (index >= 0) {
+			return 300 + index;
+		}
+
+		return 400 + roadsignNumber;
+	}
+
+	private static int getRoadsignNumber(String registryName) {
+		String prefix = "nebulaecraft:roadsign_";
+		if (!registryName.startsWith(prefix)) {
+			return -1;
+		}
+
+		try {
+			return Integer.parseInt(registryName.substring(prefix.length()));
+		} catch (NumberFormatException e) {
+			return -1;
+		}
+	}
+
+	private static int compareNaturally(String name1, String name2) {
+		String[] parts1 = name1.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+		String[] parts2 = name2.split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)");
+
+		int minLength = Math.min(parts1.length, parts2.length);
+		for (int i = 0; i < minLength; i++) {
+			String p1 = parts1[i];
+			String p2 = parts2[i];
+
+			if (p1.matches("\\d+") && p2.matches("\\d+")) {
+				int num1 = Integer.parseInt(p1);
+				int num2 = Integer.parseInt(p2);
+				if (num1 != num2) {
+					return Integer.compare(num1, num2);
+				}
+			} else {
+				int cmp = p1.compareTo(p2);
+				if (cmp != 0) {
+					return cmp;
+				}
+			}
+		}
+
+		return Integer.compare(parts1.length, parts2.length);
+	}
+
+	private static int indexOf(int[] values, int target) {
+		for (int i = 0; i < values.length; i++) {
+			if (values[i] == target) {
+				return i;
+			}
+		}
+		return -1;
+	}
+
+	private static int[] range(int start, int end, int... extraValues) {
+		int[] values = new int[end - start + 1 + extraValues.length];
+		int index = 0;
+		for (int value = start; value <= end; value++) {
+			values[index++] = value;
+		}
+		for (int value : extraValues) {
+			values[index++] = value;
+		}
+		return values;
+	}
+
 	public static CreativeTabs tab;
 }
