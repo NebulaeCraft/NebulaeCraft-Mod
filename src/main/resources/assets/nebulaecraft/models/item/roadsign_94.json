@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/roadsign_89_4",
+  "parent": "nebulaecraft:block/roadsign_94",
   "display": {
 		"thirdperson_righthand": {
 			"translation": [0, 3, 3],
