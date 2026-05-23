@@ -1,0 +1,73 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made by Kuina_20",
+	"textures": {
+		"0": "nebulaecraft:blocks/platform_edge",
+		"1": "nebulaecraft:blocks/color_outerring",
+		"particle": "nebulaecraft:blocks/platform_edge"
+	},
+	"elements": [
+		{
+			"from": [8.0188, 0, 16.04609],
+			"to": [20.7478, 1, 20.04609],
+			"rotation": {"angle": 45, "axis": "y", "origin": [5.95453, 1.3, 18.04609]},
+			"faces": {
+				"north": {"uv": [3.271, 15, 16, 16], "texture": "#0"},
+				"east": {"uv": [12, 15, 16, 16], "texture": "#0"},
+				"south": {"uv": [0, 15, 12.729, 16], "texture": "#0"},
+				"west": {"uv": [0, 15, 4, 16], "texture": "#0"},
+				"up": {"uv": [0, 0, 4, 12.729], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [0, 3.271, 4, 16], "rotation": 270, "texture": "#0"}
+			}
+		},
+		{
+			"from": [6, 0, 15.1723],
+			"to": [8.827, 1, 18.0023],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7.4135, 0.5, 16.59]},
+			"faces": {
+				"north": {"uv": [13.173, 15, 16, 16], "texture": "#0"},
+				"east": {"uv": [6, 15, 8.83, 16], "texture": "#0"},
+				"south": {"uv": [0, 15, 2.827, 16], "texture": "#0"},
+				"west": {"uv": [7.17, 15, 10, 16], "texture": "#0"},
+				"up": {"uv": [0, 7.17, 2.827, 10], "texture": "#0"},
+				"down": {"uv": [0, 6, 2.827, 8.83], "texture": "#0"}
+			}
+		},
+		{
+			"from": [15.00074, 0, 6.17145],
+			"to": [17.82974, 1, 9.00045],
+			"rotation": {"angle": 0, "axis": "y", "origin": [16.41399, 2.3, 7.58395]},
+			"faces": {
+				"north": {"uv": [6.00002, 15, 8.82902, 16], "texture": "#0"},
+				"east": {"uv": [13.171, 15, 16, 16], "texture": "#0"},
+				"south": {"uv": [7.17148, 15, 10.00048, 16], "texture": "#0"},
+				"west": {"uv": [0, 15, 2.829, 16], "texture": "#0"},
+				"up": {"uv": [7.17148, 0, 10.00048, 2.829], "rotation": 90, "texture": "#0"},
+				"down": {"uv": [7.17148, 13.171, 10.00048, 16], "rotation": 270, "texture": "#0"}
+			}
+		},
+		{
+			"from": [10.575, 1, 11.575],
+			"to": [13.075, 10, 12.575],
+			"rotation": {"angle": -22.5, "axis": "y", "origin": [11.825, 5.5, 12.075]},
+			"faces": {
+				"north": {"uv": [2.75, 0, 0.25, 9], "texture": "#1"},
+				"east": {"uv": [2, 0, 1, 9], "texture": "#1"},
+				"south": {"uv": [2.5, 0, 0, 9], "texture": "#1"},
+				"west": {"uv": [1, 0, 0, 9], "texture": "#1"},
+				"up": {"uv": [2.5, 1, 0, 2], "texture": "#1"},
+				"down": {"uv": [2.5, 0, 0, 1], "texture": "#1"}
+			}
+		}
+	],
+	"groups": [
+		{
+			"name": "group",
+			"origin": [15.17148, 0.5, -0.82833],
+			"scope": 0,
+			"color": 0,
+			"children": [0, 1, 2]
+		},
+		3
+	]
+}

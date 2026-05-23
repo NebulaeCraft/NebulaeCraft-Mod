@@ -2,6 +2,7 @@
   "variants": {
 	"subtype=subtype0": {"model": "nebulaecraft:crash_barrel"},
 	"subtype=subtype1": {"model": "nebulaecraft:crash_barrel_1"},
-	"subtype=subtype2": {"model": "nebulaecraft:crash_barrel_2"}
+	"subtype=subtype2": {"model": "nebulaecraft:crash_barrel_2"},
+	"subtype=subtype3": {"model": "nebulaecraft:crash_barrel_3"}
   }
 }

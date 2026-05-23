@@ -41,7 +41,7 @@ public class BlockCrashBarrel extends ElementsNebulaecraftMod.ModElement {
 	@Override
 	public void initElements() {
 		elements.blocks.add(() -> new BlockCustom().setRegistryName("crash_barrel"));
-		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2"}).setRegistryName(block.getRegistryName()));
+		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
 	}
 
 	@SideOnly(Side.CLIENT)
@@ -98,8 +98,11 @@ public class BlockCrashBarrel extends ElementsNebulaecraftMod.ModElement {
             else if (state.getValue(SUBTYPE).getMetadata()==1) {
                 return new AxisAlignedBB(0.25, 0, 0.25, 0.75, 1.25, 0.75);
             }
+            else if (state.getValue(SUBTYPE).getMetadata()==2) {
+                return new AxisAlignedBB(0.25, 0, 0.25, 0.75, .75, 0.75);
+            }
             else {
-                return new AxisAlignedBB(0.25, 0, 0.25, 0.75, .9, 0.75);
+                return new AxisAlignedBB(0.375, 0, 0.375, 0.625, 1, 0.625);
             }
 		}
 
@@ -134,7 +137,8 @@ public class BlockCrashBarrel extends ElementsNebulaecraftMod.ModElement {
         public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1"),
-            SUBTYPE2(2, "subtype2");
+            SUBTYPE2(2, "subtype2"),
+            SUBTYPE3(3, "subtype3");
 
             private static final BlockCrashBarrel.BlockCustom.EnumType[] META_LOOKUP = new BlockCrashBarrel.BlockCustom.EnumType[values().length];
 
