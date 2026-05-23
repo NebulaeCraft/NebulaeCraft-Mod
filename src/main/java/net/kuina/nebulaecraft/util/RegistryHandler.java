@@ -58,31 +58,14 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         System.out.println(ServerHandler.CornField);
-        for (int i = 1; i <= 4; i++) {
-            registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
-        }
-        for (int i = 5; i <= 8; i++) {
-            registerBlock(new BlockScreenDoorMedium.BlockCustom(), "screen_door_" + i);
-        }
-        for (int i = 9; i <= 12; i++) {
-            registerBlock(new BlockScreenDoorSmall.BlockCustom(), "screen_door_" + i);
 
-        }
-        for (int i = 1; i <= 5; i++) {
-            registerBlock(new BlockInfoScreen.BlockCustom(), "info_screen_" + i);
-
-        }
-        for (int i = 1; i <= 81; i++) {
-            registerBlock(new BlockRoadsignSmall.BlockCustom(), "roadsign_" + i);
-        }
-        for (int i = 82; i <= 84; i++) {
-            registerBlock(new BlockRoadsignBig.BlockCustom(), "roadsign_" + i);
-
-        }
-        for (int i = 1; i <= 10; i++) {
-            registerBlock(new BlockRoadmarkSpecial.BlockCustom(), "roadmark_special_" + i);
-
-        }
+        for (int i = 1; i <= 4; i++) registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
+        for (int i = 5; i <= 8; i++) registerBlock(new BlockScreenDoorMedium.BlockCustom(), "screen_door_" + i);
+        for (int i = 9; i <= 12; i++) registerBlock(new BlockScreenDoorSmall.BlockCustom(), "screen_door_" + i);
+        for (int i = 1; i <= 5; i++) registerBlock(new BlockInfoScreen.BlockCustom(), "info_screen_" + i);
+        for (int i = 1; i <= 81; i++) registerBlock(new BlockRoadsignSmall.BlockCustom(), "roadsign_" + i);
+        for (int i = 82; i <= 84; i++) registerBlock(new BlockRoadsignBig.BlockCustom(), "roadsign_" + i);
+        for (int i = 1; i <= 10; i++) registerBlock(new BlockRoadmarkSpecial.BlockCustom(), "roadmark_special_" + i);
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_white_line");
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_white_line_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_white_line_diagonal");
@@ -153,18 +136,14 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
     	registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_halfleft");
     	registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_left_back");
     	registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_noback");
-
         registerItem(new CameraCart.ItemCameraCart(), "cameracart");
-
-        for(int i = 0; i <= 40; i++) {
-        	registerBlock(new BlockTdt.BlockCustom(), "tdt_" + i);
-        }
+        for(int i = 0; i <= 40; i++) registerBlock(new BlockTdt.BlockCustom(), "tdt_" + i);
         registerBlock(new BlockTdt.BlockCustom().setCreativeTab(TabNebulaecraftMetro.tab), "tdt");
-
         registerTileEntity(TileEntityTdt.class, "nebulaecraft:tdt");
-
         registerTileEntity(TileEntityRoadmarkText.class, "nebulaecraft:roadmark_text");
         registerItem(new net.kuina.nebulaecraft.item.ItemTreeKiller(), "tree_killer");
+        registerBlock(new BlockJoint.BlockCustom(), "road_expansion_joint");
+        registerBlock(new BlockJointDiagonal.BlockCustom(), "road_expansion_joint_diagonal");
     }
 
 

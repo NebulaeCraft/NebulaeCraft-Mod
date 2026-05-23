@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:road_expansion_joint_diagonal","y": 270},
+	"facing=south": { "model": "nebulaecraft:road_expansion_joint_diagonal","y": 0},
+	"facing=west":  { "model": "nebulaecraft:road_expansion_joint_diagonal","y": 90},
+	"facing=north":  { "model": "nebulaecraft:road_expansion_joint_diagonal","y": 180}
+  }
+}
