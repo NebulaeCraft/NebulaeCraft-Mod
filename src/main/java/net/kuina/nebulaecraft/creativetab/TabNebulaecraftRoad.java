@@ -17,8 +17,8 @@ import java.util.Comparator;
 public class TabNebulaecraftRoad extends ElementsNebulaecraftMod.ModElement {
 	private static final int[] WARNING_ROADSIGNS = range(39, 62, 65, 66, 91);
 	private static final int[] GUIDE_ROADSIGNS = {63, 64};
-	private static final int[] DIRECTION_ROADSIGNS = range(67, 84, 87, 89, 90);
-	private static final int[] PROHIBITION_ROADSIGNS = range(1, 33, 85, 86, 34, 35, 36, 37, 88, 38);
+	private static final int[] DIRECTION_ROADSIGNS = range(75, 81, 67, 68, 69, 70, 71, 72, 90, 73, 74, 89, 87, 82, 83, 84);
+	private static final int[] PROHIBITION_ROADSIGNS = range(8, 33, 85, 86, 34, 35, 36, 37, 88, 38, 1, 2, 3, 4, 5, 6, 7, 92);
 
 	public TabNebulaecraftRoad(ElementsNebulaecraftMod instance) {
 		super(instance, 3);

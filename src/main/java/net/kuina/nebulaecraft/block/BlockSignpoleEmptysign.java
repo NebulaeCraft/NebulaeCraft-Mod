@@ -39,7 +39,36 @@ public class BlockSignpoleEmptysign extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         elements.blocks.add(() -> new BlockCustom().setRegistryName("signpole_emptysign"));
-        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
+
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block) {
+
+            // 重写 addInformation 添加描述
+            @SideOnly(Side.CLIENT)
+            @Override
+            public void addInformation(ItemStack stack, World worldIn, java.util.List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
+                super.addInformation(stack, worldIn, tooltip, flagIn);
+
+                // 获取当前物品的子类型 (metadata)
+                int meta = stack.getMetadata();
+
+                // 根据不同的 metadata 添加不同的灰色描述
+                switch (meta) {
+                    case 0: // 对应 subtype0
+                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "28x21 - 适合用于道路方向指示牌");
+                        break;
+                    case 1: // 对应 subtype1
+                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "8x16 - 适合用于指示单独目标");
+                        break;
+                    case 2: // 对应 subtype2
+                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "12x24 - 适合用于信息密度较高的指示牌");
+                        break;
+                    case 3: // 对应 subtype3
+                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "14x6 - 适合用于其他指示牌下方作为补充");
+                        break;
+                }
+            }
+
+        }.setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)

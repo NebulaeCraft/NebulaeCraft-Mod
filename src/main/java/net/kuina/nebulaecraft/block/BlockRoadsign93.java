@@ -28,55 +28,26 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
-public class BlockSignpoleEmptysign2 extends ElementsNebulaecraftMod.ModElement {
-    @GameRegistry.ObjectHolder("nebulaecraft:signpole_emptysign_2")
+public class BlockRoadsign93 extends ElementsNebulaecraftMod.ModElement {
+    @GameRegistry.ObjectHolder("nebulaecraft:roadsign_93")
     public static final Block block = null;
 
-    public BlockSignpoleEmptysign2(ElementsNebulaecraftMod instance) {
-        super(instance, 32);
+    public BlockRoadsign93(ElementsNebulaecraftMod instance) {
+        super(instance, 39);
     }
 
     @Override
     public void initElements() {
-        elements.blocks.add(() -> new BlockSignpoleEmptysign2.BlockCustom().setRegistryName("signpole_emptysign_2"));
-
-        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block) {
-
-            // 重写 addInformation 添加描述
-            @SideOnly(Side.CLIENT)
-            @Override
-            public void addInformation(ItemStack stack, World worldIn, java.util.List<String> tooltip, net.minecraft.client.util.ITooltipFlag flagIn) {
-                super.addInformation(stack, worldIn, tooltip, flagIn);
-
-                // 获取当前物品的子类型 (metadata)
-                int meta = stack.getMetadata();
-
-                // 根据不同的 metadata 添加不同的灰色描述
-                switch (meta) {
-                    case 0: // 对应 subtype0
-                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "16x20 - 适合用于大的特殊提示牌");
-                        break;
-                    case 1: // 对应 subtype1
-                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "16x16 - 适合组合用于较大的特殊提示牌");
-                        break;
-                    case 2: // 对应 subtype2
-                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "16x12 - 适合组合用于中等大小的特殊提示牌");
-                        break;
-                    case 3: // 对应 subtype3
-                        tooltip.add(net.minecraft.util.text.TextFormatting.GRAY + "16x8 - 适合组合用于较小的特殊提示牌");
-                        break;
-                }
-            }
-
-        }.setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
+        elements.blocks.add(() -> new BlockCustom().setRegistryName("roadsign_93"));
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
     @Override
     public void registerModels(ModelRegistryEvent event) {
-        BlockSignpoleEmptysign2.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign2.BlockCustom.EnumType.values();
-        for (BlockSignpoleEmptysign2.BlockCustom.EnumType subtype : allSubtypes) {
-            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:signpole_emptysign_2_" + subtype.getName(), "inventory"));
+        BlockRoadsign93.BlockCustom.EnumType[] allSubtypes = BlockRoadsign93.BlockCustom.EnumType.values();
+        for (BlockRoadsign93.BlockCustom.EnumType subtype : allSubtypes) {
+            ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:roadsign_93_" + subtype.getName(), "inventory"));
         }
     }
 
@@ -86,8 +57,8 @@ public class BlockSignpoleEmptysign2 extends ElementsNebulaecraftMod.ModElement 
 
         public BlockCustom() {
             super(Material.IRON);
-            setUnlocalizedName("signpole_emptysign_2");
-            setSoundType(SoundType.METAL);
+			setSoundType(SoundType.METAL);
+			setUnlocalizedName("roadsign_93");
 			setHardness(1F);
 			setResistance(10F);
 			setLightLevel(0F);
@@ -99,8 +70,8 @@ public class BlockSignpoleEmptysign2 extends ElementsNebulaecraftMod.ModElement 
         @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
-            BlockSignpoleEmptysign2.BlockCustom.EnumType[] allSubtypes = BlockSignpoleEmptysign2.BlockCustom.EnumType.values();
-            for (BlockSignpoleEmptysign2.BlockCustom.EnumType subtype : allSubtypes) {
+            BlockRoadsign93.BlockCustom.EnumType[] allSubtypes = BlockRoadsign93.BlockCustom.EnumType.values();
+            for (BlockRoadsign93.BlockCustom.EnumType subtype : allSubtypes) {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
@@ -121,64 +92,35 @@ public class BlockSignpoleEmptysign2 extends ElementsNebulaecraftMod.ModElement 
         }
 
         @Override
-		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-			if(state.getValue(SUBTYPE).getMetadata()==0){
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(0, 0, 0, 1, 1.25, 0.15);
-					case NORTH :
-						return new AxisAlignedBB(0, 0, 0.85, 1, 1.25, 1);
-					case EAST :
-						return new AxisAlignedBB(0, 0, 0, 0.15, 1.25, 1);
-					case WEST :
-						return new AxisAlignedBB(0.85, 0, 0, 1, 1.25, 1);
-
-                }
-            }
-            else if(state.getValue(SUBTYPE).getMetadata()==1){
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(0, 0, 0, 1, 1, 0.15);
-					case NORTH :
-						return new AxisAlignedBB(0, 0, 0.85, 1, 1, 1);
-					case EAST :
-						return new AxisAlignedBB(0, 0, 0, 0.15, 1, 1);
-					case WEST :
-						return new AxisAlignedBB(0.85, 0, 0, 1, 1, 1);
-
-                }
-            }
-            else if(state.getValue(SUBTYPE).getMetadata()==2){
+        public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+            if(state.getValue(SUBTYPE).getMetadata()==0 || state.getValue(SUBTYPE).getMetadata()==1){
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
                     default :
-                        return new AxisAlignedBB(0, 0, 0, 1, 0.75, 0.15);
+                        return new AxisAlignedBB(0, 0.25, 0, 1, 0.75, 0.1);
                     case NORTH :
-                        return new AxisAlignedBB(0, 0, 0.85, 1, 0.75, 1);
+                        return new AxisAlignedBB(0, 0.25, 0.9, 1, 0.75, 1);
                     case EAST :
-                        return new AxisAlignedBB(0, 0, 0, 0.15, 0.75, 1);
+                        return new AxisAlignedBB(0, 0.25, 0, 0.1, 0.75, 1);
                     case WEST :
-                        return new AxisAlignedBB(0.85, 0, 0, 1, 0.75, 1);
-
+                        return new AxisAlignedBB(0.9, 0.25, 0, 1, 0.75, 1);
                 }
             }
             else{
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH :
                     default :
-                        return new AxisAlignedBB(0, 0, 0, 1, 0.5, 0.15);
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 1, 0.1);
                     case NORTH :
-                        return new AxisAlignedBB(0, 0, 0.85, 1, 0.5, 1);
+                        return new AxisAlignedBB(0.25, 0, 0.9, 0.75, 1, 1);
                     case EAST :
-                        return new AxisAlignedBB(0, 0, 0, 0.15, 0.5, 1);
+                        return new AxisAlignedBB(0, 0, 0.25, 0.1, 1, 0.75);
                     case WEST :
-                        return new AxisAlignedBB(0.85, 0, 0, 1, 0.5, 1);
+                        return new AxisAlignedBB(0.9, 0, 0.25, 1, 1, 0.75);
 
                 }
             }
-		}
+        }
 
         @Override
         protected net.minecraft.block.state.BlockStateContainer createBlockState() {
@@ -221,13 +163,12 @@ public class BlockSignpoleEmptysign2 extends ElementsNebulaecraftMod.ModElement 
         public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1"),
-            SUBTYPE2(2, "subtype2"),
-            SUBTYPE3(3, "subtype3");
+            SUBTYPE2(2, "subtype2");
 
-            private static final BlockSignpoleEmptysign2.BlockCustom.EnumType[] META_LOOKUP = new BlockSignpoleEmptysign2.BlockCustom.EnumType[values().length];
+            private static final BlockRoadsign93.BlockCustom.EnumType[] META_LOOKUP = new BlockRoadsign93.BlockCustom.EnumType[values().length];
 
             static {
-                for (BlockSignpoleEmptysign2.BlockCustom.EnumType type : values()) {
+                for (BlockRoadsign93.BlockCustom.EnumType type : values()) {
                     META_LOOKUP[type.getMetadata()] = type;
                 }
             }
@@ -240,7 +181,7 @@ public class BlockSignpoleEmptysign2 extends ElementsNebulaecraftMod.ModElement 
                 this.name = i_name;
             }
 
-            public static BlockSignpoleEmptysign2.BlockCustom.EnumType byMetadata(int meta) {
+            public static BlockRoadsign93.BlockCustom.EnumType byMetadata(int meta) {
                 if (meta < 0 || meta >= META_LOOKUP.length) {
                     meta = 0;
                 }

@@ -1,0 +1,20 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"textures": {
+		"0": "nebulaecraft:blocks/roadsign_93_2",
+		"1": "nebulaecraft:blocks/roadsign_back_9",
+		"particle": "nebulaecraft:blocks/roadsign_back_9"
+	},
+	"elements": [
+		{
+			"from": [0, 0, 0.05],
+			"to": [16, 16, 0.05],
+			"rotation": {"angle": 0, "axis": "y", "origin": [8, 6, 8.1]},
+			"faces": {
+				"north": {"uv": [0, 0, 16, 16], "texture": "#1"},
+				"south": {"uv": [0, 0, 16, 16], "texture": "#0"}
+			}
+		}
+	]
+}

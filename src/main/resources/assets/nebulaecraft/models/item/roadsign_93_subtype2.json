@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/roadsign_89_4",
+  "parent": "nebulaecraft:block/roadsign_93_2",
   "display": {
 		"thirdperson_righthand": {
 			"translation": [0, 3, 3],
@@ -25,7 +25,8 @@
 		},
 		"gui": {
 			"rotation": [-10, -30, 0],
-			"translation": [-4, 1.25, 0]
+			"translation": [-4, 1, 0],
+			"scale": [0.9, 0.9, 0.9]
 		},
 		"head": {
 			"rotation": [0, -180, 0],

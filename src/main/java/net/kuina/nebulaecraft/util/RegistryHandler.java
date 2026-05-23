@@ -67,7 +67,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         for (int i = 82; i <= 84; i++) registerBlock(new BlockRoadsignBig.BlockCustom(), "roadsign_" + i);
         for (int i = 85; i <= 86; i++) registerBlock(new BlockRoadsignSmall.BlockCustom(), "roadsign_" + i);
         registerBlock(new BlockRoadsignSmall.BlockCustom(), "roadsign_88");
-        for (int i = 90; i <= 91; i++) registerBlock(new BlockRoadsignSmall.BlockCustom(), "roadsign_" + i);
+        for (int i = 90; i <= 92; i++) registerBlock(new BlockRoadsignSmall.BlockCustom(), "roadsign_" + i);
         for (int i = 1; i <= 10; i++) registerBlock(new BlockRoadmarkSpecial.BlockCustom(), "roadmark_special_" + i);
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_white_line");
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_white_line_slab");
