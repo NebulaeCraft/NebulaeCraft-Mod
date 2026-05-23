@@ -37,26 +37,30 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
 
     // 【新增】用于在客户端内存中缓存每个坐标的文字和生成的贴图
     private static final java.util.Map<net.minecraft.util.math.BlockPos, String> textCache = new java.util.HashMap<>();
+    private static final java.util.Map<net.minecraft.util.math.BlockPos, Integer> colorCache = new java.util.HashMap<>();
     private static final java.util.Map<net.minecraft.util.math.BlockPos, DynamicTexture> textureCache = new java.util.HashMap<>();
 
     @Override
     public void render(TileEntityRoadmarkText te, double x, double y, double z, float partialTicks, int destroyStage, float alpha) {
         String currentText = te.getText();
         if (currentText == null || currentText.isEmpty()) return;
+        int currentColor = te.getColor();
 
         net.minecraft.util.math.BlockPos pos = te.getPos();
         String cachedText = textCache.get(pos);
+        Integer cachedColor = colorCache.get(pos);
         DynamicTexture tex = textureCache.get(pos);
 
-        // 如果该坐标还没贴图，或者文字发生了改变，就重新生成贴图
-        if (tex == null || !currentText.equals(cachedText)) {
-            tex = generateTexture(currentText);
+        // 如果该坐标还没贴图，或者文字/颜色发生了改变，就重新生成贴图
+        if (tex == null || !currentText.equals(cachedText) || cachedColor == null || currentColor != cachedColor) {
+            tex = generateTexture(currentText, currentColor);
             // 清理旧内存
             if (textureCache.containsKey(pos)) {
                 textureCache.get(pos).deleteGlTexture();
             }
             textureCache.put(pos, tex);
             textCache.put(pos, currentText);
+            colorCache.put(pos, currentColor);
         }
 
         // 渲染部分
@@ -93,15 +97,15 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
         GlStateManager.popMatrix();
     }
 
-    // 生成贴图方法改为只接受 String 参数并返回 DynamicTexture
-    private DynamicTexture generateTexture(String text) {
+    // 生成贴图方法改为接受文字和颜色并返回 DynamicTexture
+    private DynamicTexture generateTexture(String text, int color) {
         int width = 140;
         int height = 200;
         java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_ARGB);
         java.awt.Graphics2D g2d = image.createGraphics();
 
         g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
-        g2d.setColor(new java.awt.Color(249, 249, 249));
+        g2d.setColor(new java.awt.Color(color));
 
         java.awt.Font font = trafficaFont.deriveFont(100f);
         g2d.setFont(font);

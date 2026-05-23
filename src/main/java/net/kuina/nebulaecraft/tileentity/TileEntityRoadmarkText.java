@@ -7,8 +7,12 @@ import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityRoadmarkText extends TileEntity {
 
+    public static final int COLOR_WHITE = 0xF9F9F9;
+    public static final int COLOR_YELLOW = 0xFCD667;
+
     // 保存方块显示的文字，默认值为 "字"
     private String text = "字";
+    private int color = COLOR_WHITE;
 
     // 获取当前文字
     public String getText() {
@@ -17,10 +21,16 @@ public class TileEntityRoadmarkText extends TileEntity {
 
     public void setText(String text) {
         this.text = text;
-        /* if (this.world != null && this.world.isRemote) {
-            this.needsUpdate = true; // 客户端收到新文字，标记需要刷新贴图
-        }
-        this.markDirty(); */
+        this.markDirty();
+    }
+
+    public int getColor() {
+        return color;
+    }
+
+    public void setColor(int color) {
+        this.color = normalizeColor(color);
+        this.markDirty();
     }
 
     // 1. 将数据写入 NBT 以保存到存档硬盘中
@@ -28,6 +38,7 @@ public class TileEntityRoadmarkText extends TileEntity {
     public NBTTagCompound writeToNBT(NBTTagCompound compound) {
         super.writeToNBT(compound);
         compound.setString("RoadmarkText", this.text);
+        compound.setInteger("RoadmarkColor", this.color);
         return compound;
     }
 
@@ -37,6 +48,9 @@ public class TileEntityRoadmarkText extends TileEntity {
         super.readFromNBT(compound);
         if (compound.hasKey("RoadmarkText")) {
             this.text = compound.getString("RoadmarkText");
+        }
+        if (compound.hasKey("RoadmarkColor")) {
+            this.color = normalizeColor(compound.getInteger("RoadmarkColor"));
         }
     }
 
@@ -54,7 +68,6 @@ public class TileEntityRoadmarkText extends TileEntity {
 
     @Override
     public void onDataPacket(NetworkManager net, SPacketUpdateTileEntity pkt) {
-        String oldText = this.text; // 记录旧文字
         this.readFromNBT(pkt.getNbtCompound()); // 读取新文字
     }
 
@@ -81,5 +94,9 @@ public class TileEntityRoadmarkText extends TileEntity {
     public net.minecraft.util.math.AxisAlignedBB getRenderBoundingBox() {
         // 告诉游戏这个方块的渲染范围是“无限大”，让游戏引擎把渲染决定权完全交给我们
         return net.minecraft.tileentity.TileEntity.INFINITE_EXTENT_AABB;
+    }
+
+    private static int normalizeColor(int color) {
+        return color == COLOR_YELLOW ? COLOR_YELLOW : COLOR_WHITE;
     }
 }
