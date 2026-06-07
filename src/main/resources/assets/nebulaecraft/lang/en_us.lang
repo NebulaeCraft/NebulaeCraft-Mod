@@ -437,6 +437,7 @@ tile.signpole_vertical.subtype1.name=Sign Pole Top
 tile.signpole_vertical.subtype2.name=Sign Pole
 tile.signpole_vertical.subtype3.name=Sign Pole
 tile.solar.name=Solar Panel
+tile.steel_block.name=Steel Block
 tile.streetlight.name=Street Light
 tile.streetlight_pole.name=Street Light Pole
 tile.strip_light.name=Strip Light

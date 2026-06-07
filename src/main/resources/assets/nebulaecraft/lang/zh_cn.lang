@@ -437,6 +437,7 @@ tile.signpole_vertical.subtype1.name=牌杆顶
 tile.signpole_vertical.subtype2.name=牌杆
 tile.signpole_vertical.subtype3.name=牌杆
 tile.solar.name=太阳能板
+tile.steel_block.name=钢块
 tile.streetlight.name=路灯
 tile.streetlight_pole.name=路灯杆
 tile.strip_light.name=条形灯

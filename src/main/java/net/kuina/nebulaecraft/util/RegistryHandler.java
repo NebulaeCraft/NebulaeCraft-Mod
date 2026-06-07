@@ -8,7 +8,10 @@ import net.kuina.nebulaecraft.tileentity.TileEntityTdt;
 import net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText;
 import net.kuina.nebulaecraft.util.ServerHandler;
 import net.minecraft.block.Block;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -148,6 +151,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerItem(new net.kuina.nebulaecraft.item.ItemTreeKiller(), "tree_killer");
         registerBlock(new BlockJoint.BlockCustom(), "road_expansion_joint");
         registerBlock(new BlockJointDiagonal.BlockCustom(), "road_expansion_joint_diagonal");
+        registerBlock(new BlockSolid.BlockCustom().setCreativeTab(CreativeTabs.BUILDING_BLOCKS), "steel_block");
     }
 
 
