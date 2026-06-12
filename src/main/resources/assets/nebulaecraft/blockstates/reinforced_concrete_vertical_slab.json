@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:reinforced_concrete_vertical_slab","y": 270},
+	"facing=south": { "model": "nebulaecraft:reinforced_concrete_vertical_slab"},
+	"facing=west":  { "model": "nebulaecraft:reinforced_concrete_vertical_slab","y": 90},
+	"facing=north":  { "model": "nebulaecraft:reinforced_concrete_vertical_slab","y": 180}
+  }
+}

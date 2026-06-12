@@ -1,0 +1,6 @@
+{
+  "variants": {
+	"subtype=subtype0": {"model": "nebulaecraft:reinforced_concrete_slab_0"},
+	"subtype=subtype1": {"model": "nebulaecraft:reinforced_concrete_slab_1"}
+  }
+}
