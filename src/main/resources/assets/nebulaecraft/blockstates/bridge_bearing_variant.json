@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:bridge_bearing_variant","y": 270},
+	"facing=south": { "model": "nebulaecraft:bridge_bearing_variant"},
+	"facing=west":  { "model": "nebulaecraft:bridge_bearing_variant","y": 90},
+	"facing=north":  { "model": "nebulaecraft:bridge_bearing_variant","y": 180}
+  }
+}

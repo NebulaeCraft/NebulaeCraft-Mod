@@ -7,7 +7,11 @@
 	"facing=east,subtype=subtype1": { "model": "nebulaecraft:camera_2","y": 270},
 	"facing=south,subtype=subtype1": { "model": "nebulaecraft:camera_2"},
 	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:camera_2","y": 90},
-	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:camera_2","y": 180}
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:camera_2","y": 180},
+	"facing=east,subtype=subtype2": { "model": "nebulaecraft:camera_3","y": 270},
+	"facing=south,subtype=subtype2": { "model": "nebulaecraft:camera_3"},
+	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:camera_3","y": 90},
+	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:camera_3","y": 180}
 
   }
 }

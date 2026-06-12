@@ -1,5 +1,5 @@
 {
-  "parent": "nebulaecraft:block/bridge_bearing",
+  "parent": "nebulaecraft:block/bridge_bearing_0",
   "display": {
         "gui": {
             "rotation": [ 30, 225, 0 ],

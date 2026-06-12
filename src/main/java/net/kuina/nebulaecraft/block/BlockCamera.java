@@ -39,7 +39,7 @@ public class BlockCamera extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         elements.blocks.add(() -> new BlockCustom().setRegistryName("camera"));
-        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
@@ -94,18 +94,8 @@ public class BlockCamera extends ElementsNebulaecraftMod.ModElement {
         @Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
             if(state.getValue(SUBTYPE).getMetadata()==0){
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH:
-                    default:
-                        return new AxisAlignedBB(0.25, 0.5, 0.25, 0.75, 1, 0.75);
-                    case NORTH:
-                        return new AxisAlignedBB(0.25, 0.5, 0.25, 0.75, 1, 0.75);
-                    case EAST:
-                        return new AxisAlignedBB(0.25, 0.5, 0.25, 0.75, 1, 0.75);
-                    case WEST:
-                        return new AxisAlignedBB(0.25, 0.5, 0.25, 0.75, 1, 0.75);
-                }
-            } else{
+                return new AxisAlignedBB(0.25, 0.5, 0.25, 0.75, 1, 0.75);
+            } else if(state.getValue(SUBTYPE).getMetadata()==1){
                 switch (state.getValue(BlockHorizontal.FACING)) {
                     case SOUTH:
                     default:
@@ -117,6 +107,8 @@ public class BlockCamera extends ElementsNebulaecraftMod.ModElement {
                     case WEST:
                         return new AxisAlignedBB(0.25, 0.25, 0.25, 1, 0.75, 0.75);
                 }
+            } else{
+                return new AxisAlignedBB(0.25, 0, 0.25, 0.75, 0.5, 0.75);
             }
 		}
 
@@ -160,7 +152,8 @@ public class BlockCamera extends ElementsNebulaecraftMod.ModElement {
 
         public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),
-            SUBTYPE1(1, "subtype1");
+            SUBTYPE1(1, "subtype1"),
+            SUBTYPE2(2, "subtype2");
 
             private static final BlockCamera.BlockCustom.EnumType[] META_LOOKUP = new BlockCamera.BlockCustom.EnumType[values().length];
 

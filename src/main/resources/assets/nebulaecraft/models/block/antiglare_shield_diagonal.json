@@ -3,7 +3,8 @@
 	"credit": "Made by Kuina_20",
 	"textures": {
 		"2": "nebulaecraft:blocks/platform_edge",
-		"3": "nebulaecraft:blocks/color_outerring"
+		"3": "nebulaecraft:blocks/color_outerring",
+		"particle": "nebulaecraft:blocks/platform_edge"
 	},
 	"elements": [
 		{

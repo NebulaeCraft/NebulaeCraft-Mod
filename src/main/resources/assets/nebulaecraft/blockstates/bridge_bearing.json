@@ -1,7 +1,6 @@
 {
   "variants": {
-    "normal": {
-      "model": "nebulaecraft:bridge_bearing"
-    }
+	"subtype=subtype0": {"model": "nebulaecraft:bridge_bearing_0"},
+	"subtype=subtype1": {"model": "nebulaecraft:bridge_bearing_1"}
   }
 }
