@@ -1,8 +1,12 @@
 {
   "variants": {
-	"facing=east": { "model": "nebulaecraft:antiglare_shield","y": 90},
-	"facing=south": { "model": "nebulaecraft:antiglare_shield","y": 0},
-	"facing=west":  { "model": "nebulaecraft:antiglare_shield","y": 90},
-	"facing=north":  { "model": "nebulaecraft:antiglare_shield","y": 0}
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:antiglare_shield","y": 90},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:antiglare_shield","y": 0},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:antiglare_shield","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:antiglare_shield","y": 0},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:antiglare_shield_s","y": 90},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:antiglare_shield_s","y": 0},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:antiglare_shield_s","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:antiglare_shield_s","y": 0}
   }
 }
