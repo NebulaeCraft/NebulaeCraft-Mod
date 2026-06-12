@@ -38,7 +38,7 @@ public class BlockBridgeBearing extends ElementsNebulaecraftMod.ModElement {
 	public static final Block block = null;
 
 	public BlockBridgeBearing(ElementsNebulaecraftMod instance) {
-		super(instance, 1);
+		super(instance, 53);
 	}
 
 	@Override

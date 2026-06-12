@@ -180,6 +180,7 @@ tile.cubic_light.name=块状灯
 tile.device_apple_imac.name=iMac
 tile.device_apple_macbook.name=MacBook Pro
 tile.device_ms_surface.name=Surface Pro 8
+tile.dustbins.name=垃圾桶
 tile.flat_light.name=平板状灯
 tile.info_screen_1.name=导流显示屏
 tile.info_screen_2.name=导流显示屏
