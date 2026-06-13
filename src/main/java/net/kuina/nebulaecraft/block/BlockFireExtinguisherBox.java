@@ -2,6 +2,7 @@
 package net.kuina.nebulaecraft.block;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
+import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.SoundType;
@@ -9,7 +10,6 @@ import net.minecraft.block.material.Material;
 import net.minecraft.block.properties.PropertyDirection;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -57,7 +57,7 @@ public class BlockFireExtinguisherBox extends ElementsNebulaecraftMod.ModElement
 			setResistance(10F);
 			setLightLevel(0F);
 			setLightOpacity(0);
-			setCreativeTab(CreativeTabs.BUILDING_BLOCKS);
+			setCreativeTab(TabNebulaecraftMetro.tab);
 			this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
 		}
 
