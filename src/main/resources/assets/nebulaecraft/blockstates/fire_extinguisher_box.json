@@ -1,9 +1,10 @@
 {
+  "forge_marker": 1,
   "variants": {
 	"facing=east": { "model": "nebulaecraft:fire_extinguisher_box.obj","y": 270},
 	"facing=south": { "model": "nebulaecraft:fire_extinguisher_box.obj"},
 	"facing=west":  { "model": "nebulaecraft:fire_extinguisher_box.obj","y": 90},
 	"facing=north":  { "model": "nebulaecraft:fire_extinguisher_box.obj","y": 180},
-	"inventory": { "model": "nebulaecraft:fire_extinguisher_box.obj" }
+	"inventory": { "model": "nebulaecraft:fire_extinguisher_box.obj", "transform": "forge:default-block" }
   }
 }
