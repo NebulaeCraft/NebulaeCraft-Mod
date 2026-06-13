@@ -12,6 +12,7 @@ import net.minecraft.block.properties.PropertyEnum;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -27,6 +28,8 @@ import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
+
+import java.util.List;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockMedianStripsDiagonal extends ElementsNebulaecraftMod.ModElement {
@@ -54,6 +57,13 @@ public class BlockMedianStripsDiagonal extends ElementsNebulaecraftMod.ModElemen
 	public static class BlockCustom extends Block {
 		public static final PropertyDirection FACING = BlockHorizontal.FACING;
 		public static final PropertyEnum<EnumType> SUBTYPE = PropertyEnum.create("subtype", EnumType.class);
+		private static final int COLLISION_STEPS = 16;
+		private static final double[][] COLLISION_LAYERS = new double[][] {
+				{0, 0.0625, 0.96967},
+				{0.0625, 0.1875, 1.0625},
+				{0.1875, 0.375, 1.14645},
+				{0.375, 1, 1.23484}
+		};
 		public BlockCustom() {
 			super(Material.ROCK);
 			setUnlocalizedName("median_strips_diagonal");
@@ -91,6 +101,36 @@ public class BlockMedianStripsDiagonal extends ElementsNebulaecraftMod.ModElemen
         }
 
         @Override
+        public void addCollisionBoxToList(IBlockState state, World worldIn, BlockPos pos, AxisAlignedBB entityBox,
+                                          List<AxisAlignedBB> collidingBoxes, @javax.annotation.Nullable Entity entityIn,
+                                          boolean isActualState) {
+            double yOffset = state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : -0.5;
+            int rotationSteps = getRotationSteps(state.getValue(BlockHorizontal.FACING));
+
+            for (double[] layer : COLLISION_LAYERS) {
+                for (int i = 0; i < COLLISION_STEPS; i++) {
+                    double xMin = (double) i / COLLISION_STEPS;
+                    double xMax = (double) (i + 1) / COLLISION_STEPS;
+                    double zMin = layer[2] - xMax;
+
+                    if (zMin >= 1) {
+                        continue;
+                    }
+
+                    AxisAlignedBB box = new AxisAlignedBB(
+                            xMin,
+                            layer[0] + yOffset,
+                            Math.max(0, zMin),
+                            xMax,
+                            layer[1] + yOffset,
+                            1
+                    );
+                    addCollisionBoxToList(pos, entityBox, collidingBoxes, rotateAABB(box, rotationSteps));
+                }
+            }
+        }
+
+        @Override
         public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
             if(state.getValue(SUBTYPE).getMetadata()==0){
                 switch (state.getValue(BlockHorizontal.FACING)) {
@@ -120,6 +160,37 @@ public class BlockMedianStripsDiagonal extends ElementsNebulaecraftMod.ModElemen
 
                 }
             }
+        }
+
+        private static int getRotationSteps(EnumFacing facing) {
+            switch (facing) {
+                case WEST:
+                    return 1;
+                case NORTH:
+                    return 2;
+                case EAST:
+                    return 3;
+                case SOUTH:
+                default:
+                    return 0;
+            }
+        }
+
+        private static AxisAlignedBB rotateAABB(AxisAlignedBB box, int steps) {
+            AxisAlignedBB rotated = box;
+
+            for (int i = 0; i < steps; i++) {
+                rotated = new AxisAlignedBB(
+                        1 - rotated.maxZ,
+                        rotated.minY,
+                        rotated.minX,
+                        1 - rotated.minZ,
+                        rotated.maxY,
+                        rotated.maxX
+                );
+            }
+
+            return rotated;
         }
 
 		@Override
