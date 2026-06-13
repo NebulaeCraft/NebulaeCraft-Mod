@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:median_strips","y": 90},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:median_strips"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:median_strips","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:median_strips"},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:median_strips_s","y": 90},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:median_strips_s"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:median_strips_s","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:median_strips_s"}
+  }
+}
