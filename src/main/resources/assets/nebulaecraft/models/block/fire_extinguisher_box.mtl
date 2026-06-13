@@ -1,0 +1,8 @@
+# Materials for fire_extinguisher_box.obj
+newmtl red
+Kd 1.000 1.000 1.000
+map_Kd minecraft:blocks/concrete_red
+
+newmtl front
+Kd 1.000 1.000 1.000
+map_Kd nebulaecraft:blocks/fire_extinguisher_box
