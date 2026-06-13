@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:fire_extinguisher_box","y": 270},
+	"facing=south": { "model": "nebulaecraft:fire_extinguisher_box"},
+	"facing=west":  { "model": "nebulaecraft:fire_extinguisher_box","y": 90},
+	"facing=north":  { "model": "nebulaecraft:fire_extinguisher_box","y": 180}
+  }
+}
