@@ -1,8 +1,9 @@
 {
   "variants": {
-	"facing=east": { "model": "nebulaecraft:fire_extinguisher_box","y": 270},
-	"facing=south": { "model": "nebulaecraft:fire_extinguisher_box"},
-	"facing=west":  { "model": "nebulaecraft:fire_extinguisher_box","y": 90},
-	"facing=north":  { "model": "nebulaecraft:fire_extinguisher_box","y": 180}
+	"facing=east": { "model": "nebulaecraft:fire_extinguisher_box.obj","y": 270},
+	"facing=south": { "model": "nebulaecraft:fire_extinguisher_box.obj"},
+	"facing=west":  { "model": "nebulaecraft:fire_extinguisher_box.obj","y": 90},
+	"facing=north":  { "model": "nebulaecraft:fire_extinguisher_box.obj","y": 180},
+	"inventory": { "model": "nebulaecraft:fire_extinguisher_box.obj" }
   }
 }
