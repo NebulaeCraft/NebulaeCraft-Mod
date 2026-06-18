@@ -1,6 +1,6 @@
 # NebulaeCraft
 
-<img align="right" width="160" src="src/main/resources/logo.png">
+<img align="right" width="160" src="docs/images/logo.png">
 
 [![Minecraft Version](https://img.shields.io/badge/Minecraft-1.12.2-brightgreen.svg)](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html)
 [![Forge Version](https://img.shields.io/badge/Forge-14.23.5.2864-orange.svg)](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html)
@@ -8,7 +8,7 @@
 
 NebulaeCraft is a Minecraft Forge mod made for the NebulaeCraft 5th Server, focused on detailed modern city, road, and metro construction.
 
-![NebulaeCraft road showcase](docs/images/road-showcase.png)
+![NebulaeCraft road showcase](docs/images/road-showcase.jpg)
 
 What is NebulaeCraft?
 
@@ -25,7 +25,7 @@ Download: [Releases](https://github.com/NebulaeCraft/NebulaeCraft-Mod/releases)
 
 More Pictures:
 
-![NebulaeCraft metro showcase](docs/images/metro-showcase.png)
+![NebulaeCraft metro showcase](docs/images/metro-showcase.jpg)
 
 Features summary:
 
