@@ -1,6 +1,6 @@
 # NebulaeCraft
 
-<img align="right" width="160" src="docs/images/logo.png">
+<img align="right" height="80px" src="docs/images/logo.png">
 
 [![Minecraft Version](https://img.shields.io/badge/Minecraft-1.12.2-brightgreen.svg)](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html)
 [![Forge Version](https://img.shields.io/badge/Forge-14.23.5.2864-orange.svg)](https://files.minecraftforge.net/net/minecraftforge/forge/index_1.12.2.html)
@@ -20,8 +20,6 @@ What is NebulaeCraft?
 Versions [Forge]: 1.12.2
 
 Current Mod Version: 2.22
-
-Download: [Releases](https://github.com/NebulaeCraft/NebulaeCraft-Mod/releases)
 
 More Pictures:
 
