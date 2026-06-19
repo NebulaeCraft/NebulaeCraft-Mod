@@ -1,0 +1,12 @@
+{
+  "variants": {
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:trafficlight_red_a","y": 270},
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:trafficlight_red_a"},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_red_a","y": 90},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:trafficlight_red_a","y": 180},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:trafficlight_green_a","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:trafficlight_green_a"},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:trafficlight_green_a","y": 90},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:trafficlight_green_a","y": 180}
+  }
+}
