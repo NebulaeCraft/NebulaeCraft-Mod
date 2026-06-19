@@ -140,6 +140,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_left");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_straight_right");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_straight_left");
+        registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_straight_back");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_right_left");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_back");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_halfright");

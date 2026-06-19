@@ -2,8 +2,8 @@
 	"format_version": "1.9.0",
 	"credit": "Made with Blockbench",
 	"textures": {
-		"0": "nebulaecraft:blocks/roadmark_arrow_right",
-		"particle": "nebulaecraft:blocks/roadmark_arrow_right"
+		"0": "nebulaecraft:blocks/roadmark_arrow_straight_back",
+		"particle": "nebulaecraft:blocks/roadmark_arrow_straight_back"
 	},
 	"elements": [
 		{
