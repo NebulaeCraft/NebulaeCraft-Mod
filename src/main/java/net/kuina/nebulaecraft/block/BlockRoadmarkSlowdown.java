@@ -39,7 +39,7 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
     @Override
     public void initElements() {
         elements.blocks.add(() -> new BlockCustom().setRegistryName("roadmark_slowdown"));
-        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2"}).setRegistryName(block.getRegistryName()));
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
     }
 
     @SideOnly(Side.CLIENT)
@@ -56,9 +56,9 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
         public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
 
         public BlockCustom() {
-            super(Material.IRON);
+            super(Material.CLOTH);
             setUnlocalizedName("roadmark_slowdown");
-            setSoundType(SoundType.METAL);
+            setSoundType(SoundType.CLOTH);
             setHardness(1F);
             setResistance(10F);
             setLightLevel(0F);
@@ -99,16 +99,28 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-            switch (state.getValue(BlockHorizontal.FACING)) {
-                case SOUTH:
-                default:
-                    return new AxisAlignedBB(0.1875, 0, 0.0625, 0.8125, 0.1, 0.9375);
-                case NORTH:
-                    return new AxisAlignedBB(0.1875, 0, 0.0625, 0.8125, 0.1, 0.9375);
-                case EAST:
-                    return new AxisAlignedBB(0.0625, 0, 0.1875, 0.9375, 0.1, 0.8125);
-                case WEST:
-                    return new AxisAlignedBB(0.0625, 0, 0.1875, 0.9375, 0.1, 0.8125);
+            if (state.getValue(SUBTYPE).getMetadata() == 3) {
+                switch (state.getValue(BlockHorizontal.FACING)) {
+                    case SOUTH:
+                    case NORTH:
+                    default:
+                        return new AxisAlignedBB(-0.5, 0, 0.1875, 1.5, 0.1, 0.8125);
+                    case EAST:
+                    case WEST:
+                        return new AxisAlignedBB(0.1875, 0, -0.5, 0.8125, 0.1, 1.5);
+
+                }
+            } else {
+                switch (state.getValue(BlockHorizontal.FACING)) {
+                    case SOUTH:
+                    case NORTH:
+                    default:
+                        return new AxisAlignedBB(0.25, 0, 0, 0.75, 0.1, 1);
+                    case EAST:
+                    case WEST:
+                        return new AxisAlignedBB(0, 0, 0.25, 1, 0.1, 0.75);
+
+                }
             }
         }
 
@@ -158,7 +170,8 @@ public class BlockRoadmarkSlowdown extends ElementsNebulaecraftMod.ModElement {
         public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),
             SUBTYPE1(1, "subtype1"),
-            SUBTYPE2(2, "subtype2");
+            SUBTYPE2(2, "subtype2"),
+            SUBTYPE3(3, "subtype3");
 
             private static final BlockRoadmarkSlowdown.BlockCustom.EnumType[] META_LOOKUP = new BlockRoadmarkSlowdown.BlockCustom.EnumType[values().length];
 

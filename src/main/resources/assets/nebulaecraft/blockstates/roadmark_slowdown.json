@@ -11,6 +11,10 @@
 	"facing=east,subtype=subtype2": { "model": "nebulaecraft:roadmark_slowdown_half_2","y": 270},
 	"facing=south,subtype=subtype2": { "model": "nebulaecraft:roadmark_slowdown_half_2"},
 	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:roadmark_slowdown_half_2","y": 90},
-	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:roadmark_slowdown_half_2","y": 180}
+	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:roadmark_slowdown_half_2","y": 180},
+	"facing=east,subtype=subtype3": { "model": "nebulaecraft:roadmark_slowdown_h","y": 270},
+	"facing=south,subtype=subtype3": { "model": "nebulaecraft:roadmark_slowdown_h"},
+	"facing=west,subtype=subtype3":  { "model": "nebulaecraft:roadmark_slowdown_h","y": 90},
+	"facing=north,subtype=subtype3":  { "model": "nebulaecraft:roadmark_slowdown_h","y": 180}
   }
 }
