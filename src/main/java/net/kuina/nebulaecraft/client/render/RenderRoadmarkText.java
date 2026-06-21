@@ -26,7 +26,7 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
         // 初始化时加载 ttf 字体
         if (roadmarkFont == null) {
             try {
-                ResourceLocation fontLoc = new ResourceLocation("nebulaecraft", "fonts/roadmark.ttf");
+                ResourceLocation fontLoc = new ResourceLocation("nebulaecraft", "textures/font/roadmark.ttf");
                 InputStream is = Minecraft.getMinecraft().getResourceManager().getResource(fontLoc).getInputStream();
                 roadmarkFont = Font.createFont(Font.TRUETYPE_FONT, is);
             } catch (Exception e) {
@@ -37,7 +37,7 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
         // 优先使用的西文字体
         if (roadmarkEnFont == null) {
             try {
-                ResourceLocation fontLoc = new ResourceLocation("nebulaecraft", "fonts/roadmark_en.ttf");
+                ResourceLocation fontLoc = new ResourceLocation("nebulaecraft", "textures/font/roadmark_en.ttf");
                 InputStream is = Minecraft.getMinecraft().getResourceManager().getResource(fontLoc).getInputStream();
                 roadmarkEnFont = Font.createFont(Font.TRUETYPE_FONT, is);
             } catch (Exception e) {
