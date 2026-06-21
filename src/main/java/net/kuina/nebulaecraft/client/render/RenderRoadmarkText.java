@@ -19,18 +19,30 @@ import java.io.InputStream;
 
 public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoadmarkText> {
 
-    private static Font trafficaFont;
+    private static Font roadmarkFont;   // 完整字体（roadmark.ttf），用于西文字体不包含的字符
+    private static Font roadmarkEnFont; // 仅西文字体（roadmark_en.ttf），优先使用
 
     public RenderRoadmarkText() {
-        // 初始化时加载你的 ttf 字体
-        if (trafficaFont == null) {
+        // 初始化时加载 ttf 字体
+        if (roadmarkFont == null) {
             try {
                 ResourceLocation fontLoc = new ResourceLocation("nebulaecraft", "fonts/roadmark.ttf");
                 InputStream is = Minecraft.getMinecraft().getResourceManager().getResource(fontLoc).getInputStream();
-                trafficaFont = Font.createFont(Font.TRUETYPE_FONT, is);
+                roadmarkFont = Font.createFont(Font.TRUETYPE_FONT, is);
             } catch (Exception e) {
                 e.printStackTrace();
-                trafficaFont = new Font("SansSerif", Font.BOLD, 100); // 容错备用字体
+                roadmarkFont = new Font("SansSerif", Font.BOLD, 100); // 容错备用字体
+            }
+        }
+        // 优先使用的西文字体
+        if (roadmarkEnFont == null) {
+            try {
+                ResourceLocation fontLoc = new ResourceLocation("nebulaecraft", "fonts/roadmark_en.ttf");
+                InputStream is = Minecraft.getMinecraft().getResourceManager().getResource(fontLoc).getInputStream();
+                roadmarkEnFont = Font.createFont(Font.TRUETYPE_FONT, is);
+            } catch (Exception e) {
+                e.printStackTrace();
+                roadmarkEnFont = null; // 加载失败时回退到 roadmarkFont
             }
         }
     }
@@ -108,22 +120,30 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
         g2d.setRenderingHint(java.awt.RenderingHints.KEY_ANTIALIASING, java.awt.RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setColor(new java.awt.Color(color));
 
-        java.awt.Font font = trafficaFont.deriveFont(100f);
-        g2d.setFont(font);
-        // 使用文字的实际像素轮廓边界（visual bounds），而不是包含上伸/下伸空白的逻辑边界，
-        // 这样无下伸部的字符（如数字、大写字母）也能在贴图内真正居中，不再偏上。
-        java.awt.font.FontRenderContext frc = g2d.getFontRenderContext();
-        java.awt.font.GlyphVector gv = font.createGlyphVector(frc, text);
-        // 水平方向用逻辑边界（advance），让空格等无墨字符也占据宽度、正常显示；
-        // 垂直方向用实际像素边界，避免无下伸部字符（数字/大写）偏上。
-        java.awt.geom.Rectangle2D logical = gv.getLogicalBounds();
-        java.awt.geom.Rectangle2D visual = gv.getVisualBounds();
+        java.awt.Font enFont = (roadmarkEnFont != null) ? roadmarkEnFont.deriveFont(100f) : null;
+        java.awt.Font cnFont = roadmarkFont.deriveFont(100f);
 
-        double scaleX = width / logical.getWidth();
+        // 逐字符选择字体：优先使用西文字体 roadmark_en.ttf；当该字体不包含某字符时，
+        // 退回使用完整字体 roadmark.ttf。空格等无墨字符按 canDisplay 同样处理。
+        java.text.AttributedString as = new java.text.AttributedString(text);
+        for (int i = 0; i < text.length(); i++) {
+            char c = text.charAt(i);
+            java.awt.Font use = (enFont != null && enFont.canDisplay(c)) ? enFont : cnFont;
+            as.addAttribute(java.awt.font.TextAttribute.FONT, use, i, i + 1);
+        }
+
+        java.awt.font.FontRenderContext frc = g2d.getFontRenderContext();
+        java.awt.font.TextLayout layout = new java.awt.font.TextLayout(as.getIterator(), frc);
+        // 水平方向用 advance（含空格等无墨字符的步进），让空格也占据宽度、正常显示；
+        // 垂直方向用实际像素边界（visual bounds），避免无下伸部字符（数字/大写）偏上。
+        java.awt.geom.Rectangle2D visual = layout.getBounds();
+        double advance = layout.getAdvance();
+
+        double scaleX = width / advance;
         double scaleY = height / visual.getHeight();
         g2d.scale(scaleX, scaleY);
 
-        g2d.drawGlyphVector(gv, (float) -logical.getX(), (float) -visual.getY());
+        layout.draw(g2d, 0f, (float) -visual.getY());
         g2d.dispose();
 
         return new DynamicTexture(image);
