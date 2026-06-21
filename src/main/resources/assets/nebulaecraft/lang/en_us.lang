@@ -28,6 +28,7 @@ tile.asphalt_bus_half_line_diagonal_right_slab.name=Right Half Bus Lane Diagonal
 tile.asphalt_bus_half_line_slab.name=Bus Lane Line Slab
 tile.asphalt_bus_half_slab.name=Half Bus Lane Slab
 tile.asphalt_crosswalk.name=Crosswalk Line
+tile.asphalt_crosswalk_slab.name=Crosswalk Line Slab
 tile.asphalt_double_white_line.name=Double White Line
 tile.asphalt_double_white_line_diagonal.name=Double White Line Diagonal
 tile.asphalt_double_white_line_diagonal_slab.name=Double White Line Diagonal Slab

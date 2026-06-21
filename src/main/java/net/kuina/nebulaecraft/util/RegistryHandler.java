@@ -104,6 +104,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_double_yellow_line_diagonal_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_stop_line_full");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_crosswalk");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_crosswalk_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_bus_half");
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_bus_half_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_bus_half_line");
