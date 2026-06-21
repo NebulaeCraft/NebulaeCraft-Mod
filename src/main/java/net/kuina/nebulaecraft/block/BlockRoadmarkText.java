@@ -97,14 +97,14 @@ public class BlockRoadmarkText extends ElementsNebulaecraftMod.ModElement {
         // 宽 0.6*2=1.2、长 1.3*2=2.6）贴合，仅用于准星高亮，不影响通行。
         @Override
         public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-            // 与渲染保持一致：单字符宽 16px，2 个及以上字符（空格也算）宽 26px。
+            // 与渲染保持一致：单字符宽 20px，2 个及以上字符（空格也算）宽 28px。
             TileEntity te = source.getTileEntity(pos);
             int len = 0;
             if (te instanceof TileEntityRoadmarkText) {
                 String t = ((TileEntityRoadmarkText) te).getText();
                 if (t != null) len = t.length();
             }
-            double hw = (len >= 2) ? 0.8125 : 0.5; // 半宽：26/16 或 16/16
+            double hw = (len >= 2) ? 0.875 : 0.625; // 半宽：28/16 或 20/16
             switch (state.getValue(BlockHorizontal.FACING)) {
                 case SOUTH:
                 case NORTH:
