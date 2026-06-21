@@ -109,14 +109,17 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
 
         java.awt.Font font = trafficaFont.deriveFont(100f);
         g2d.setFont(font);
-        java.awt.FontMetrics fm = g2d.getFontMetrics();
-        java.awt.geom.Rectangle2D rect = fm.getStringBounds(text, g2d);
+        // 使用文字的实际像素轮廓边界（visual bounds），而不是包含上伸/下伸空白的逻辑边界，
+        // 这样无下伸部的字符（如数字、大写字母）也能在贴图内真正居中，不再偏上。
+        java.awt.font.FontRenderContext frc = g2d.getFontRenderContext();
+        java.awt.font.GlyphVector gv = font.createGlyphVector(frc, text);
+        java.awt.geom.Rectangle2D rect = gv.getVisualBounds();
 
         double scaleX = width / rect.getWidth();
         double scaleY = height / rect.getHeight();
         g2d.scale(scaleX, scaleY);
 
-        g2d.drawString(text, (float) -rect.getX(), (float) -rect.getY());
+        g2d.drawGlyphVector(gv, (float) -rect.getX(), (float) -rect.getY());
         g2d.dispose();
 
         return new DynamicTexture(image);

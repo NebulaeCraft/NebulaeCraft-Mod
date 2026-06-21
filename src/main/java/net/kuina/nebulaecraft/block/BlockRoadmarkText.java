@@ -93,17 +93,18 @@ public class BlockRoadmarkText extends ElementsNebulaecraftMod.ModElement {
             return NULL_AABB;
         }
 
-        // 设置物理边框（玩家准星瞄准的框）。为了贴合 1.25x1.75，我们根据朝向设定稍大的边框
+        // 设置物理边框（玩家准星瞄准的黑色框）。根据渲染贴图的实际尺寸（以方块为中心，
+        // 宽 0.6*2=1.2、长 1.3*2=2.6）贴合，仅用于准星高亮，不影响通行。
         @Override
         public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
             switch (state.getValue(BlockHorizontal.FACING)) {
                 case SOUTH:
                 case NORTH:
-                    return new AxisAlignedBB(-0.1, 0, -0.25, 1.125, 0.05, 1.); // 宽度 1.25，高度 1.75
+                    return new AxisAlignedBB(-0.1, 0, -0.8, 1.1, 0.05, 1.8); // 宽 1.2，长 2.6
                 case EAST:
                 case WEST:
                 default:
-                    return new AxisAlignedBB(-0.25, 0, -0.1, 1.25, 0.05, 1.1);
+                    return new AxisAlignedBB(-0.8, 0, -0.1, 1.8, 0.05, 1.1); // 旋转 90°，宽长互换
             }
         }
 
