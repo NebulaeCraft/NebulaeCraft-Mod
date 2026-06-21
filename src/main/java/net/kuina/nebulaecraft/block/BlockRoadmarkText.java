@@ -100,11 +100,11 @@ public class BlockRoadmarkText extends ElementsNebulaecraftMod.ModElement {
             switch (state.getValue(BlockHorizontal.FACING)) {
                 case SOUTH:
                 case NORTH:
-                    return new AxisAlignedBB(-0.1, 0, -0.8, 1.1, 0.05, 1.8); // 宽 1.2，长 2.6
+                    return new AxisAlignedBB(0.0625, 0, -0.4375, 0.9375, 0.05, 1.4375); // 宽 14px，长 30px
                 case EAST:
                 case WEST:
                 default:
-                    return new AxisAlignedBB(-0.8, 0, -0.1, 1.8, 0.05, 1.1); // 旋转 90°，宽长互换
+                    return new AxisAlignedBB(-0.4375, 0, 0.0625, 1.4375, 0.05, 0.9375); // 旋转 90°，宽长互换
             }
         }
 
