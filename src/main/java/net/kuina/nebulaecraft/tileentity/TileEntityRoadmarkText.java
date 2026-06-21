@@ -7,8 +7,8 @@ import net.minecraft.tileentity.TileEntity;
 
 public class TileEntityRoadmarkText extends TileEntity {
 
-    public static final int COLOR_WHITE = 0xF9F9F9;
-    public static final int COLOR_YELLOW = 0xFCD667;
+    public static final int COLOR_WHITE = 0xFAFAFA;
+    public static final int COLOR_YELLOW = 0xEFDE24;
 
     // 保存方块显示的文字，默认值为 "字"
     private String text = "字";

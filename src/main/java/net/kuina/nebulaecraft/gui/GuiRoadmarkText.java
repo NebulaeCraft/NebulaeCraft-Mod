@@ -27,7 +27,7 @@ public class GuiRoadmarkText extends GuiScreen {
         // 在屏幕中央创建一个输入框
         this.textField = new GuiTextField(0, this.fontRenderer, this.width / 2 - 62, this.height / 2 - 10, 100, 20);
         this.buttonList.add(new GuiButton(1, this.width / 2 + 42, this.height / 2 -10, 20, 20, getColorButtonText()));
-        this.textField.setMaxStringLength(3);
+        this.textField.setMaxStringLength(5);
         this.textField.setFocused(true);
         this.textField.setText(te.getText());
         this.buttonList.add(new GuiButton(0, this.width / 2 - 30, this.height / 2 + 25, 60, 20, "保存"));

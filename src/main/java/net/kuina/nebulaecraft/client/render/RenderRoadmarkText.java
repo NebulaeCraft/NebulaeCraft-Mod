@@ -83,8 +83,8 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        double w = 0.7;
-        double h = 1;
+        double w = 0.6;
+        double h = 1.3;
         buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
         buffer.pos(-w, 0, -h).tex(0, 0).endVertex();
         buffer.pos(-w, 0, h).tex(0, 1).endVertex();
@@ -99,8 +99,8 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
 
     // 生成贴图方法改为接受文字和颜色并返回 DynamicTexture
     private DynamicTexture generateTexture(String text, int color) {
-        int width = 140;
-        int height = 200;
+        int width = 180;
+        int height = 390;
         java.awt.image.BufferedImage image = new java.awt.image.BufferedImage(width, height, java.awt.image.BufferedImage.TYPE_INT_ARGB);
         java.awt.Graphics2D g2d = image.createGraphics();
 
