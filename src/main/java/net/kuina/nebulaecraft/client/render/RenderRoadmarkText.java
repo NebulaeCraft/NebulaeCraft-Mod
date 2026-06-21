@@ -83,8 +83,8 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        // 单字符宽 14px；2 个及以上字符（空格也算）整体宽 24px。长度固定 30px。
-        double w = (currentText.length() >= 2) ? 0.75 : 0.4375; // 半宽：24/16 或 14/16
+        // 单字符宽 16px；2 个及以上字符（空格也算）整体宽 26px。长度固定 30px。
+        double w = (currentText.length() >= 2) ? 0.8125 : 0.5; // 半宽：26/16 或 16/16
         double h = 0.9375; // 30/16 的一半，整体长 30px
         buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
         buffer.pos(-w, 0, -h).tex(0, 0).endVertex();
