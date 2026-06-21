@@ -83,7 +83,8 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
 
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
-        double w = 0.4375; // 14/16 的一半，整体宽 14px
+        // 单字符宽 14px；2 个及以上字符（空格也算）整体宽 24px。长度固定 30px。
+        double w = (currentText.length() >= 2) ? 0.75 : 0.4375; // 半宽：24/16 或 14/16
         double h = 0.9375; // 30/16 的一半，整体长 30px
         buffer.begin(7, DefaultVertexFormats.POSITION_TEX);
         buffer.pos(-w, 0, -h).tex(0, 0).endVertex();
@@ -113,13 +114,16 @@ public class RenderRoadmarkText extends TileEntitySpecialRenderer<TileEntityRoad
         // 这样无下伸部的字符（如数字、大写字母）也能在贴图内真正居中，不再偏上。
         java.awt.font.FontRenderContext frc = g2d.getFontRenderContext();
         java.awt.font.GlyphVector gv = font.createGlyphVector(frc, text);
-        java.awt.geom.Rectangle2D rect = gv.getVisualBounds();
+        // 水平方向用逻辑边界（advance），让空格等无墨字符也占据宽度、正常显示；
+        // 垂直方向用实际像素边界，避免无下伸部字符（数字/大写）偏上。
+        java.awt.geom.Rectangle2D logical = gv.getLogicalBounds();
+        java.awt.geom.Rectangle2D visual = gv.getVisualBounds();
 
-        double scaleX = width / rect.getWidth();
-        double scaleY = height / rect.getHeight();
+        double scaleX = width / logical.getWidth();
+        double scaleY = height / visual.getHeight();
         g2d.scale(scaleX, scaleY);
 
-        g2d.drawGlyphVector(gv, (float) -rect.getX(), (float) -rect.getY());
+        g2d.drawGlyphVector(gv, (float) -logical.getX(), (float) -visual.getY());
         g2d.dispose();
 
         return new DynamicTexture(image);
