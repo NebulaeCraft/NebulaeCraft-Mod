@@ -80,17 +80,17 @@ public class BlockBridgeBearing extends ElementsNebulaecraftMod.ModElement {
 
 		@Override
 		public BlockRenderLayer getBlockLayer() {
-			return BlockRenderLayer.SOLID;
+			return BlockRenderLayer.CUTOUT_MIPPED;
 		}
 
 		@Override
 		public boolean isOpaqueCube(IBlockState state) {
-			return true;
+			return false;
 		}
 
 		@Override
 		public boolean isFullCube(IBlockState state) {
-			return true;
+			return false;
 		}
 
 		@Override
