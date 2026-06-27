@@ -11,6 +11,10 @@
 	"facing=south,subtype=subtype2": { "model": "nebulaecraft:screen_door_topside_2","y": 180},
 	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:screen_door_topside_2"},
 	"facing=east,subtype=subtype2": { "model": "nebulaecraft:screen_door_topside_2","y": 90},
-	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:screen_door_topside_2","y": 270}
+	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:screen_door_topside_2","y": 270},
+	"facing=south,subtype=subtype3": { "model": "nebulaecraft:screen_door_top_enddoor","y": 180},
+	"facing=north,subtype=subtype3":  { "model": "nebulaecraft:screen_door_top_enddoor"},
+	"facing=east,subtype=subtype3": { "model": "nebulaecraft:screen_door_top_enddoor","y": 90},
+	"facing=west,subtype=subtype3":  { "model": "nebulaecraft:screen_door_top_enddoor","y": 270}
   }
 }
