@@ -193,6 +193,7 @@ tile.device_apple_macbook.name=MacBook Pro
 tile.device_ms_surface.name=Surface Pro 8
 tile.dustbins.name=垃圾桶
 tile.fire_extinguisher_box.name=灭火器箱
+tile.fire_hydrant.name=消火栓
 tile.flat_light.name=平板状灯
 tile.info_screen_1.name=导流显示屏
 tile.info_screen_2.name=导流显示屏

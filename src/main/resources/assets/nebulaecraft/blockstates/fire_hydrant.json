@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=south": { "model": "nebulaecraft:fire_hydrant","y": 180},
+	"facing=north":  { "model": "nebulaecraft:fire_hydrant"},
+	"facing=east": { "model": "nebulaecraft:fire_hydrant","y": 90},
+	"facing=west":  { "model": "nebulaecraft:fire_hydrant","y": 270}
+  }
+}

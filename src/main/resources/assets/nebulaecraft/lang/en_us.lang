@@ -193,6 +193,7 @@ tile.device_apple_macbook.name=MacBook Pro
 tile.device_ms_surface.name=Surface Pro 8
 tile.dustbins.name=Rubbish Bin
 tile.fire_extinguisher_box.name=Fire Extinguisher Box
+tile.fire_hydrant.name=Fire Hydrant
 tile.flat_light.name=Flat Light
 tile.info_screen_1.name=Guidance Display Screen
 tile.info_screen_2.name=Guidance Display Screen
