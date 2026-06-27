@@ -40,9 +40,17 @@ public interface Narrator {
         }
         if (osName.contains("mac")) {
             setJNAPath(":");
-            return new NarratorOSX();
+            return createMacosNarrator();
         }
         return new NarratorDummy();
+    }
+
+    static Narrator createMacosNarrator() {
+        try {
+            return (Narrator) Class.forName("com.mojang.text2speech.NarratorOSX").newInstance();
+        } catch (ReflectiveOperationException | LinkageError e) {
+            return new NarratorDummy();
+        }
     }
 
     static void setJNAPath(String separator) {
