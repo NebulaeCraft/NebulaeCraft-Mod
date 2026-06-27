@@ -93,16 +93,31 @@ public class BlockScreenDoorEnddoor extends ElementsNebulaecraftMod.ModElement {
 
         @Override
 		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+            AxisAlignedBB box;
+            switch (state.getValue(SUBTYPE)) {
+                case SUBTYPE2:
+                    box = new AxisAlignedBB(0, 0, 0.5, 1, 1.53125, 0.625);
+                    break;
+                case SUBTYPE3:
+                    box = new AxisAlignedBB(0, 0, 0.5, 1, 1.3125, 0.5625);
+                    break;
+                case SUBTYPE0:
+                case SUBTYPE1:
+                default:
+                    box = new AxisAlignedBB(0, 0, 0.496875, 1, 2, 0.625);
+                    break;
+            }
+
 			switch (state.getValue(BlockHorizontal.FACING)) {
                 case EAST :
-                    return new AxisAlignedBB(0.4375, 0, 0, 0.503125, 2, 1);
+                    return new AxisAlignedBB(1 - box.maxZ, box.minY, box.minX, 1 - box.minZ, box.maxY, box.maxX);
 				case WEST :
-                    return new AxisAlignedBB(0.496875, 0, 0, 0.5625, 2, 1);
+                    return new AxisAlignedBB(box.minZ, box.minY, 1 - box.maxX, box.maxZ, box.maxY, 1 - box.minX);
 				case SOUTH :
-					return new AxisAlignedBB(0, 0, 0.4375, 1, 2, 0.503125);
+					return new AxisAlignedBB(1 - box.maxX, box.minY, 1 - box.maxZ, 1 - box.minX, box.maxY, 1 - box.minZ);
 				case NORTH :
                 default :
-                    return new AxisAlignedBB(0, 0, 0.496875, 1, 2, 0.5625);
+                    return box;
 			}
 		}
 

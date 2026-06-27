@@ -101,6 +101,9 @@ public class BlockScreenDoorTop2 extends ElementsNebulaecraftMod.ModElement {
                 case SUBTYPE2:
                     box = new AxisAlignedBB(0, 0, 0, 1.25, 1, 0.75);
                     break;
+                case SUBTYPE3:
+                    box = new AxisAlignedBB(0, 0, 0.5, 1, 1, 0.75);
+                    break;
                 case SUBTYPE0:
                 default:
                     box = new AxisAlignedBB(0, 0, 0, 1, 1, 0.25);
