@@ -1,4 +1,3 @@
-
 package net.kuina.nebulaecraft.block;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
@@ -30,43 +29,45 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @ElementsNebulaecraftMod.ModElement.Tag
 public class BlockScreenDoorTop extends ElementsNebulaecraftMod.ModElement {
-	@GameRegistry.ObjectHolder("nebulaecraft:screen_door_top")
-	public static final Block block = null;
-	public BlockScreenDoorTop(ElementsNebulaecraftMod instance) {
-		super(instance, 18);
-	}
+    @GameRegistry.ObjectHolder("nebulaecraft:screen_door_top")
+    public static final Block block = null;
 
-	@Override
-	public void initElements() {
-		elements.blocks.add(() -> new BlockCustom().setRegistryName("screen_door_top"));
-		elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1"}).setRegistryName(block.getRegistryName()));
-	}
+    public BlockScreenDoorTop(ElementsNebulaecraftMod instance) {
+        super(instance, 32);
+    }
 
-	@SideOnly(Side.CLIENT)
-	@Override
-	public void registerModels(ModelRegistryEvent event) {
+    @Override
+    public void initElements() {
+        elements.blocks.add(() -> new BlockScreenDoorTop.BlockCustom().setRegistryName("screen_door_top"));
+        elements.items.add(() -> new ItemHasVariantsAndSubtypes(block).setSubtypeNames(new String[]{"subtype0", "subtype1", "subtype2", "subtype3"}).setRegistryName(block.getRegistryName()));
+    }
+
+    @SideOnly(Side.CLIENT)
+    @Override
+    public void registerModels(ModelRegistryEvent event) {
         BlockScreenDoorTop.BlockCustom.EnumType[] allSubtypes = BlockScreenDoorTop.BlockCustom.EnumType.values();
         for (BlockScreenDoorTop.BlockCustom.EnumType subtype : allSubtypes) {
             ModelLoader.setCustomModelResourceLocation(Item.getItemFromBlock(block), subtype.getMetadata(), new ModelResourceLocation("nebulaecraft:screen_door_top_" + subtype.getName(), "inventory"));
         }
     }
-    
-	public static class BlockCustom extends Block {
-		public static final PropertyDirection FACING = BlockHorizontal.FACING;
-		public static final PropertyEnum<EnumType> SUBTYPE = PropertyEnum.create("subtype", EnumType.class);
-		public BlockCustom() {
-			super(Material.ROCK);
-			setUnlocalizedName("screen_door_top");
-			setSoundType(SoundType.STONE);
-			setHardness(1F);
-			setResistance(10F);
-			setLightLevel(0F);
-			setLightOpacity(0);
-			setCreativeTab(TabNebulaecraftMetro.tab);
-			this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
-		}
 
-		@Override
+    public static class BlockCustom extends Block {
+        public static final PropertyDirection FACING = BlockHorizontal.FACING;
+        public static final PropertyEnum<EnumType> SUBTYPE = PropertyEnum.create("subtype", EnumType.class);
+
+        public BlockCustom() {
+            super(Material.ROCK);
+            setUnlocalizedName("screen_door_top");
+            setSoundType(SoundType.STONE);
+            setHardness(1F);
+            setResistance(10F);
+            setLightLevel(0F);
+            setLightOpacity(0);
+            setCreativeTab(TabNebulaecraftMetro.tab);
+            this.setDefaultState(this.blockState.getBaseState().withProperty(FACING, EnumFacing.NORTH));
+        }
+
+        @Override
         @SideOnly(Side.CLIENT)
         public void getSubBlocks(CreativeTabs whichTab, NonNullList<ItemStack> items) {
             BlockScreenDoorTop.BlockCustom.EnumType[] allSubtypes = BlockScreenDoorTop.BlockCustom.EnumType.values();
@@ -74,55 +75,39 @@ public class BlockScreenDoorTop extends ElementsNebulaecraftMod.ModElement {
                 items.add(new ItemStack(this, 1, subtype.getMetadata()));
             }
         }
-        
-		@Override
-		public BlockRenderLayer getBlockLayer() {
-			return BlockRenderLayer.CUTOUT_MIPPED;
-		}
 
-		@Override
-		public boolean isFullCube(IBlockState state) {
-			return false;
-		}
+        @Override
+        public BlockRenderLayer getBlockLayer() {
+            return BlockRenderLayer.CUTOUT_MIPPED;
+        }
+
+        @Override
+        public boolean isFullCube(IBlockState state) {
+            return false;
+        }
 
         @Override
         public boolean isOpaqueCube(IBlockState state) {
             return false;
         }
 
-		@Override
-		public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-            if(state.getValue(SUBTYPE).getMetadata()==0 || state.getValue(SUBTYPE).getMetadata()==1){
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(0, 0, 0.75, 1, 1, 1);
-					case NORTH :
-						return new AxisAlignedBB(0, 0, 0, 1, 1, 0.25);
-					case EAST :
-						return new AxisAlignedBB(0.75, 0, 0, 1, 1, 1);
-					case WEST :
-						return new AxisAlignedBB(0, 0, 0, 0.25, 1, 1);
+        @Override
+        public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
+            switch (state.getValue(BlockHorizontal.FACING)) {
+                case SOUTH :
+                default :
+                    return new AxisAlignedBB(0, 0, 0.75, 1, 1, 1);
+                case NORTH :
+                    return new AxisAlignedBB(0, 0, 0, 1, 1, 0.25);
+                case EAST :
+                    return new AxisAlignedBB(0.75, 0, 0, 1, 1, 1);
+                case WEST :
+                    return new AxisAlignedBB(0, 0, 0, 0.25, 1, 1);
 
-                }
             }
-            else{
-                switch (state.getValue(BlockHorizontal.FACING)) {
-                    case SOUTH :
-					default :
-						return new AxisAlignedBB(0, 0, 0, 0.5625, 0.2, 1);
-					case NORTH :
-						return new AxisAlignedBB(0.4375, 0, 0, 1, 0.2, 1);
-					case EAST :
-						return new AxisAlignedBB(0, 0, 0.4375, 1, 0.2, 1);
-					case WEST :
-						return new AxisAlignedBB(0, 0, 0, 1, 0.2, 0.5625);
+        }
 
-                }
-            }
-		}
-
-		@Override
+        @Override
         protected net.minecraft.block.state.BlockStateContainer createBlockState() {
             return new net.minecraft.block.state.BlockStateContainer(this, FACING, SUBTYPE);
         }
@@ -139,12 +124,13 @@ public class BlockScreenDoorTop extends ElementsNebulaecraftMod.ModElement {
 
         @Override
         public IBlockState getStateFromMeta(int meta) {
-            return this.getDefaultState().withProperty(FACING, EnumFacing.getFront((meta >= 4 ? meta - 4 : meta) + 2)).withProperty(SUBTYPE, meta >= 4 ? EnumType.SUBTYPE1 : EnumType.SUBTYPE0);
+            return this.getDefaultState().withProperty(FACING, EnumFacing.getFront((meta % 4) + 2)).withProperty(SUBTYPE, EnumType.byMetadata(meta / 4));
         }
 
         @Override
         public int getMetaFromState(IBlockState state) {
-            return ((state.getValue(FACING).getIndex() - 2) + (state.getValue(SUBTYPE).getMetadata() == 0 ? 0 : 4));
+            int metadata=((state.getValue(FACING).getIndex() - 2) + (4 * state.getValue(SUBTYPE).getMetadata()));
+            return metadata;
         }
 
         @Override
@@ -161,7 +147,9 @@ public class BlockScreenDoorTop extends ElementsNebulaecraftMod.ModElement {
 
         public enum EnumType implements IStringSerializable {
             SUBTYPE0(0, "subtype0"),
-            SUBTYPE1(1, "subtype1");
+            SUBTYPE1(1, "subtype1"),
+            SUBTYPE2(2, "subtype2"),
+            SUBTYPE3(3, "subtype3");
 
             private static final BlockScreenDoorTop.BlockCustom.EnumType[] META_LOOKUP = new BlockScreenDoorTop.BlockCustom.EnumType[values().length];
 
@@ -200,5 +188,5 @@ public class BlockScreenDoorTop extends ElementsNebulaecraftMod.ModElement {
                 return this.name;
             }
         }
-	}
+    }
 }
