@@ -77,13 +77,13 @@ public class BlockFireHydrant extends ElementsNebulaecraftMod.ModElement {
 			switch (state.getValue(BlockHorizontal.FACING)) {
 				case SOUTH :
 				default :
-					return new AxisAlignedBB(0.125, 0, 0, 0.875, 1, 0.5);
+					return new AxisAlignedBB(0, 0, 0, 1, 2, 0.375);
 				case NORTH :
-					return new AxisAlignedBB(0.125, 0, 0.5, 0.875, 1, 1);
+					return new AxisAlignedBB(0, 0, 0.625, 1, 2, 1);
 				case EAST :
-					return new AxisAlignedBB(0, 0, 0.125, 0.5, 1, 0.875);
+					return new AxisAlignedBB(0, 0, 0, 0.375, 2, 1);
 				case WEST :
-					return new AxisAlignedBB(0.5, 0, 0.125, 1, 1, 0.875);
+					return new AxisAlignedBB(0.625, 0, 0, 1, 2, 1);
 			}
 		}
 
