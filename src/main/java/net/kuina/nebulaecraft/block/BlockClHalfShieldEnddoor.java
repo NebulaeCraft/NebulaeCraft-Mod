@@ -97,16 +97,16 @@ public class BlockClHalfShieldEnddoor extends ElementsNebulaecraftMod.ModElement
 			// The panel side depends on both FACING and SUBTYPE (the two subtypes are rotated 180 apart).
 			boolean sub1 = state.getValue(SUBTYPE) == EnumType.SUBTYPE1;
 			switch (state.getValue(BlockHorizontal.FACING)) {
-				case WEST :
+				case NORTH :
 					return sub1 ? new AxisAlignedBB(0, 0, 0, 1, 1.375, 0.0625)
 								: new AxisAlignedBB(0, 0, 0.9375, 1, 1.375, 1);
-				case NORTH :
+				case EAST :
 					return sub1 ? new AxisAlignedBB(0.9375, 0, 0, 1, 1.375, 1)
 								: new AxisAlignedBB(0, 0, 0, 0.0625, 1.375, 1);
-				case EAST :
+				case SOUTH :
 					return sub1 ? new AxisAlignedBB(0, 0, 0.9375, 1, 1.375, 1)
 								: new AxisAlignedBB(0, 0, 0, 1, 1.375, 0.0625);
-				case SOUTH :
+				case WEST :
 				default :
 					return sub1 ? new AxisAlignedBB(0, 0, 0, 0.0625, 1.375, 1)
 								: new AxisAlignedBB(0.9375, 0, 0, 1, 1.375, 1);
