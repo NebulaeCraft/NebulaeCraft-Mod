@@ -6,7 +6,7 @@
 		"1": "nebulaecraft:blocks/screen_door_gary",
 		"2": "nebulaecraft:blocks/screen_door_glass",
 		"4": "nebulaecraft:blocks/screen_enddoor_image_2b",
-		"5": "nebulaecraft:blocks/screen_door_metal",
+		"5": "nebulaecraft:blocks/screen_enddoor_image_3",
 		"particle": "nebulaecraft:blocks/screen_door_black"
 	},
 	"elements": [
