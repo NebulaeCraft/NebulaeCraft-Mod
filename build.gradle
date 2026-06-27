@@ -19,6 +19,21 @@ archivesBaseName = 'modid'
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
+def isMacosArm = org.gradle.internal.os.OperatingSystem.current().isMacOsX() &&
+        ['aarch64', 'arm64'].contains(System.getProperty('os.arch').toLowerCase())
+
+configurations {
+    macosArmNatives
+}
+
+if (isMacosArm) {
+    configurations.all {
+        resolutionStrategy.force 'org.lwjgl.lwjgl:lwjgl:2.9.4-nightly-20150209'
+        resolutionStrategy.force 'org.lwjgl.lwjgl:lwjgl_util:2.9.4-nightly-20150209'
+        resolutionStrategy.force 'net.java.dev.jna:jna:5.13.0'
+    }
+}
+
 minecraft {
     // The mappings can be changed at any time, and must be in the following format.
     // snapshot_YYYYMMDD   Snapshot are built nightly.
@@ -60,6 +75,7 @@ dependencies {
     // that the dep is a ForgeGradle 'patcher' dependency. And it's patches will be applied.
     // The userdev artifact is a special name and will get all sorts of transformations applied to it.
     minecraft 'net.minecraftforge:forge:1.12.2-14.23.5.2864'
+    macosArmNatives fileTree(dir: 'libs/macos-arm64-natives', include: ['*.jar'])
 
     // You may put jars on which you depend on in ./libs or you may define them like so..
     // compile "some.group:artifact:version:classifier"
@@ -81,8 +97,51 @@ dependencies {
 
 }
 
+task copyMacosArmNatives(type: Copy) {
+    onlyIf {
+        isMacosArm
+    }
+    from {
+        configurations.macosArmNatives.collect { zipTree(it) }
+    }
+    include 'liblwjgl.dylib', 'openal.dylib', 'libjinput-osx.jnilib'
+    into "$buildDir/natives"
+}
+
+tasks.matching { it.name == 'extractNatives' }.all {
+    finalizedBy copyMacosArmNatives
+    copyMacosArmNatives.mustRunAfter it
+}
+
+tasks.matching { it.name == 'prepareRunClient' }.all {
+    finalizedBy copyMacosArmNatives
+}
+
+tasks.withType(JavaExec).all { task ->
+    if (task.name == 'net.minecraftforge.legacydev.MainClient.main()' ||
+            task.main == 'net.minecraftforge.legacydev.MainClient') {
+        dependsOn 'prepareRunClient'
+        workingDir project.file('run')
+        jvmArgs '-Dforge.logging.console.level=debug',
+                '-Dforge.logging.markers=SCAN,REGISTRIES,REGISTRYDUMP'
+        environment 'MCP_TO_SRG', project.file('build/createSrgToMcp/output.srg')
+        environment 'MOD_CLASSES', project.file('build/sourcesSets/main')
+        environment 'mainClass', 'net.minecraft.launchwrapper.Launch'
+        environment 'MCP_MAPPINGS', 'snapshot_20171003-1.12'
+        environment 'FORGE_VERSION', '14.23.5.2864'
+        environment 'assetIndex', '1.12'
+        environment 'assetDirectory', new File(gradle.gradleUserHomeDir, 'caches/forge_gradle/assets')
+        environment 'nativesDirectory', project.file('build/natives')
+        environment 'FORGE_GROUP', 'net.minecraftforge'
+        environment 'tweakClass', 'net.minecraftforge.fml.common.launcher.FMLTweaker'
+        environment 'MC_VERSION', '1.12.2'
+    }
+}
+
 // Example for how to get properties into the manifest for reading by the runtime..
 jar {
+    exclude 'com/mojang/text2speech/**'
+
     manifest {
         attributes([
             "Specification-Title": "examplemod",
