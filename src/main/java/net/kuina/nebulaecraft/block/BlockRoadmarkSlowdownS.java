@@ -56,9 +56,9 @@ public class BlockRoadmarkSlowdownS extends ElementsNebulaecraftMod.ModElement {
         public static final PropertyEnum<BlockCustom.EnumType> SUBTYPE = PropertyEnum.create("subtype", BlockCustom.EnumType.class);
 
         public BlockCustom() {
-            super(Material.IRON);
+            super(Material.CLOTH);
             setUnlocalizedName("roadmark_slowdown_s");
-            setSoundType(SoundType.METAL);
+            setSoundType(SoundType.CLOTH);
             setHardness(1F);
             setResistance(10F);
             setLightLevel(0F);
