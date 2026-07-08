@@ -20,6 +20,8 @@ build
 # other
 eclipse
 run
+.vscode
+.claude
 
 # Files from Forge MDK
 forge*changelog.txt
