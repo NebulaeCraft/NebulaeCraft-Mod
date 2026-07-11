@@ -1,0 +1,20 @@
+{
+  "variants": {
+	"facing=south,subtype=subtype0": { "model": "nebulaecraft:exit_b_0","y": 180},
+	"facing=north,subtype=subtype0":  { "model": "nebulaecraft:exit_b_0"},
+	"facing=east,subtype=subtype0": { "model": "nebulaecraft:exit_b_0","y": 90},
+	"facing=west,subtype=subtype0":  { "model": "nebulaecraft:exit_b_0","y": 270},
+	"facing=south,subtype=subtype1": { "model": "nebulaecraft:exit_b_1","y": 180},
+	"facing=north,subtype=subtype1":  { "model": "nebulaecraft:exit_b_1"},
+	"facing=east,subtype=subtype1": { "model": "nebulaecraft:exit_b_1","y": 90},
+	"facing=west,subtype=subtype1":  { "model": "nebulaecraft:exit_b_1","y": 270},
+	"facing=south,subtype=subtype2": { "model": "nebulaecraft:exit_b_2","y": 180},
+	"facing=north,subtype=subtype2":  { "model": "nebulaecraft:exit_b_2"},
+	"facing=east,subtype=subtype2": { "model": "nebulaecraft:exit_b_2","y": 90},
+	"facing=west,subtype=subtype2":  { "model": "nebulaecraft:exit_b_2","y": 270},
+	"facing=south,subtype=subtype3": { "model": "nebulaecraft:exit_b_3","y": 180},
+	"facing=north,subtype=subtype3":  { "model": "nebulaecraft:exit_b_3"},
+	"facing=east,subtype=subtype3": { "model": "nebulaecraft:exit_b_3","y": 90},
+	"facing=west,subtype=subtype3":  { "model": "nebulaecraft:exit_b_3","y": 270}
+  }
+}
