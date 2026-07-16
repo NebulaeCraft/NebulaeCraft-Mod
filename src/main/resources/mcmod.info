@@ -3,7 +3,7 @@
     "modid": "nebulaecraft",
     "name": "NebulaeCraft",
     "description": "This mod is designed for NebulaeCraft 5th Server only.",
-    "version": "2.23",
+    "version": "${version}",
     "credits": "(c)2017-2026 NebulaeCraft  All Rights Reserved.",
     "logoFile": "assets/nebulaecraft/textures/logo.png",
     "mcversion": "1.12.2",
