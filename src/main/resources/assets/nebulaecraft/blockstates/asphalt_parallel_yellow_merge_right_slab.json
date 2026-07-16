@@ -1,0 +1,8 @@
+{
+  "variants": {
+	"facing=east": { "model": "nebulaecraft:asphalt_parallel_yellow_merge_right_slab","y": 0},
+	"facing=south": { "model": "nebulaecraft:asphalt_parallel_yellow_merge_right_slab","y": 90},
+	"facing=west":  { "model": "nebulaecraft:asphalt_parallel_yellow_merge_right_slab","y": 180},
+	"facing=north":  { "model": "nebulaecraft:asphalt_parallel_yellow_merge_right_slab","y": 270}
+  }
+}
