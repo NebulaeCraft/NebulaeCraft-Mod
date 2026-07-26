@@ -50,7 +50,7 @@ minecraft {
     mappings channel: 'snapshot', version: '20171003-1.12'
     // makeObfSourceJar = false // an Srg named sources jar is made by default. uncomment this to disable.
     
-    // accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+    accessTransformer = file('src/main/resources/META-INF/nebulaecraft_at.cfg')
 
     // Default run configurations.
     // These can be tweaked, removed, or duplicated as needed.
@@ -103,6 +103,40 @@ dependencies {
 
 }
 
+// ForgeGradle 3's legacy 1.12 joined artifact still contains Side.BUKKIT, which
+// crashes NetworkRegistry before a development client can reach the title screen.
+// Use the correctly recompiled Forge artifact for runs and apply the two Railcraft
+// access wideners to a project-local copy. Production jars use META-INF/FMLAT.
+def devForgeRecompiled = new File(gradle.gradleUserHomeDir,
+        'caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/' +
+        '1.12.2-14.23.5.2864_mapped_snapshot_20171003-1.12/' +
+        'forge-1.12.2-14.23.5.2864_mapped_snapshot_20171003-1.12-recomp.jar')
+def devAccessTransformerTool = new File(gradle.gradleUserHomeDir,
+        'caches/forge_gradle/maven_downloader/net/minecraftforge/accesstransformers/' +
+        '1.0.5/accesstransformers-1.0.5-fatjar.jar')
+def devAccessTransformer = file('gradle/nebulaecraft_dev_at.cfg')
+def devForgePatched = file("$buildDir/dev/forge-1.12.2-14.23.5.2864-recomp-nebulaecraft-at.jar")
+
+task prepareDevForgeJar(type: JavaExec) {
+    inputs.files devForgeRecompiled, devAccessTransformerTool, devAccessTransformer
+    outputs.file devForgePatched
+    classpath = files(devAccessTransformerTool)
+    main = 'net.minecraftforge.accesstransformer.TransformerProcessor'
+    args '--inJar', devForgeRecompiled,
+            '--outJar', devForgePatched,
+            '--atFile', devAccessTransformer
+
+    doFirst {
+        if (!devForgeRecompiled.isFile()) {
+            throw new GradleException("Missing recompiled Forge development jar: ${devForgeRecompiled}")
+        }
+        if (!devAccessTransformerTool.isFile()) {
+            throw new GradleException("Missing Forge access transformer tool: ${devAccessTransformerTool}")
+        }
+        devForgePatched.parentFile.mkdirs()
+    }
+}
+
 processResources {
     inputs.property 'version', project.version
 
@@ -132,8 +166,12 @@ tasks.matching { it.name == 'prepareRunClient' }.all {
 }
 
 tasks.withType(JavaExec).all { task ->
-    if (task.name == 'net.minecraftforge.legacydev.MainClient.main()' ||
-            task.main == 'net.minecraftforge.legacydev.MainClient') {
+    def isLegacyDevClient = task.name == 'net.minecraftforge.legacydev.MainClient.main()' ||
+            task.main == 'net.minecraftforge.legacydev.MainClient'
+    def isLegacyDevServer = task.name == 'net.minecraftforge.legacydev.MainServer.main()' ||
+            task.main == 'net.minecraftforge.legacydev.MainServer'
+
+    if (isLegacyDevClient) {
         dependsOn 'prepareRunClient'
         workingDir project.file('run')
         jvmArgs '-Dforge.logging.console.level=debug',
@@ -150,6 +188,17 @@ tasks.withType(JavaExec).all { task ->
         environment 'tweakClass', 'net.minecraftforge.fml.common.launcher.FMLTweaker'
         environment 'MC_VERSION', '1.12.2'
     }
+
+    if (task.name == 'runClient' || task.name == 'runServer' ||
+            isLegacyDevClient || isLegacyDevServer) {
+        dependsOn prepareDevForgeJar
+        doFirst {
+            task.classpath = files(task.classpath.files.collect { entry ->
+                entry.name == 'forge-1.12.2-14.23.5.2864_mapped_snapshot_20171003-1.12.jar' ?
+                        devForgePatched : entry
+            })
+        }
+    }
 }
 
 // Example for how to get properties into the manifest for reading by the runtime..
@@ -164,7 +213,8 @@ jar {
             "Implementation-Title": project.name,
             "Implementation-Version": "${version}",
             "Implementation-Vendor" :"examplemodsareus",
-            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+            "FMLAT": "nebulaecraft_at.cfg"
         ])
     }
 }

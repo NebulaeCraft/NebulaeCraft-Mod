@@ -1,9 +1,13 @@
 package net.kuina.nebulaecraft.util;
 
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
+import net.kuina.nebulaecraft.autogen.CommandNebulaeTunnel;
+import net.kuina.nebulaecraft.autogen.TunnelConfig;
+import net.kuina.nebulaecraft.autogen.TunnelGenerationManager;
 import net.kuina.nebulaecraft.block.*;
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.kuina.nebulaecraft.entities.*;
+import net.kuina.nebulaecraft.item.ItemAutogenWand;
 import net.kuina.nebulaecraft.tileentity.TileEntityTdt;
 import net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText;
 import net.kuina.nebulaecraft.util.ServerHandler;
@@ -16,12 +20,16 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 import java.util.ArrayList;
+import java.io.File;
 import java.util.List;
 
 
@@ -60,8 +68,6 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
 
     @Override
     public void initElements() {
-        System.out.println(ServerHandler.CornField);
-
         for (int i = 1; i <= 4; i++) registerBlock(new BlockScreenDoorBig.BlockCustom(), "screen_door_" + i);
         for (int i = 5; i <= 8; i++) registerBlock(new BlockScreenDoorMedium.BlockCustom(), "screen_door_" + i);
         for (int i = 9; i <= 12; i++) registerBlock(new BlockScreenDoorSmall.BlockCustom(), "screen_door_" + i);
@@ -170,9 +176,22 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerTileEntity(TileEntityTdt.class, "nebulaecraft:tdt");
         registerTileEntity(TileEntityRoadmarkText.class, "nebulaecraft:roadmark_text");
         registerItem(new net.kuina.nebulaecraft.item.ItemTreeKiller(), "tree_killer");
+        registerBlock(new BlockAutogenMarker(), "autogen_marker");
+        registerItem(new ItemAutogenWand(), "autogen_wand");
         registerBlock(new BlockJoint.BlockCustom(), "road_expansion_joint");
         registerBlock(new BlockJointDiagonal.BlockCustom(), "road_expansion_joint_diagonal");
         registerBlock(new BlockSolid.BlockCustom().setCreativeTab(CreativeTabs.BUILDING_BLOCKS), "steel_block");
+    }
+
+    @Override
+    public void preInit(FMLPreInitializationEvent event) {
+        TunnelConfig.initialize(new File(event.getModConfigurationDirectory(), "nebulaecraft/tunnel_presets.json"));
+        MinecraftForge.EVENT_BUS.register(TunnelGenerationManager.INSTANCE);
+    }
+
+    @Override
+    public void serverLoad(FMLServerStartingEvent event) {
+        event.registerServerCommand(new CommandNebulaeTunnel());
     }
 
 

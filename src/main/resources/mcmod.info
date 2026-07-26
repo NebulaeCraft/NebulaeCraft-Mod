@@ -12,9 +12,9 @@
     "authorList": [
       "Kuina, Ishirai, Srcphy"
     ],
-    "dependencies": [],
+    "dependencies": ["railcraft"],
     "dependants": [],
-    "requiredMods": [],
+    "requiredMods": ["railcraft"],
     "useDependencyInformation": "true"
   }
 ]

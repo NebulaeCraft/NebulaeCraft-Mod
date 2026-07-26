@@ -1,0 +1,8 @@
+{
+  "variants": {
+    "facing=north": { "model": "nebulaecraft:autogen_marker" },
+    "facing=east":  { "model": "nebulaecraft:autogen_marker", "y": 90 },
+    "facing=south": { "model": "nebulaecraft:autogen_marker", "y": 180 },
+    "facing=west":  { "model": "nebulaecraft:autogen_marker", "y": 270 }
+  }
+}

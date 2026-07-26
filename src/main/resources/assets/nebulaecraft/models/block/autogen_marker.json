@@ -1,0 +1,51 @@
+{
+  "parent": "block/block",
+  "textures": {
+    "yellow": "minecraft:blocks/concrete_yellow",
+    "black": "minecraft:blocks/concrete_black",
+    "orange": "minecraft:blocks/concrete_orange",
+    "particle": "minecraft:blocks/concrete_yellow"
+  },
+  "elements": [
+    {
+      "from": [2, 0, 7], "to": [4, 12, 9],
+      "faces": {
+        "north": {"texture": "#black"}, "south": {"texture": "#black"},
+        "east": {"texture": "#yellow"}, "west": {"texture": "#yellow"},
+        "up": {"texture": "#yellow"}, "down": {"texture": "#black"}
+      }
+    },
+    {
+      "from": [12, 0, 7], "to": [14, 12, 9],
+      "faces": {
+        "north": {"texture": "#black"}, "south": {"texture": "#black"},
+        "east": {"texture": "#yellow"}, "west": {"texture": "#yellow"},
+        "up": {"texture": "#yellow"}, "down": {"texture": "#black"}
+      }
+    },
+    {
+      "from": [1, 10, 6], "to": [15, 13, 10],
+      "faces": {
+        "north": {"texture": "#yellow"}, "south": {"texture": "#yellow"},
+        "east": {"texture": "#black"}, "west": {"texture": "#black"},
+        "up": {"texture": "#yellow"}, "down": {"texture": "#black"}
+      }
+    },
+    {
+      "from": [7, 1, 2], "to": [9, 2, 8],
+      "faces": {
+        "north": {"texture": "#orange"}, "south": {"texture": "#orange"},
+        "east": {"texture": "#orange"}, "west": {"texture": "#orange"},
+        "up": {"texture": "#orange"}, "down": {"texture": "#orange"}
+      }
+    },
+    {
+      "from": [5, 1, 1], "to": [11, 2, 4],
+      "faces": {
+        "north": {"texture": "#orange"}, "south": {"texture": "#orange"},
+        "east": {"texture": "#orange"}, "west": {"texture": "#orange"},
+        "up": {"texture": "#orange"}, "down": {"texture": "#orange"}
+      }
+    }
+  ]
+}
