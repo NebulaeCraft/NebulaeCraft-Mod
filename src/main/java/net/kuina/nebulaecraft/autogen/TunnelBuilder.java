@@ -80,11 +80,12 @@ public final class TunnelBuilder {
         List<TunnelPlan.Operation> railFinalizations = new ArrayList<>();
         List<BlockPos> route = geometry.route;
         List<EnumFacing> sectionFacings = geometry.sectionFacings;
+        GradeLayout gradeLayout = new GradeLayout(route, geometry.sectionTangents);
         Set<Integer> catenarySupportIndices = normalizedPower.equals("catenary")
                 ? catenarySupportIndices(route, settings.catenarySupportSpacing)
                 : Collections.<Integer>emptySet();
         ThirdRailLayout thirdRailLayout = normalizedPower.startsWith("thirdrail_")
-                ? createThirdRailLayout(route, sectionFacings, mirrored,
+                ? createThirdRailLayout(route, sectionFacings, gradeLayout, mirrored,
                 settings.thirdRailSupportSpacing)
                 : null;
         int halfClearWidth = preset.clearWidth / 2;
@@ -107,57 +108,63 @@ public final class TunnelBuilder {
             // C AAAAA C / CC S K S CC / CCCCCCC.
             // Lining is planned before clearance. Clearance has the higher priority so the union
             // of neighbouring slices remains open through curves instead of leaving transverse piers.
-            int sectionRoofY = roofY + (slopeSection ? 1 : 0);
             for (int lateral = -shellLateral; lateral <= shellLateral; lateral++) {
-                put(states, offset(center, nx, nz, lateral, 0), concrete, 10);
-                put(states, offset(center, nx, nz, lateral, sectionRoofY), concrete, 10);
+                BlockPos floor = gradedOffset(center, nx, nz, lateral, gradeLayout);
+                boolean raisedSectionCell = gradeLayout.isSlopeSection(floor);
+                put(states, floor, concrete, 10);
+                put(states, floor.up(roofY + (raisedSectionCell ? 1 : 0)), concrete, 10);
             }
 
             // A slope rail rises through the upper half of this slice. Its special eight-layer
             // section replaces the normal upper full-block wall with a third vertical-slab row.
-            put(states, offset(center, nx, nz, -shellLateral, 1), concrete, 10);
-            put(states, offset(center, nx, nz, shellLateral, 1), concrete, 10);
-            if (!slopeSection) {
-                put(states, offset(center, nx, nz, -shellLateral, preset.clearHeight), concrete, 10);
-                put(states, offset(center, nx, nz, shellLateral, preset.clearHeight), concrete, 10);
-            }
-
-            // Normal slices have two middle slab rows; slope slices have three.
             EnumFacing leftOutward = lateralFacing(nx, nz, -1);
             EnumFacing rightOutward = lateralFacing(nx, nz, 1);
             IBlockState leftVerticalSlab = sideMountedState(verticalSlab.getBlock(), leftOutward);
             IBlockState rightVerticalSlab = sideMountedState(verticalSlab.getBlock(), rightOutward);
-            int verticalSlabTopY = slopeSection ? preset.clearHeight : preset.clearHeight - 1;
-            for (int y = 2; y <= verticalSlabTopY; y++) {
-                put(states, offset(center, nx, nz, -shellLateral, y), leftVerticalSlab, 11);
-                put(states, offset(center, nx, nz, shellLateral, y), rightVerticalSlab, 11);
+            for (int sign = -1; sign <= 1; sign += 2) {
+                BlockPos wallFloor = gradedOffset(
+                        center, nx, nz, sign * shellLateral, gradeLayout);
+                boolean raisedWall = gradeLayout.isSlopeSection(wallFloor);
+                IBlockState wallSlab = sign < 0 ? leftVerticalSlab : rightVerticalSlab;
+                put(states, wallFloor.up(), concrete, 10);
+                if (!raisedWall) {
+                    put(states, wallFloor.up(preset.clearHeight), concrete, 10);
+                }
+                int verticalSlabTopY = raisedWall
+                        ? preset.clearHeight : preset.clearHeight - 1;
+                for (int y = 2; y <= verticalSlabTopY; y++) {
+                    put(states, wallFloor.up(y), wallSlab, 11);
+                }
             }
 
-            if (slopeSection) {
-                // Slope section, bottom to top around the contact wire:
-                // V AAAAA V / C AA K AA C / CC S A S CC / CCCCCCC.
-                put(states, offset(center, nx, nz, -shellLateral, catenaryY), concrete, 10);
-                put(states, offset(center, nx, nz, shellLateral, catenaryY), concrete, 10);
-                put(states, offset(center, nx, nz, -shellLateral, roofY), concrete, 10);
-                put(states, offset(center, nx, nz, -halfClearWidth, roofY), concrete, 10);
-                put(states, offset(center, nx, nz, -1, roofY), horizontalSlab, 11);
-                put(states, offset(center, nx, nz, 1, roofY), horizontalSlab, 11);
-                put(states, offset(center, nx, nz, halfClearWidth, roofY), concrete, 10);
-                put(states, offset(center, nx, nz, shellLateral, roofY), concrete, 10);
-            } else {
-                // Normal catenary row: two blocks, upper slab, wire, upper slab, two blocks.
-                put(states, offset(center, nx, nz, -shellLateral, catenaryY), concrete, 10);
-                put(states, offset(center, nx, nz, -halfClearWidth, catenaryY), concrete, 10);
-                put(states, offset(center, nx, nz, -1, catenaryY), horizontalSlab, 11);
-                put(states, offset(center, nx, nz, 1, catenaryY), horizontalSlab, 11);
-                put(states, offset(center, nx, nz, halfClearWidth, catenaryY), concrete, 10);
-                put(states, offset(center, nx, nz, shellLateral, catenaryY), concrete, 10);
+            for (int lateral = -shellLateral; lateral <= shellLateral; lateral++) {
+                BlockPos floor = gradedOffset(center, nx, nz, lateral, gradeLayout);
+                boolean raisedSectionCell = gradeLayout.isSlopeSection(floor);
+                int absoluteLateral = Math.abs(lateral);
+                if (raisedSectionCell) {
+                    if (absoluteLateral == shellLateral) {
+                        put(states, floor.up(catenaryY), concrete, 10);
+                    }
+                    if (absoluteLateral == shellLateral
+                            || absoluteLateral == halfClearWidth) {
+                        put(states, floor.up(roofY), concrete, 10);
+                    } else if (absoluteLateral == 1) {
+                        put(states, floor.up(roofY), horizontalSlab, 11);
+                    }
+                } else if (absoluteLateral == shellLateral
+                        || absoluteLateral == halfClearWidth) {
+                    put(states, floor.up(catenaryY), concrete, 10);
+                } else if (absoluteLateral == 1) {
+                    put(states, floor.up(catenaryY), horizontalSlab, 11);
+                }
             }
 
             for (int lateral = -halfClearWidth; lateral <= halfClearWidth; lateral++) {
-                int clearTopY = slopeSection ? catenaryY : preset.clearHeight;
+                BlockPos clearFloor = gradedOffset(center, nx, nz, lateral, gradeLayout);
+                boolean raisedSectionCell = gradeLayout.isSlopeSection(clearFloor);
+                int clearTopY = raisedSectionCell ? catenaryY : preset.clearHeight;
                 for (int y = 1; y <= clearTopY; y++) {
-                    put(states, offset(center, nx, nz, lateral, y), Blocks.AIR.getDefaultState(), 20);
+                    put(states, clearFloor.up(y), Blocks.AIR.getDefaultState(), 20);
                 }
             }
             put(states, offset(center, nx, nz, 0, slopeSection ? roofY : catenaryY),
@@ -166,8 +173,11 @@ public final class TunnelBuilder {
             // Normal trackbed is 44:0, 43:8, 44:0. The slope rail needs a solid three-block
             // 43:8 base so the rising Railcraft model is supported across the whole section.
             put(states, center, centerBed, 30);
-            put(states, offset(center, nx, nz, -1, 0), slopeSection ? centerBed : sideBed, 30);
-            put(states, offset(center, nx, nz, 1, 0), slopeSection ? centerBed : sideBed, 30);
+            for (int sign = -1; sign <= 1; sign += 2) {
+                BlockPos sideFloor = gradedOffset(center, nx, nz, sign, gradeLayout);
+                put(states, sideFloor,
+                        gradeLayout.isSlopeSection(sideFloor) ? centerBed : sideBed, 30);
+            }
             IBlockState railState = reinforcedTrack.getStateFromMeta(railMeta(route, i));
             put(states, center.up(), railState, 50);
             // Railcraft recalculates a flex track's shape in onBlockAdded. During the first pass
@@ -176,7 +186,7 @@ public final class TunnelBuilder {
             railFinalizations.add(new TunnelPlan.Operation(center.up(), railState, false));
 
             // The optional colored maintenance platform sits on the intact left floor block.
-            put(states, offset(center, nx, nz, -2, 1), platformState, 40);
+            put(states, gradedOffset(center, nx, nz, -2, gradeLayout).up(), platformState, 40);
 
             if (normalizedPower.equals("catenary")) {
                 IBlockState catenary = catenaryState(route, i, forward,
@@ -208,11 +218,11 @@ public final class TunnelBuilder {
         Set<Long> clearFootprint = applyTurnSectionTransitions(
                 states, route, sectionFacings, concrete, horizontalSlab,
                 verticalSlab, sideBed, centerBed, platformState, preset.clearHeight,
-                preset.catenaryRecessHeight, mirrored);
+                preset.catenaryRecessHeight, gradeLayout, mirrored);
         orientVerticalSlabsByCurveTangent(
                 states, route, sectionFacings, verticalSlab.getBlock());
         placeTunnelLights(states, route, sectionFacings, clearFootprint,
-                tunnelLight, settings.lightSpacing, mirrored);
+                tunnelLight, settings.lightSpacing, mirrored, gradeLayout);
 
         if (states.size() > settings.maxChangedBlocks) {
             throw new TunnelBuildException("预计修改方块数超过配置上限 " + settings.maxChangedBlocks);
@@ -247,7 +257,7 @@ public final class TunnelBuilder {
             IBlockState horizontalSlab, IBlockState verticalSlab,
             IBlockState sideBed, IBlockState centerBed,
             IBlockState platformState, int clearHeight,
-            int recessHeight, boolean mirrored)
+            int recessHeight, GradeLayout gradeLayout, boolean mirrored)
             throws TunnelBuildException {
         TurnSectionLayout transitionLayout = findTurnSectionLayout(route, sectionFacings);
         List<TurnSectionTransition> transitions = transitionLayout.transitions;
@@ -255,15 +265,19 @@ public final class TunnelBuilder {
         // owns real 43/44 floor cells. Merge every candidate into the semantic bed before clearance
         // and wall extraction so reversing the route cannot leave the new-axis bed under a wall.
         TrackbedLayout trackbedLayout = createTrackbedLayout(
-                route, transitionLayout.allTransitions);
-        Set<Long> clearFootprint = levelRouteClearFootprint(route, sectionFacings);
+                route, transitionLayout.allTransitions, gradeLayout);
+        Set<Long> clearFootprint = levelRouteClearFootprint(
+                route, sectionFacings, gradeLayout);
         for (TurnSectionTransition transition : transitions) {
-            addTurnSectionClearFootprint(clearFootprint, transition.before, transition.shift);
-            addTurnSectionClearFootprint(clearFootprint, transition.oldCorner, transition.shift);
+            addTurnSectionClearFootprint(
+                    clearFootprint, transition.before, transition.shift, gradeLayout);
+            addTurnSectionClearFootprint(
+                    clearFootprint, transition.oldCorner, transition.shift, gradeLayout);
             addTurnSectionClearFootprint(clearFootprint,
-                    transition.projectedOldCenter, transition.shift);
+                    transition.projectedOldCenter, transition.shift, gradeLayout);
         }
-        addTrackbedClearanceFootprint(clearFootprint, trackbedLayout, route);
+        addTrackbedClearanceFootprint(
+                clearFootprint, trackbedLayout, route, gradeLayout);
 
         for (TurnSectionTransition transition : transitions) {
             putTurnSectionRow(states, transition.before, transition.shift,
@@ -300,9 +314,11 @@ public final class TunnelBuilder {
 
         Set<Long> wallBoundary = rebuildTurnShell(
                 states, route, sectionFacings, clearFootprint,
-                concrete, verticalSlab, clearHeight, recessHeight);
+                concrete, verticalSlab, clearHeight, recessHeight, gradeLayout);
+        reinforceSlopeSections(states, gradeLayout, concrete, horizontalSlab,
+                verticalSlab, clearHeight, recessHeight);
         addTurnWallCornerBackings(states, route, clearFootprint, wallBoundary,
-                concrete, clearHeight, recessHeight);
+                concrete, clearHeight, recessHeight, gradeLayout);
         rebuildContinuousTrackbed(states, trackbedLayout, concrete,
                 sideBed, centerBed, clearFootprint);
         return clearFootprint;
@@ -355,22 +371,26 @@ public final class TunnelBuilder {
         return new TurnSectionLayout(transitions, allTransitions);
     }
 
-    private static Set<Long> levelRouteClearFootprint(List<BlockPos> route,
-                                                       List<EnumFacing> sectionFacings) {
+    private static Set<Long> levelRouteClearFootprint(
+            List<BlockPos> route, List<EnumFacing> sectionFacings,
+            GradeLayout gradeLayout) {
         Set<Long> footprint = new HashSet<>();
         for (int i = 0; i < route.size(); i++) {
             EnumFacing lateral = sectionFacings.get(i).rotateY();
             for (int offset = -2; offset <= 2; offset++) {
-                footprint.add(route.get(i).offset(lateral, offset).toLong());
+                footprint.add(gradeLayout.floorAt(
+                        route.get(i).offset(lateral, offset)).toLong());
             }
         }
         return footprint;
     }
 
     private static void addTurnSectionClearFootprint(Set<Long> clearFootprint,
-                                                     BlockPos center, EnumFacing shift) {
+                                                     BlockPos center, EnumFacing shift,
+                                                     GradeLayout gradeLayout) {
         for (int offset = -2; offset <= 3; offset++) {
-            clearFootprint.add(center.offset(shift, offset).toLong());
+            clearFootprint.add(gradeLayout.floorAt(
+                    center.offset(shift, offset)).toLong());
         }
     }
 
@@ -383,14 +403,15 @@ public final class TunnelBuilder {
      */
     private static void addTrackbedClearanceFootprint(Set<Long> clearFootprint,
                                                        TrackbedLayout trackbedLayout,
-                                                       List<BlockPos> route) {
+                                                       List<BlockPos> route,
+                                                       GradeLayout gradeLayout) {
         Set<Long> trackbedCells = new HashSet<>(trackbedLayout.centerCells);
         trackbedCells.addAll(trackbedLayout.sideCells.keySet());
         for (long packed : trackbedCells) {
             BlockPos trackbed = BlockPos.fromLong(packed);
             clearFootprint.add(packed);
             for (EnumFacing direction : EnumFacing.HORIZONTALS) {
-                BlockPos floor = trackbed.offset(direction);
+                BlockPos floor = gradeLayout.floorAt(trackbed.offset(direction));
                 // At a one-block grade change, the next slice's bed occupies this XZ column one
                 // level higher or lower. Dilating either bed into the other slice would make the
                 // rebuilt floor place concrete above the low 43:8 row and below the high row.
@@ -419,15 +440,10 @@ public final class TunnelBuilder {
                                                 Set<Long> clearFootprint,
                                                 IBlockState concrete,
                                                 IBlockState verticalSlab,
-                                                int clearHeight, int recessHeight)
+                                                int clearHeight, int recessHeight,
+                                                GradeLayout gradeLayout)
             throws TunnelBuildException {
         int roofY = clearHeight + 1 + recessHeight;
-        Set<Long> originalVerticalSlabs = new HashSet<>();
-        for (Map.Entry<Long, PlannedState> entry : states.entrySet()) {
-            if (entry.getValue().state.getBlock() == verticalSlab.getBlock()) {
-                originalVerticalSlabs.add(entry.getKey());
-            }
-        }
         Set<Long> boundary = new HashSet<>();
         for (long packed : clearFootprint) {
             BlockPos clear = BlockPos.fromLong(packed);
@@ -435,14 +451,13 @@ public final class TunnelBuilder {
             // A de-duplicated axis-switch template still contributes trackbed clearance; relying
             // only on retained full templates for the two ceiling layers leaves that clearance
             // uncapped. These defaults sit below every explicit recess air/slab/wire state.
-            int routeIndex = closestRouteIndex(clear, route);
-            int slopeLift = isSlopeRailCell(route, routeIndex) ? 1 : 0;
+            int slopeLift = gradeLayout.isSlopeSection(clear) ? 1 : 0;
             put(states, clear.up(clearHeight + 1 + slopeLift), concrete, 9);
             put(states, clear.up(roofY + slopeLift), concrete, 9);
 
             // The entire horizontal opening is authoritative. Clear remnants left by differently
             // oriented normal sections before reconstructing its outer boundary.
-            for (int y = 1; y <= clearHeight; y++) {
+            for (int y = 1; y <= clearHeight + slopeLift; y++) {
                 put(states, clear.up(y), Blocks.AIR.getDefaultState(), 37);
             }
             put(states, clear, concrete, 38);
@@ -467,9 +482,9 @@ public final class TunnelBuilder {
                     wall, inwardDirections, route, sectionFacings);
             IBlockState middleWallState = sideMountedState(
                     verticalSlab.getBlock(), inward.getOpposite());
-            boolean slopeTop = originalVerticalSlabs.contains(
-                    wall.up(clearHeight).toLong());
-            for (int y = 0; y <= roofY; y++) {
+            boolean slopeTop = gradeLayout.isSlopeSection(wall);
+            int wallRoofY = roofY + (slopeTop ? 1 : 0);
+            for (int y = 0; y <= wallRoofY; y++) {
                 BlockPos target = wall.up(y);
                 if (insideClearVolume(target, clearFootprint, clearHeight)) {
                     continue;
@@ -484,6 +499,56 @@ public final class TunnelBuilder {
             }
         }
         return boundary;
+    }
+
+    /**
+     * Reapply the eight-layer slope reference section on the rasterized normal of the analytic
+     * curve tangent. The ordinary section loop uses a cardinal dominant axis, which is sufficient
+     * away from a grade change but would put both three-high wall columns on the same X/Z row in a
+     * curve. Rounding points along the true normal produces the same stepped cross-section as the
+     * curve itself and keeps the raised recess centred over the slope wire model.
+     */
+    private static void reinforceSlopeSections(
+            Map<Long, PlannedState> states, GradeLayout gradeLayout,
+            IBlockState concrete, IBlockState horizontalSlab,
+            IBlockState verticalSlab, int clearHeight, int recessHeight)
+            throws TunnelBuildException {
+        int catenaryY = clearHeight + 1;
+        int roofY = catenaryY + recessHeight;
+        for (GradeTransition transition : gradeLayout.transitions) {
+            BlockPos center = transition.lowCenter;
+            for (int lateral = -3; lateral <= 3; lateral++) {
+                BlockPos floor = transition.normalOffset(lateral);
+                int absoluteLateral = Math.abs(lateral);
+                if (absoluteLateral == 3) {
+                    EnumFacing inward = lateral < 0
+                            ? transition.normalFacing : transition.normalFacing.getOpposite();
+                    IBlockState wallSlab = sideMountedState(
+                            verticalSlab.getBlock(), inward.getOpposite());
+                    put(states, floor, concrete, 39);
+                    put(states, floor.up(), concrete, 39);
+                    for (int y = 2; y <= clearHeight; y++) {
+                        put(states, floor.up(y), wallSlab, 39);
+                    }
+                    put(states, floor.up(catenaryY), concrete, 39);
+                    put(states, floor.up(roofY), concrete, 39);
+                    put(states, floor.up(roofY + 1), concrete, 39);
+                    continue;
+                }
+
+                for (int y = 1; y <= catenaryY; y++) {
+                    put(states, floor.up(y), Blocks.AIR.getDefaultState(), 39);
+                }
+                if (absoluteLateral == 2) {
+                    put(states, floor.up(roofY), concrete, 39);
+                } else if (absoluteLateral == 1) {
+                    put(states, floor.up(roofY), horizontalSlab, 39);
+                } else {
+                    put(states, floor.up(roofY), Blocks.AIR.getDefaultState(), 39);
+                }
+                put(states, floor.up(roofY + 1), concrete, 39);
+            }
+        }
     }
 
     private static boolean containsClearFootprintAtGrade(
@@ -653,7 +718,8 @@ public final class TunnelBuilder {
                                                Set<Long> clearFootprint,
                                                Set<Long> wallBoundary,
                                                IBlockState concrete,
-                                               int clearHeight, int recessHeight) {
+                                               int clearHeight, int recessHeight,
+                                               GradeLayout gradeLayout) {
         int roofY = clearHeight + 1 + recessHeight;
         Set<Long> backings = new HashSet<>();
         for (long packed : clearFootprint) {
@@ -675,7 +741,8 @@ public final class TunnelBuilder {
         }
         for (long packed : backings) {
             BlockPos corner = BlockPos.fromLong(packed);
-            for (int y = 0; y <= roofY; y++) {
+            int backingRoofY = roofY + (gradeLayout.isSlopeSection(corner) ? 1 : 0);
+            for (int y = 0; y <= backingRoofY; y++) {
                 put(states, corner.up(y), concrete, 9);
             }
         }
@@ -709,7 +776,8 @@ public final class TunnelBuilder {
      * included here as well; this makes "trackbed is always inside clearance" an explicit invariant.
      */
     private static TrackbedLayout createTrackbedLayout(
-            List<BlockPos> route, List<TurnSectionTransition> transitions) {
+            List<BlockPos> route, List<TurnSectionTransition> transitions,
+            GradeLayout gradeLayout) {
         Set<Long> routeCells = new HashSet<>();
         Set<Long> centerCells = new HashSet<>();
         Map<Long, Boolean> sideCells = new LinkedHashMap<>();
@@ -719,7 +787,6 @@ public final class TunnelBuilder {
         }
         for (int i = 0; i < route.size(); i++) {
             BlockPos center = route.get(i);
-            boolean solidSlopeBed = isSlopeRailCell(route, i);
             Set<EnumFacing> connections = new HashSet<>();
             if (i > 0) {
                 EnumFacing connection = horizontalDirection(center, route.get(i - 1));
@@ -734,15 +801,19 @@ public final class TunnelBuilder {
                 }
             }
             for (EnumFacing connection : connections) {
-                BlockPos left = center.offset(connection.rotateYCCW());
-                BlockPos right = center.offset(connection.rotateY());
+                BlockPos left = gradeLayout.floorAt(
+                        center.offset(connection.rotateYCCW()));
+                BlockPos right = gradeLayout.floorAt(
+                        center.offset(connection.rotateY()));
                 if (!routeCells.contains(left.toLong())) {
                     sideCells.put(left.toLong(),
-                            solidSlopeBed || Boolean.TRUE.equals(sideCells.get(left.toLong())));
+                            gradeLayout.isSlopeSection(left)
+                                    || Boolean.TRUE.equals(sideCells.get(left.toLong())));
                 }
                 if (!routeCells.contains(right.toLong())) {
                     sideCells.put(right.toLong(),
-                            solidSlopeBed || Boolean.TRUE.equals(sideCells.get(right.toLong())));
+                            gradeLayout.isSlopeSection(right)
+                                    || Boolean.TRUE.equals(sideCells.get(right.toLong())));
                 }
             }
         }
@@ -750,13 +821,13 @@ public final class TunnelBuilder {
         for (TurnSectionTransition transition : transitions) {
             addTurnTrackbedLayoutRow(sideCells, centerCells,
                     transition.before, transition.shift,
-                    new int[]{-1, 1, 2}, new int[]{0});
+                    new int[]{-1, 1, 2}, new int[]{0}, gradeLayout);
             addTurnTrackbedLayoutRow(sideCells, centerCells,
                     transition.oldCorner, transition.shift,
-                    new int[]{-1, 2}, new int[]{0, 1});
+                    new int[]{-1, 2}, new int[]{0, 1}, gradeLayout);
             addTurnTrackbedLayoutRow(sideCells, centerCells,
                     transition.projectedOldCenter, transition.shift,
-                    new int[]{-1, 0, 2}, new int[]{1});
+                    new int[]{-1, 0, 2}, new int[]{1}, gradeLayout);
         }
         for (long packed : centerCells) {
             sideCells.remove(packed);
@@ -878,12 +949,15 @@ public final class TunnelBuilder {
     private static void addTurnTrackbedLayoutRow(Map<Long, Boolean> sideCells,
                                                   Set<Long> centerCells,
                                                   BlockPos center, EnumFacing shift,
-                                                  int[] sideOffsets, int[] centerOffsets) {
+                                                  int[] sideOffsets, int[] centerOffsets,
+                                                  GradeLayout gradeLayout) {
         for (int offset : sideOffsets) {
-            sideCells.put(center.offset(shift, offset).toLong(), false);
+            BlockPos side = gradeLayout.floorAt(center.offset(shift, offset));
+            sideCells.put(side.toLong(), gradeLayout.isSlopeSection(side));
         }
         for (int offset : centerOffsets) {
-            centerCells.add(center.offset(shift, offset).toLong());
+            centerCells.add(gradeLayout.floorAt(
+                    center.offset(shift, offset)).toLong());
         }
     }
 
@@ -1199,20 +1273,21 @@ public final class TunnelBuilder {
                                           Set<Long> clearFootprint,
                                           Block tunnelLight,
                                           int spacing,
-                                          boolean mirrored)
+                                          boolean mirrored,
+                                          GradeLayout gradeLayout)
             throws TunnelBuildException {
         int safeSpacing = Math.max(1, spacing);
         for (int i = 0; i < route.size(); i += safeSpacing) {
             EnumFacing forward = sectionFacings.get(i);
             EnumFacing outward = mirrored ? forward.rotateY() : forward.rotateYCCW();
-            BlockPos lightFloor = route.get(i);
-            BlockPos next = lightFloor.offset(outward);
+            BlockPos lightFloor = gradeLayout.floorAt(route.get(i));
+            BlockPos next = gradeLayout.floorAt(lightFloor.offset(outward));
             while (clearFootprint.contains(next.toLong())) {
                 lightFloor = next;
-                next = lightFloor.offset(outward);
+                next = gradeLayout.floorAt(lightFloor.offset(outward));
             }
             IBlockState lightState = sideMountedState(tunnelLight, outward);
-            int lightY = isSlopeRailCell(route, i) ? 5 : 4;
+            int lightY = gradeLayout.isSlopeSection(lightFloor) ? 5 : 4;
             put(states, lightFloor.up(lightY), lightState, 60);
         }
     }
@@ -1355,9 +1430,13 @@ public final class TunnelBuilder {
         if (rasterized.positions.size() < 2) {
             throw new TunnelBuildException("无法将曲线转换为连续轨道");
         }
-        List<EnumFacing> sectionFacings = curveTangentFacings(
+        List<Vec> sectionTangents = curveTangents(
                 rasterized.parameters, p0, p1, v0, v1);
-        return new Geometry(rasterized.positions, sectionFacings,
+        List<EnumFacing> sectionFacings = curveTangentFacings(sectionTangents, v0);
+        List<BlockPos> gradedRoute = alignGradesToCurveSections(
+                rasterized.positions, rasterized.parameters, sectionFacings,
+                p0, p1, v0, v1);
+        return new Geometry(gradedRoute, sectionFacings, sectionTangents,
                 length, minRadius, maxGrade);
     }
 
@@ -1380,12 +1459,20 @@ public final class TunnelBuilder {
                 .add(c5.scale(5 * t * t * t * t));
     }
 
-    private static List<EnumFacing> curveTangentFacings(
+    private static List<Vec> curveTangents(
             List<Double> parameters, Vec p0, Vec p1, Vec v0, Vec v1) {
-        List<EnumFacing> facings = new ArrayList<>(parameters.size());
-        EnumFacing previous = dominantFacing(v0.x, v0.z);
+        List<Vec> tangents = new ArrayList<>(parameters.size());
         for (double parameter : parameters) {
-            Vec tangent = quinticTangent(p0, p1, v0, v1, parameter);
+            tangents.add(quinticTangent(p0, p1, v0, v1, parameter));
+        }
+        return tangents;
+    }
+
+    private static List<EnumFacing> curveTangentFacings(
+            List<Vec> tangents, Vec initialTangent) {
+        List<EnumFacing> facings = new ArrayList<>(tangents.size());
+        EnumFacing previous = dominantFacing(initialTangent.x, initialTangent.z);
+        for (Vec tangent : tangents) {
             if (Math.abs(tangent.x) > 1.0E-8 || Math.abs(tangent.z) > 1.0E-8) {
                 previous = dominantFacing(tangent.x, tangent.z);
             }
@@ -1408,18 +1495,13 @@ public final class TunnelBuilder {
             double parameter = pointIndex / (double) (points.size() - 1);
             int targetX = (int) Math.round(point.x);
             int targetZ = (int) Math.round(point.z);
-            int targetY = (int) Math.round(point.y);
             while (current.getX() != targetX || current.getZ() != targetZ) {
                 int sx = Integer.signum(targetX - current.getX());
                 int sz = Integer.signum(targetZ - current.getZ());
                 boolean moveX = sx != 0 && (sz == 0 || Math.abs(point.x - current.getX()) >= Math.abs(point.z - current.getZ()));
                 int nextX = current.getX() + (moveX ? sx : 0);
                 int nextZ = current.getZ() + (moveX ? 0 : sz);
-                int nextY = current.getY();
-                if (nextY != targetY) {
-                    nextY += Integer.signum(targetY - nextY);
-                }
-                BlockPos next = new BlockPos(nextX, nextY, nextZ);
+                BlockPos next = new BlockPos(nextX, start.getY(), nextZ);
                 long key = xzKey(nextX, nextZ);
                 if (visitedXZ.contains(key)) {
                     throw new TunnelBuildException("曲线在方格化后发生自交，请增大标记间距或调整方向");
@@ -1433,13 +1515,138 @@ public final class TunnelBuilder {
         if (current.getX() != end.getX() || current.getZ() != end.getZ()) {
             throw new TunnelBuildException("轨道路径没有到达终点");
         }
-        if (current.getY() != end.getY()) {
-            if (Math.abs(current.getY() - end.getY()) > 1 || result.size() < 2) {
-                throw new TunnelBuildException("坡度无法转换为连续的轨道台阶");
-            }
-            result.set(result.size() - 1, new BlockPos(end.getX(), end.getY(), end.getZ()));
-        }
         return new RasterizedRoute(result, parameters);
+    }
+
+    /**
+     * Snap every one-block grade change to a complete tangent-normal section. A rasterized lateral
+     * shift consists of incoming, transverse, and outgoing edges; changing Y on any of those three
+     * edges splits the widened 3x8 curve template between two levels. Move the grade to the first
+     * tangent-aligned edge on the low side of that template, which also prevents an ascending rail
+     * from being combined with a horizontal curve corner.
+     */
+    private static List<BlockPos> alignGradesToCurveSections(
+            List<BlockPos> horizontalRoute, List<Double> parameters,
+            List<EnumFacing> sectionFacings,
+            Vec p0, Vec p1, Vec v0, Vec v1) throws TunnelBuildException {
+        int startY = (int) Math.round(p0.y);
+        int endY = (int) Math.round(p1.y);
+        if (startY == endY) {
+            return horizontalRoute;
+        }
+        int direction = Integer.signum(endY - startY);
+        int transitionCount = Math.abs(endY - startY);
+        Set<Integer> forbiddenEdges = turnTransitionEdges(
+                horizontalRoute, sectionFacings);
+        boolean[] eligible = new boolean[horizontalRoute.size()];
+        for (int i = 1; i < horizontalRoute.size(); i++) {
+            EnumFacing edge = horizontalDirection(
+                    horizontalRoute.get(i - 1), horizontalRoute.get(i));
+            eligible[i] = edge != null
+                    && edge.getAxis() == sectionFacings.get(i).getAxis()
+                    && !forbiddenEdges.contains(i);
+        }
+
+        List<Integer> desiredEdges = new ArrayList<>(transitionCount);
+        for (int step = 1; step <= transitionCount; step++) {
+            double threshold = startY + direction * (step - 0.5);
+            int desired = -1;
+            for (int i = 1; i < parameters.size(); i++) {
+                double curveY = quintic(p0, p1, v0, v1, parameters.get(i)).y;
+                if (direction > 0 ? curveY >= threshold : curveY <= threshold) {
+                    desired = i;
+                    break;
+                }
+            }
+            if (desired < 0) {
+                desired = horizontalRoute.size() - 1;
+            }
+            desiredEdges.add(desired);
+        }
+
+        List<Integer> selectedEdges = new ArrayList<>(transitionCount);
+        int previous = 0;
+        for (int step = 0; step < transitionCount; step++) {
+            int desired = Math.max(desiredEdges.get(step), previous + 1);
+            int nextDesired = step + 1 < transitionCount
+                    ? desiredEdges.get(step + 1) : horizontalRoute.size();
+            int selected = -1;
+            // Prefer the low side of a blocked curve template. This makes the selected physical
+            // slope section independent of which endpoint the player clicked first: descending
+            // routes search forward, while the reversed ascending route searches backward.
+            if (direction < 0) {
+                for (int i = desired; i < nextDesired && i < eligible.length; i++) {
+                    if (eligible[i]) {
+                        selected = i;
+                        break;
+                    }
+                }
+                if (selected < 0) {
+                    for (int i = Math.min(desired - 1, eligible.length - 1);
+                         i > previous; i--) {
+                        if (eligible[i]) {
+                            selected = i;
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for (int i = Math.min(desired, eligible.length - 1);
+                     i > previous; i--) {
+                    if (eligible[i]) {
+                        selected = i;
+                        break;
+                    }
+                }
+                if (selected < 0) {
+                    for (int i = desired + 1;
+                         i < nextDesired && i < eligible.length; i++) {
+                        if (eligible[i]) {
+                            selected = i;
+                            break;
+                        }
+                    }
+                }
+            }
+            if (selected < 0) {
+                throw new TunnelBuildException("坡度附近没有可用的完整切线断面");
+            }
+            selectedEdges.add(selected);
+            previous = selected;
+        }
+
+        List<BlockPos> result = new ArrayList<>(horizontalRoute.size());
+        int applied = 0;
+        for (int i = 0; i < horizontalRoute.size(); i++) {
+            while (applied < selectedEdges.size() && selectedEdges.get(applied) <= i) {
+                applied++;
+            }
+            BlockPos horizontal = horizontalRoute.get(i);
+            result.add(new BlockPos(horizontal.getX(), startY + direction * applied,
+                    horizontal.getZ()));
+        }
+        if (result.get(result.size() - 1).getY() != endY) {
+            throw new TunnelBuildException("坡度无法转换为连续的轨道台阶");
+        }
+        return result;
+    }
+
+    private static Set<Integer> turnTransitionEdges(
+            List<BlockPos> route, List<EnumFacing> sectionFacings) {
+        Set<Integer> result = new HashSet<>();
+        for (int i = 1; i + 2 < route.size(); i++) {
+            EnumFacing incoming = horizontalDirection(route.get(i - 1), route.get(i));
+            EnumFacing shift = horizontalDirection(route.get(i), route.get(i + 1));
+            EnumFacing outgoing = horizontalDirection(route.get(i + 1), route.get(i + 2));
+            if (incoming != null && outgoing == incoming && shift != null
+                    && shift.getAxis() != incoming.getAxis()
+                    && sectionFacings.get(i).getAxis() == incoming.getAxis()) {
+                result.add(i);
+                result.add(i + 1);
+                result.add(i + 2);
+            }
+        }
+        return result;
     }
 
     private static int railMeta(List<BlockPos> route, int index) {
@@ -1525,6 +1732,7 @@ public final class TunnelBuilder {
      */
     private static ThirdRailLayout createThirdRailLayout(List<BlockPos> route,
                                                           List<EnumFacing> sectionFacings,
+                                                          GradeLayout gradeLayout,
                                                           boolean mirrored, int supportSpacing)
             throws TunnelBuildException {
         int size = route.size();
@@ -1533,7 +1741,8 @@ public final class TunnelBuilder {
             EnumFacing placementSide = mirrored
                     ? sectionFacings.get(i).rotateYCCW()
                     : sectionFacings.get(i).rotateY();
-            candidates[i] = route.get(i).offset(placementSide);
+            candidates[i] = gradeLayout.floorAt(
+                    route.get(i).offset(placementSide));
         }
 
         // Re-anchor each selected one-block shift. The old formula is the inside case only. Its
@@ -1587,7 +1796,7 @@ public final class TunnelBuilder {
             }
             used.add(packed);
             placements.add(new ThirdRailPlacement(
-                    candidate, i, isSlopeRailCell(route, i)));
+                    candidate, i, gradeLayout.isSlopeSection(candidate)));
         }
 
         List<BlockPos> thirdRailRoute = new ArrayList<>(placements.size());
@@ -1873,6 +2082,11 @@ public final class TunnelBuilder {
         return center.add(nx * lateral, y, nz * lateral);
     }
 
+    private static BlockPos gradedOffset(BlockPos center, int nx, int nz, int lateral,
+                                         GradeLayout gradeLayout) {
+        return gradeLayout.floorAt(offset(center, nx, nz, lateral, 0));
+    }
+
     private static EnumFacing lateralFacing(int nx, int nz, int sign) {
         return EnumFacing.getFacingFromVector(nx * sign, 0, nz * sign);
     }
@@ -2061,17 +2275,111 @@ public final class TunnelBuilder {
         }
     }
 
+    /** Assign every horizontal tunnel cell to a level using tangent-normal grade planes. */
+    private static final class GradeLayout {
+        final List<BlockPos> route;
+        final List<Vec> tangents;
+        final List<GradeTransition> transitions = new ArrayList<>();
+
+        GradeLayout(List<BlockPos> route, List<Vec> tangents) {
+            this.route = route;
+            this.tangents = tangents;
+            for (int i = 1; i < route.size(); i++) {
+                int deltaY = route.get(i).getY() - route.get(i - 1).getY();
+                if (deltaY == 0) {
+                    continue;
+                }
+                int lowIndex = deltaY > 0 ? i - 1 : i;
+                transitions.add(new GradeTransition(
+                        route.get(lowIndex), tangents.get(lowIndex)));
+            }
+        }
+
+        BlockPos floorAt(BlockPos horizontal) {
+            int grade = route.get(sectionIndex(horizontal)).getY();
+            return new BlockPos(horizontal.getX(), grade, horizontal.getZ());
+        }
+
+        boolean isSlopeSection(BlockPos horizontal) {
+            return isSlopeRailCell(route, sectionIndex(horizontal));
+        }
+
+        /**
+         * Choose the curve point whose tangent-normal section passes closest to this block. The
+         * Euclidean nearest route cell supplies a local window so a remote normal elsewhere on a
+         * long bend cannot win merely because its infinite line happens to cross the same area.
+         */
+        int sectionIndex(BlockPos pos) {
+            int nearest = closestHorizontalRouteIndex(pos, route);
+            int first = Math.max(0, nearest - LOCAL_TRANSITION_PATH_LIMIT);
+            int last = Math.min(route.size() - 1,
+                    nearest + LOCAL_TRANSITION_PATH_LIMIT);
+            int bestIndex = nearest;
+            double bestLongitudinal = Double.POSITIVE_INFINITY;
+            long bestDistance = Long.MAX_VALUE;
+            for (int i = first; i <= last; i++) {
+                BlockPos center = route.get(i);
+                Vec tangent = tangents.get(i);
+                double length = Math.sqrt(
+                        tangent.x * tangent.x + tangent.z * tangent.z);
+                if (length <= 1.0E-8) {
+                    continue;
+                }
+                double dx = pos.getX() - center.getX();
+                double dz = pos.getZ() - center.getZ();
+                double longitudinal = Math.abs(
+                        (dx * tangent.x + dz * tangent.z) / length);
+                long distance = (long) dx * (long) dx + (long) dz * (long) dz;
+                if (longitudinal < bestLongitudinal - 1.0E-8
+                        || Math.abs(longitudinal - bestLongitudinal) <= 1.0E-8
+                        && distance < bestDistance) {
+                    bestIndex = i;
+                    bestLongitudinal = longitudinal;
+                    bestDistance = distance;
+                }
+            }
+            return bestIndex;
+        }
+    }
+
+    private static final class GradeTransition {
+        final BlockPos lowCenter;
+        final double normalX;
+        final double normalZ;
+        final EnumFacing normalFacing;
+
+        GradeTransition(BlockPos lowCenter, Vec tangent) {
+            this.lowCenter = lowCenter;
+            double tangentLength = Math.sqrt(
+                    tangent.x * tangent.x + tangent.z * tangent.z);
+            normalX = -tangent.z / tangentLength;
+            normalZ = tangent.x / tangentLength;
+            normalFacing = EnumFacing.getFacingFromVector(
+                    (float) normalX, 0, (float) normalZ);
+        }
+
+        BlockPos normalOffset(int lateral) {
+            return new BlockPos(
+                    Math.round(lowCenter.getX() + normalX * lateral),
+                    lowCenter.getY(),
+                    Math.round(lowCenter.getZ() + normalZ * lateral));
+        }
+    }
+
     private static final class Geometry {
         final List<BlockPos> route;
         final List<EnumFacing> sectionFacings;
+        final List<Vec> sectionTangents;
         final double length;
         final double minimumRadius;
         final double maximumGrade;
 
         Geometry(List<BlockPos> route, List<EnumFacing> sectionFacings,
+                 List<Vec> sectionTangents,
                  double length, double minimumRadius, double maximumGrade) {
             this.route = route;
             this.sectionFacings = sectionFacings;
+            this.sectionTangents = sectionTangents;
             this.length = length;
             this.minimumRadius = minimumRadius;
             this.maximumGrade = maximumGrade;
