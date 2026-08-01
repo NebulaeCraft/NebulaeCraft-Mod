@@ -100,7 +100,9 @@ public final class TunnelGenerationManager {
                 activeJob.undoEntries.get(activeJob.index).restore(activeJob.world);
             } else {
                 TunnelPlan.Operation operation = activeJob.plan.operations.get(activeJob.index);
-                activeJob.undoData.capture(activeJob.world, operation.pos);
+                if (operation.captureUndo) {
+                    activeJob.undoData.capture(activeJob.world, operation.pos);
+                }
                 activeJob.world.setBlockState(operation.pos, operation.state, 2);
             }
             activeJob.index++;

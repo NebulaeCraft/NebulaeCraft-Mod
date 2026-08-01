@@ -11,9 +11,12 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,6 +25,7 @@ import java.util.Map;
 import java.util.Set;
 
 public final class TunnelBuilder {
+    private static final int LOCAL_TRANSITION_PATH_LIMIT = 7;
     private static final String[] COLORS = {
             "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
             "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
@@ -69,11 +73,13 @@ public final class TunnelBuilder {
         IBlockState sideBed = resolveState(preset.sideTrackbed);
         Block reinforcedTrack = resolveBlock(preset.reinforcedTrack);
         Block platform = resolveBlock(preset.platform);
+        Block tunnelLight = resolveBlock("nebulaecraft:tunnel_light@0");
         IBlockState platformState = platform.getStateFromMeta(colorMeta);
 
         LinkedHashMap<Long, PlannedState> states = new LinkedHashMap<>();
+        List<TunnelPlan.Operation> railFinalizations = new ArrayList<>();
         List<BlockPos> route = geometry.route;
-        List<EnumFacing> sectionFacings = sectionFacings(route);
+        List<EnumFacing> sectionFacings = geometry.sectionFacings;
         Set<Integer> catenarySupportIndices = normalizedPower.equals("catenary")
                 ? catenarySupportIndices(route, settings.catenarySupportSpacing)
                 : Collections.<Integer>emptySet();
@@ -87,7 +93,6 @@ public final class TunnelBuilder {
         int roofY = catenaryY + preset.catenaryRecessHeight;
         for (int i = 0; i < route.size(); i++) {
             BlockPos center = route.get(i);
-            EnumFacing trackForward = routeFacing(route, i);
             EnumFacing forward = sectionFacings.get(i);
             boolean slopeSection = isSlopeRailCell(route, i);
             int nx = -forward.getFrontOffsetZ();
@@ -163,7 +168,12 @@ public final class TunnelBuilder {
             put(states, center, centerBed, 30);
             put(states, offset(center, nx, nz, -1, 0), slopeSection ? centerBed : sideBed, 30);
             put(states, offset(center, nx, nz, 1, 0), slopeSection ? centerBed : sideBed, 30);
-            put(states, center.up(), reinforcedTrack.getStateFromMeta(railMeta(route, i)), 50);
+            IBlockState railState = reinforcedTrack.getStateFromMeta(railMeta(route, i));
+            put(states, center.up(), railState, 50);
+            // Railcraft recalculates a flex track's shape in onBlockAdded. During the first pass
+            // the next route cell does not exist yet, so a requested corner can be changed into
+            // a straight rail. Reapply the explicit route shape after every track is present.
+            railFinalizations.add(new TunnelPlan.Operation(center.up(), railState, false));
 
             // The optional colored maintenance platform sits on the intact left floor block.
             put(states, offset(center, nx, nz, -2, 1), platformState, 40);
@@ -171,7 +181,7 @@ public final class TunnelBuilder {
             if (normalizedPower.startsWith("thirdrail_")) {
                 boolean yellow = normalizedPower.endsWith("yellow");
                 EnumFacing thirdRailTowardTrack = lateralFacing(nx, nz, -1);
-                IBlockState thirdRail = thirdRailState(yellow, route, i, trackForward,
+                IBlockState thirdRail = thirdRailState(yellow, route, i, forward,
                         thirdRailTowardTrack, thirdRailLayout.diagonalTypes[i],
                         thirdRailLayout.diagonalFacings[i], thirdRailLayout.supports[i]);
                 BlockPos thirdRailPos = offset(center, nx, nz, 1, 1);
@@ -180,32 +190,21 @@ public final class TunnelBuilder {
                 }
                 put(states, thirdRailPos, thirdRail, 45);
             } else if (normalizedPower.equals("catenary")) {
-                IBlockState catenary = catenaryState(route, i, trackForward,
+                IBlockState catenary = catenaryState(route, i, forward,
                         catenarySupportIndices.contains(i));
                 put(states, center.up(catenaryY), catenary, 45);
             }
 
-            if (i % settings.lightSpacing == 0) {
-                // Keep every light on the metal-platform side. Mirroring reverses nx/nz above,
-                // so the platform and its lights move to the opposite physical side together.
-                int lateral = -halfClearWidth;
-                EnumFacing attachmentSide = lateralFacing(nx, nz, -1);
-                Block light = resolveBlock("nebulaecraft:tunnel_light@0");
-                IBlockState lightState = sideMountedState(light, attachmentSide);
-                BlockPos lightPos = offset(center, nx, nz, lateral, 4);
-                if (slopeSection) {
-                    lightPos = lightPos.up();
-                }
-                if (turnLightNeedsOutset(route, sectionFacings, i, attachmentSide, mirrored)) {
-                    lightPos = lightPos.offset(attachmentSide);
-                }
-                put(states, lightPos, lightState, 60);
-            }
         }
 
-        applyTurnSectionTransitions(states, route, sectionFacings, concrete, horizontalSlab,
+        Set<Long> clearFootprint = applyTurnSectionTransitions(
+                states, route, sectionFacings, concrete, horizontalSlab,
                 verticalSlab, sideBed, centerBed, platformState, preset.clearHeight,
                 preset.catenaryRecessHeight, mirrored);
+        orientVerticalSlabsByCurveTangent(
+                states, route, sectionFacings, verticalSlab.getBlock());
+        placeTunnelLights(states, route, sectionFacings, clearFootprint,
+                tunnelLight, settings.lightSpacing, mirrored);
 
         if (states.size() > settings.maxChangedBlocks) {
             throw new TunnelBuildException("预计修改方块数超过配置上限 " + settings.maxChangedBlocks);
@@ -216,6 +215,7 @@ public final class TunnelBuilder {
         for (PlannedState planned : orderedStates) {
             operations.add(new TunnelPlan.Operation(planned.pos, planned.state));
         }
+        operations.addAll(railFinalizations);
         return new TunnelPlan(world.provider.getDimension(), operations, new ArrayList<>(route), geometry.length,
                 geometry.minimumRadius, geometry.maximumGrade, presetId, normalizeColor(platformColor),
                 normalizedPower, mirrored);
@@ -233,13 +233,83 @@ public final class TunnelBuilder {
      * D is 43:8, S is 44:0. The template is rotated from the actual lateral step, so it works for
      * all four directions and both left/right shifts.
      */
-    private static void applyTurnSectionTransitions(Map<Long, PlannedState> states, List<BlockPos> route,
-                                                     List<EnumFacing> sectionFacings, IBlockState concrete,
-                                                     IBlockState horizontalSlab, IBlockState verticalSlab,
-                                                     IBlockState sideBed, IBlockState centerBed,
-                                                     IBlockState platformState, int clearHeight,
-                                                     int recessHeight, boolean mirrored)
+    private static Set<Long> applyTurnSectionTransitions(
+            Map<Long, PlannedState> states, List<BlockPos> route,
+            List<EnumFacing> sectionFacings, IBlockState concrete,
+            IBlockState horizontalSlab, IBlockState verticalSlab,
+            IBlockState sideBed, IBlockState centerBed,
+            IBlockState platformState, int clearHeight,
+            int recessHeight, boolean mirrored)
             throws TunnelBuildException {
+        TurnSectionLayout transitionLayout = findTurnSectionLayout(route, sectionFacings);
+        List<TurnSectionTransition> transitions = transitionLayout.transitions;
+        // Full 3x8 structures remain de-duplicated, but the skipped perpendicular transition still
+        // owns real 43/44 floor cells. Merge every candidate into the semantic bed before clearance
+        // and wall extraction so reversing the route cannot leave the new-axis bed under a wall.
+        TrackbedLayout trackbedLayout = createTrackbedLayout(
+                route, transitionLayout.allTransitions);
+        Set<Long> clearFootprint = levelRouteClearFootprint(route, sectionFacings);
+        for (TurnSectionTransition transition : transitions) {
+            addTurnSectionClearFootprint(clearFootprint, transition.before, transition.shift);
+            addTurnSectionClearFootprint(clearFootprint, transition.oldCorner, transition.shift);
+            addTurnSectionClearFootprint(clearFootprint,
+                    transition.projectedOldCenter, transition.shift);
+        }
+        addTrackbedClearanceFootprint(clearFootprint, trackbedLayout, route);
+
+        for (TurnSectionTransition transition : transitions) {
+            putTurnSectionRow(states, transition.before, transition.shift,
+                    concrete, horizontalSlab, verticalSlab,
+                    sideBed, centerBed, clearHeight, recessHeight,
+                    new int[]{-1, 1, 2}, new int[]{0});
+            putTurnSectionRow(states, transition.oldCorner, transition.shift,
+                    concrete, horizontalSlab, verticalSlab,
+                    sideBed, centerBed, clearHeight, recessHeight,
+                    new int[]{-1, 2}, new int[]{0, 1});
+            putTurnSectionRow(states, transition.projectedOldCenter, transition.shift,
+                    concrete, horizontalSlab, verticalSlab,
+                    sideBed, centerBed, clearHeight, recessHeight,
+                    new int[]{-1, 0, 2}, new int[]{1});
+        }
+
+        // The perpendicular candidate omitted from the full shell still carries a real recess
+        // pattern. Merge this semantic layer for every candidate; center air outranks side slabs,
+        // and side slabs outrank the surrounding concrete in the same way as the full template.
+        for (TurnSectionTransition transition : transitionLayout.allTransitions) {
+            putTurnCatenaryRow(states, transition.before, transition.shift,
+                    concrete, horizontalSlab, clearHeight,
+                    new int[]{-1, 1, 2}, new int[]{0});
+            putTurnCatenaryRow(states, transition.oldCorner, transition.shift,
+                    concrete, horizontalSlab, clearHeight,
+                    new int[]{-1, 2}, new int[]{0, 1});
+            putTurnCatenaryRow(states, transition.projectedOldCenter, transition.shift,
+                    concrete, horizontalSlab, clearHeight,
+                    new int[]{-1, 0, 2}, new int[]{1});
+        }
+
+        rebuildTurnPlatform(states, transitionLayout.allTransitions, route,
+                trackbedLayout, clearFootprint, platformState, mirrored);
+
+        Set<Long> wallBoundary = rebuildTurnShell(
+                states, route, sectionFacings, clearFootprint,
+                concrete, verticalSlab, clearHeight, recessHeight);
+        addTurnWallCornerBackings(states, route, clearFootprint, wallBoundary,
+                concrete, clearHeight, recessHeight);
+        rebuildContinuousTrackbed(states, trackbedLayout, concrete,
+                sideBed, centerBed, clearFootprint);
+        return clearFootprint;
+    }
+
+    /**
+     * Select one non-overlapping tessellation at the point where a long diagonal run changes its
+     * section axis. Without the adjacent-index guard, the same two track corners are expanded once
+     * as an X-oriented shift and again as a Z-oriented shift; the later template then cuts through
+     * the former wall and trackbed.
+     */
+    private static TurnSectionLayout findTurnSectionLayout(List<BlockPos> route,
+                                                            List<EnumFacing> sectionFacings) {
+        List<TurnSectionTransition> transitions = new ArrayList<>();
+        List<TurnSectionTransition> allTransitions = new ArrayList<>();
         for (int i = 1; i + 2 < route.size(); i++) {
             BlockPos before = route.get(i - 1);
             BlockPos oldCorner = route.get(i);
@@ -259,66 +329,847 @@ public final class TunnelBuilder {
                 continue;
             }
 
-            putTurnSectionRow(states, before, shift, concrete, horizontalSlab, verticalSlab,
-                    sideBed, centerBed, clearHeight, recessHeight,
+            TurnSectionTransition candidate = new TurnSectionTransition(i, before, oldCorner,
+                    newCorner, after, after.offset(shift.getOpposite()), incoming, shift);
+            allTransitions.add(candidate);
+            if (!transitions.isEmpty()) {
+                TurnSectionTransition previous = transitions.get(transitions.size() - 1);
+                if (i == previous.index + 1
+                        && incoming.getAxis() != previous.incoming.getAxis()) {
+                    // The two perpendicular 3x8 templates overlap at the X/Z section-axis switch.
+                    // Keep only the first structural template. The skipped transition still keeps
+                    // its trackbed, recess, and platform semantics.
+                    continue;
+                }
+            }
+            transitions.add(candidate);
+        }
+        return new TurnSectionLayout(transitions, allTransitions);
+    }
+
+    private static Set<Long> levelRouteClearFootprint(List<BlockPos> route,
+                                                       List<EnumFacing> sectionFacings) {
+        Set<Long> footprint = new HashSet<>();
+        for (int i = 0; i < route.size(); i++) {
+            EnumFacing lateral = sectionFacings.get(i).rotateY();
+            for (int offset = -2; offset <= 2; offset++) {
+                footprint.add(route.get(i).offset(lateral, offset).toLong());
+            }
+        }
+        return footprint;
+    }
+
+    private static void addTurnSectionClearFootprint(Set<Long> clearFootprint,
+                                                     BlockPos center, EnumFacing shift) {
+        for (int offset = -2; offset <= 3; offset++) {
+            clearFootprint.add(center.offset(shift, offset).toLong());
+        }
+    }
+
+    /**
+     * The reference floor always leaves one intact concrete cell between either side of the
+     * 43/44 trackbed and the wall. A route-graph corner can contribute a side-bed cell outside the
+     * section-axis footprint, so adding only the bed cell itself lets the rebuilt boundary touch
+     * that 44:0 directly. Dilate the final graph/template bed by one cardinal cell before extracting
+     * the wall. Cells beyond the open route ends remain untouched.
+     */
+    private static void addTrackbedClearanceFootprint(Set<Long> clearFootprint,
+                                                       TrackbedLayout trackbedLayout,
+                                                       List<BlockPos> route) {
+        Set<Long> trackbedCells = new HashSet<>(trackbedLayout.centerCells);
+        trackbedCells.addAll(trackbedLayout.sideCells.keySet());
+        for (long packed : trackbedCells) {
+            BlockPos trackbed = BlockPos.fromLong(packed);
+            clearFootprint.add(packed);
+            for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                BlockPos floor = trackbed.offset(direction);
+                if (!isBeyondOpenRouteEnd(floor, route)) {
+                    clearFootprint.add(floor.toLong());
+                }
+            }
+        }
+    }
+
+    /**
+     * Rebuild the complete curve shell from the union of every normal and widened clear section.
+     * The same final footprint supplies the floor and two ceiling layers. Only cardinal neighbours
+     * form the regular wall: adding the complete diagonal ring would create a full-height column at
+     * every inside step of the curve, where it visibly projects into the tunnel. True outside-corner
+     * backings are derived from the completed cardinal boundary separately below.
+     */
+    private static Set<Long> rebuildTurnShell(
+                                                Map<Long, PlannedState> states,
+                                                List<BlockPos> route,
+                                                List<EnumFacing> sectionFacings,
+                                                Set<Long> clearFootprint,
+                                                IBlockState concrete,
+                                                IBlockState verticalSlab,
+                                                int clearHeight, int recessHeight)
+            throws TunnelBuildException {
+        int roofY = clearHeight + 1 + recessHeight;
+        Set<Long> originalVerticalSlabs = new HashSet<>();
+        for (Map.Entry<Long, PlannedState> entry : states.entrySet()) {
+            if (entry.getValue().state.getBlock() == verticalSlab.getBlock()) {
+                originalVerticalSlabs.add(entry.getKey());
+            }
+        }
+        Set<Long> boundary = new HashSet<>();
+        for (long packed : clearFootprint) {
+            BlockPos clear = BlockPos.fromLong(packed);
+            // Floor, walls, and ceiling must all come from the same final semantic clearance.
+            // A de-duplicated axis-switch template still contributes trackbed clearance; relying
+            // only on retained full templates for the two ceiling layers leaves that clearance
+            // uncapped. These defaults sit below every explicit recess air/slab/wire state.
+            int routeIndex = closestRouteIndex(clear, route);
+            int slopeLift = isSlopeRailCell(route, routeIndex) ? 1 : 0;
+            put(states, clear.up(clearHeight + 1 + slopeLift), concrete, 9);
+            put(states, clear.up(roofY + slopeLift), concrete, 9);
+
+            // The entire horizontal opening is authoritative. Clear remnants left by differently
+            // oriented normal sections before reconstructing its outer boundary.
+            for (int y = 1; y <= clearHeight; y++) {
+                put(states, clear.up(y), Blocks.AIR.getDefaultState(), 37);
+            }
+            put(states, clear, concrete, 38);
+            for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                BlockPos candidate = clear.offset(direction);
+                if (!containsClearFootprintAtGrade(candidate, clearFootprint)
+                        && !isBeyondOpenRouteEnd(candidate, route)) {
+                    boundary.add(candidate.toLong());
+                }
+            }
+        }
+
+        for (long packed : boundary) {
+            BlockPos wall = BlockPos.fromLong(packed);
+            List<EnumFacing> inwardDirections = new ArrayList<>();
+            for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                if (clearFootprint.contains(wall.offset(direction).toLong())) {
+                    inwardDirections.add(direction);
+                }
+            }
+            EnumFacing inward = preferredWallInwardDirection(
+                    wall, inwardDirections, route, sectionFacings);
+            IBlockState middleWallState = sideMountedState(
+                    verticalSlab.getBlock(), inward.getOpposite());
+            boolean slopeTop = originalVerticalSlabs.contains(
+                    wall.up(clearHeight).toLong());
+            for (int y = 0; y <= roofY; y++) {
+                BlockPos target = wall.up(y);
+                if (insideClearVolume(target, clearFootprint, clearHeight)) {
+                    continue;
+                }
+                IBlockState wallState = concrete;
+                if (slopeTop && y == clearHeight) {
+                    wallState = middleWallState;
+                } else if (y >= 2 && y < clearHeight) {
+                    wallState = middleWallState;
+                }
+                put(states, target, wallState, 38);
+            }
+        }
+        return boundary;
+    }
+
+    private static boolean containsClearFootprintAtGrade(
+            BlockPos pos, Set<Long> clearFootprint) {
+        return clearFootprint.contains(pos.toLong())
+                || clearFootprint.contains(pos.up().toLong())
+                || clearFootprint.contains(pos.down().toLong());
+    }
+
+    private static boolean insideClearVolume(BlockPos pos,
+                                             Set<Long> clearFootprint,
+                                             int clearHeight) {
+        for (int down = 0; down <= clearHeight; down++) {
+            if (clearFootprint.contains(pos.down(down).toLong())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static int boundaryPathDistance(BlockPos from, BlockPos to) {
+        return Math.max(Math.abs(from.getX() - to.getX()),
+                Math.abs(from.getZ() - to.getZ()));
+    }
+
+    private static List<BlockPos> reconstructBoundaryPath(Map<Long, Long> previous,
+                                                           BlockPos start, BlockPos end) {
+        List<BlockPos> reversed = new ArrayList<>();
+        BlockPos current = end;
+        reversed.add(current);
+        while (!current.equals(start)) {
+            Long parent = previous.get(current.toLong());
+            if (parent == null) {
+                return Collections.emptyList();
+            }
+            current = BlockPos.fromLong(parent);
+            reversed.add(current);
+        }
+        Collections.reverse(reversed);
+        return reversed;
+    }
+
+    /**
+     * Orient every vertical slab from the smooth center-curve tangent at the closest route point.
+     * A tangent closer to X uses a NORTH/SOUTH normal; one closer to Z uses an EAST/WEST normal.
+     * Stair-step boundary cells can have only an along-track clear neighbour, so adjacency alone
+     * must not rotate their slab by ninety degrees. Prefer a matching clear neighbour when one is
+     * available, otherwise choose the tangent normal that points toward the route.
+     */
+    private static EnumFacing preferredWallInwardDirection(
+            BlockPos wall, List<EnumFacing> inwardDirections,
+            List<BlockPos> route, List<EnumFacing> sectionFacings) {
+        int routeIndex = closestHorizontalRouteIndex(wall, route);
+        EnumFacing.Axis trackAxis = sectionFacings.get(routeIndex).getAxis();
+        List<EnumFacing> tangentNormals = new ArrayList<>(2);
+        for (EnumFacing inward : inwardDirections) {
+            if (inward.getAxis() != trackAxis) {
+                tangentNormals.add(inward);
+            }
+        }
+        if (!tangentNormals.isEmpty()) {
+            return closestHorizontalRouteDirection(wall, tangentNormals, route);
+        }
+        return curveNormalTowardRoute(wall, routeIndex, route, sectionFacings);
+    }
+
+    private static EnumFacing curveNormalTowardRoute(
+            BlockPos wall, int routeIndex, List<BlockPos> route,
+            List<EnumFacing> sectionFacings) {
+        EnumFacing firstNormal = sectionFacings.get(routeIndex).rotateY();
+        List<EnumFacing> tangentNormals = new ArrayList<>(2);
+        tangentNormals.add(firstNormal);
+        tangentNormals.add(firstNormal.getOpposite());
+        return closestHorizontalRouteDirection(wall, tangentNormals, route);
+    }
+
+    /** Apply the tangent-axis rule to every final slab, including open-end/template remnants. */
+    private static void orientVerticalSlabsByCurveTangent(
+            Map<Long, PlannedState> states, List<BlockPos> route,
+            List<EnumFacing> sectionFacings, Block verticalSlab)
+            throws TunnelBuildException {
+        for (Map.Entry<Long, PlannedState> entry : states.entrySet()) {
+            PlannedState planned = entry.getValue();
+            if (planned.state.getBlock() != verticalSlab) {
+                continue;
+            }
+            int routeIndex = closestHorizontalRouteIndex(planned.pos, route);
+            EnumFacing inward = curveNormalTowardRoute(
+                    planned.pos, routeIndex, route, sectionFacings);
+            IBlockState oriented = sideMountedState(verticalSlab, inward.getOpposite());
+            entry.setValue(new PlannedState(planned.pos, oriented, planned.priority));
+        }
+    }
+
+    private static EnumFacing closestHorizontalRouteDirection(
+            BlockPos wall, List<EnumFacing> directions, List<BlockPos> route) {
+        EnumFacing best = directions.get(0);
+        long bestDistance = Long.MAX_VALUE;
+        for (EnumFacing direction : directions) {
+            BlockPos inside = wall.offset(direction);
+            long distance = horizontalDistanceToRoute(inside, route);
+            if (distance < bestDistance) {
+                best = direction;
+                bestDistance = distance;
+            }
+        }
+        return best;
+    }
+
+    private static int distanceToRoute(BlockPos pos, List<BlockPos> route) {
+        return routeDistanceAtIndex(pos, route, closestRouteIndex(pos, route));
+    }
+
+    private static int closestRouteIndex(BlockPos pos, List<BlockPos> route) {
+        int bestIndex = 0;
+        int best = Integer.MAX_VALUE;
+        for (int i = 0; i < route.size(); i++) {
+            int distance = routeDistanceAtIndex(pos, route, i);
+            if (distance < best) {
+                best = distance;
+                bestIndex = i;
+            }
+        }
+        return bestIndex;
+    }
+
+    private static int closestHorizontalRouteIndex(BlockPos pos, List<BlockPos> route) {
+        int bestIndex = 0;
+        long best = Long.MAX_VALUE;
+        for (int i = 0; i < route.size(); i++) {
+            BlockPos routePos = route.get(i);
+            long dx = pos.getX() - (long) routePos.getX();
+            long dz = pos.getZ() - (long) routePos.getZ();
+            long distance = dx * dx + dz * dz;
+            if (distance < best) {
+                best = distance;
+                bestIndex = i;
+            }
+        }
+        return bestIndex;
+    }
+
+    private static long horizontalDistanceToRoute(BlockPos pos, List<BlockPos> route) {
+        BlockPos routePos = route.get(closestHorizontalRouteIndex(pos, route));
+        long dx = pos.getX() - (long) routePos.getX();
+        long dz = pos.getZ() - (long) routePos.getZ();
+        return dx * dx + dz * dz;
+    }
+
+    private static int routeDistanceAtIndex(BlockPos pos, List<BlockPos> route, int index) {
+        BlockPos routePos = route.get(index);
+        return Math.abs(pos.getX() - routePos.getX())
+                + Math.abs(pos.getY() - routePos.getY())
+                + Math.abs(pos.getZ() - routePos.getZ());
+    }
+
+    /**
+     * Fill the true outside corner behind two perpendicular cells of the final wall boundary. A
+     * fixed transition-template coordinate misses corners introduced by overlapping shifts and by
+     * the X/Z axis switch; filling every diagonal neighbour, on the other hand, creates inside
+     * piers. Requiring both orthogonal elbows to be real final wall cells identifies only the
+     * backing column needed to close the visible seam.
+     */
+    private static void addTurnWallCornerBackings(
+                                               Map<Long, PlannedState> states,
+                                               List<BlockPos> route,
+                                               Set<Long> clearFootprint,
+                                               Set<Long> wallBoundary,
+                                               IBlockState concrete,
+                                               int clearHeight, int recessHeight) {
+        int roofY = clearHeight + 1 + recessHeight;
+        Set<Long> backings = new HashSet<>();
+        for (long packed : clearFootprint) {
+            BlockPos clear = BlockPos.fromLong(packed);
+            for (int dx = -1; dx <= 1; dx += 2) {
+                for (int dz = -1; dz <= 1; dz += 2) {
+                    BlockPos corner = clear.add(dx, 0, dz);
+                    BlockPos xWall = clear.add(dx, 0, 0);
+                    BlockPos zWall = clear.add(0, 0, dz);
+                    if (!containsClearFootprintAtGrade(corner, clearFootprint)
+                            && !wallBoundary.contains(corner.toLong())
+                            && wallBoundary.contains(xWall.toLong())
+                            && wallBoundary.contains(zWall.toLong())
+                            && !isBeyondOpenRouteEnd(corner, route)) {
+                        backings.add(corner.toLong());
+                    }
+                }
+            }
+        }
+        for (long packed : backings) {
+            BlockPos corner = BlockPos.fromLong(packed);
+            for (int y = 0; y <= roofY; y++) {
+                put(states, corner.up(y), concrete, 9);
+            }
+        }
+    }
+
+    private static boolean isBeyondOpenRouteEnd(BlockPos pos, List<BlockPos> route) {
+        if (route.size() < 2) {
+            return false;
+        }
+        BlockPos start = route.get(0);
+        EnumFacing startForward = horizontalDirection(start, route.get(1));
+        if (startForward != null && pos.getY() == start.getY()
+                && horizontalDot(start, pos, startForward) < 0) {
+            return true;
+        }
+        BlockPos end = route.get(route.size() - 1);
+        EnumFacing endForward = horizontalDirection(route.get(route.size() - 2), end);
+        return endForward != null && pos.getY() == end.getY()
+                && horizontalDot(end, pos, endForward) > 0;
+    }
+
+    private static int horizontalDot(BlockPos origin, BlockPos pos, EnumFacing facing) {
+        return (pos.getX() - origin.getX()) * facing.getFrontOffsetX()
+                + (pos.getZ() - origin.getZ()) * facing.getFrontOffsetZ();
+    }
+
+    /**
+     * Plan the complete bed before the wall. At a corner both connected segment axes contribute
+     * their lateral cells, so consecutive shifts and the X/Z axis change produce a continuous band
+     * without relying on the section-facing axis. The widened transition's extra 43/44 cells are
+     * included here as well; this makes "trackbed is always inside clearance" an explicit invariant.
+     */
+    private static TrackbedLayout createTrackbedLayout(
+            List<BlockPos> route, List<TurnSectionTransition> transitions) {
+        Set<Long> routeCells = new HashSet<>();
+        Set<Long> centerCells = new HashSet<>();
+        Map<Long, Boolean> sideCells = new LinkedHashMap<>();
+        for (BlockPos center : route) {
+            routeCells.add(center.toLong());
+            centerCells.add(center.toLong());
+        }
+        for (int i = 0; i < route.size(); i++) {
+            BlockPos center = route.get(i);
+            boolean solidSlopeBed = isSlopeRailCell(route, i);
+            Set<EnumFacing> connections = new HashSet<>();
+            if (i > 0) {
+                EnumFacing connection = horizontalDirection(center, route.get(i - 1));
+                if (connection != null) {
+                    connections.add(connection);
+                }
+            }
+            if (i + 1 < route.size()) {
+                EnumFacing connection = horizontalDirection(center, route.get(i + 1));
+                if (connection != null) {
+                    connections.add(connection);
+                }
+            }
+            for (EnumFacing connection : connections) {
+                BlockPos left = center.offset(connection.rotateYCCW());
+                BlockPos right = center.offset(connection.rotateY());
+                if (!routeCells.contains(left.toLong())) {
+                    sideCells.put(left.toLong(),
+                            solidSlopeBed || Boolean.TRUE.equals(sideCells.get(left.toLong())));
+                }
+                if (!routeCells.contains(right.toLong())) {
+                    sideCells.put(right.toLong(),
+                            solidSlopeBed || Boolean.TRUE.equals(sideCells.get(right.toLong())));
+                }
+            }
+        }
+
+        for (TurnSectionTransition transition : transitions) {
+            addTurnTrackbedLayoutRow(sideCells, centerCells,
+                    transition.before, transition.shift,
                     new int[]{-1, 1, 2}, new int[]{0});
-            putTurnSectionRow(states, oldCorner, shift, concrete, horizontalSlab, verticalSlab,
-                    sideBed, centerBed, clearHeight, recessHeight,
+            addTurnTrackbedLayoutRow(sideCells, centerCells,
+                    transition.oldCorner, transition.shift,
                     new int[]{-1, 2}, new int[]{0, 1});
-            BlockPos projectedOldCenter = after.offset(shift.getOpposite());
-            putTurnSectionRow(states, projectedOldCenter, shift, concrete, horizontalSlab, verticalSlab,
-                    sideBed, centerBed, clearHeight, recessHeight,
+            addTurnTrackbedLayoutRow(sideCells, centerCells,
+                    transition.projectedOldCenter, transition.shift,
                     new int[]{-1, 0, 2}, new int[]{1});
+        }
+        for (long packed : centerCells) {
+            sideCells.remove(packed);
+        }
+        connectSideTrackbedCardinally(sideCells, centerCells, route);
+        return new TrackbedLayout(centerCells, sideCells);
+    }
 
-            addTurnOuterCornerColumns(states, before, projectedOldCenter, incoming, shift,
-                    concrete, clearHeight + 1 + recessHeight);
-            adjustTurnPlatform(states, before, oldCorner, newCorner, after, incoming, shift,
-                    platformState, mirrored);
+    /**
+     * A diagonal rail shift can leave the two 44:0 lanes touching only at one corner. Visually that
+     * is a full-block break because slabs need a shared edge. For each pair of diagonal side-lane
+     * components, add the only orthogonal elbow that is outside the 43:8 center bed. This preserves
+     * the two one-block-wide lanes and makes their cardinal topology continuous.
+     */
+    private static void connectSideTrackbedCardinally(
+            Map<Long, Boolean> sideCells, Set<Long> centerCells,
+            List<BlockPos> route) {
+        Map<Long, Integer> componentIds = cardinalComponentIds(sideCells.keySet());
+        int componentCount = 0;
+        for (int component : componentIds.values()) {
+            componentCount = Math.max(componentCount, component + 1);
+        }
+        int[] parents = new int[componentCount];
+        for (int i = 0; i < parents.length; i++) {
+            parents[i] = i;
+        }
+
+        List<SideTrackbedBridge> candidates = new ArrayList<>();
+        List<Long> orderedCells = new ArrayList<>(sideCells.keySet());
+        Collections.sort(orderedCells);
+        for (long packed : orderedCells) {
+            BlockPos first = BlockPos.fromLong(packed);
+            int firstComponent = componentIds.get(packed);
+            for (int dx = -1; dx <= 1; dx += 2) {
+                for (int dz = -1; dz <= 1; dz += 2) {
+                    BlockPos second = first.add(dx, 0, dz);
+                    Integer secondComponent = componentIds.get(second.toLong());
+                    if (secondComponent == null || firstComponent == secondComponent) {
+                        continue;
+                    }
+                    int low = Math.min(firstComponent, secondComponent);
+                    int high = Math.max(firstComponent, secondComponent);
+
+                    BlockPos xThenZ = new BlockPos(
+                            second.getX(), first.getY(), first.getZ());
+                    BlockPos zThenX = new BlockPos(
+                            first.getX(), first.getY(), second.getZ());
+                    boolean firstElbowCenter = centerCells.contains(xThenZ.toLong());
+                    boolean secondElbowCenter = centerCells.contains(zThenX.toLong());
+                    if (firstElbowCenter == secondElbowCenter) {
+                        continue;
+                    }
+                    BlockPos bridge = firstElbowCenter ? zThenX : xThenZ;
+                    if (centerCells.contains(bridge.toLong())
+                            || sideCells.containsKey(bridge.toLong())
+                            || isBeyondOpenRouteEnd(bridge, route)) {
+                        continue;
+                    }
+                    boolean solid = Boolean.TRUE.equals(sideCells.get(first.toLong()))
+                            || Boolean.TRUE.equals(sideCells.get(second.toLong()));
+                    candidates.add(new SideTrackbedBridge(
+                            low, high, bridge, solid));
+                }
+            }
+        }
+
+        Collections.sort(candidates, Comparator.comparingLong(
+                value -> value.pos.toLong()));
+        for (SideTrackbedBridge candidate : candidates) {
+            int firstRoot = componentRoot(parents, candidate.firstComponent);
+            int secondRoot = componentRoot(parents, candidate.secondComponent);
+            if (firstRoot == secondRoot) {
+                continue;
+            }
+            parents[firstRoot] = secondRoot;
+            sideCells.put(candidate.pos.toLong(), candidate.solid);
+        }
+    }
+
+    private static Map<Long, Integer> cardinalComponentIds(Set<Long> cells) {
+        Map<Long, Integer> result = new HashMap<>();
+        Set<Long> remaining = new HashSet<>(cells);
+        int component = 0;
+        while (!remaining.isEmpty()) {
+            long start = remaining.iterator().next();
+            remaining.remove(start);
+            Deque<BlockPos> queue = new ArrayDeque<>();
+            queue.add(BlockPos.fromLong(start));
+            result.put(start, component);
+            while (!queue.isEmpty()) {
+                BlockPos current = queue.removeFirst();
+                for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                    BlockPos next = current.offset(direction);
+                    long packed = next.toLong();
+                    if (remaining.remove(packed)) {
+                        result.put(packed, component);
+                        queue.addLast(next);
+                    }
+                }
+            }
+            component++;
+        }
+        return result;
+    }
+
+    private static int componentRoot(int[] parents, int component) {
+        int root = component;
+        while (parents[root] != root) {
+            root = parents[root];
+        }
+        while (parents[component] != component) {
+            int parent = parents[component];
+            parents[component] = root;
+            component = parent;
+        }
+        return root;
+    }
+
+    private static void addTurnTrackbedLayoutRow(Map<Long, Boolean> sideCells,
+                                                  Set<Long> centerCells,
+                                                  BlockPos center, EnumFacing shift,
+                                                  int[] sideOffsets, int[] centerOffsets) {
+        for (int offset : sideOffsets) {
+            sideCells.put(center.offset(shift, offset).toLong(), false);
+        }
+        for (int offset : centerOffsets) {
+            centerCells.add(center.offset(shift, offset).toLong());
+        }
+    }
+
+    private static void rebuildContinuousTrackbed(Map<Long, PlannedState> states,
+                                                   TrackbedLayout layout,
+                                                   IBlockState concrete,
+                                                   IBlockState sideBed,
+                                                   IBlockState centerBed,
+                                                   Set<Long> clearFootprint) {
+        for (long packed : clearFootprint) {
+            put(states, BlockPos.fromLong(packed), concrete, 38);
+        }
+        for (Map.Entry<Long, Boolean> entry : layout.sideCells.entrySet()) {
+            put(states, BlockPos.fromLong(entry.getKey()),
+                    entry.getValue() ? centerBed : sideBed, 39);
+        }
+        for (long packed : layout.centerCells) {
+            put(states, BlockPos.fromLong(packed), centerBed, 40);
         }
     }
 
     /**
-     * The widened three-row transition meets the narrower straight sections at two diagonal
-     * outside corners. A side slab at either seam exposes the world beyond its missing half.
-     * Fill the actual seam corners, not another block laterally outside the transition, with
-     * complete floor-to-roof concrete columns.
+     * Rebuild the platform as one ordered offset lane. Structural transition templates are
+     * de-duplicated at an X/Z axis switch, but their facility anchors must not be. After invalid
+     * trackbed-overlapping cells are removed, only anchor pairs not already joined by the existing
+     * 8-neighbour platform lane receive a short diagonal bridge. Platform cells reserve clearance
+     * before the wall is extracted instead of being allowed to replace the trackbed-side floor.
      */
-    private static void addTurnOuterCornerColumns(Map<Long, PlannedState> states,
-                                                  BlockPos firstTransitionCenter,
-                                                  BlockPos lastTransitionCenter,
-                                                  EnumFacing forward, EnumFacing shift,
-                                                  IBlockState concrete, int roofY) {
-        BlockPos incomingCorner = firstTransitionCenter.offset(shift, 4)
-                .offset(forward.getOpposite());
-        BlockPos outgoingCorner = lastTransitionCenter.offset(shift, -3)
-                .offset(forward);
-        for (int y = 0; y <= roofY; y++) {
-            put(states, incomingCorner.up(y), concrete, 35);
-            put(states, outgoingCorner.up(y), concrete, 35);
+    private static void rebuildTurnPlatform(Map<Long, PlannedState> states,
+                                            List<TurnSectionTransition> transitions,
+                                            List<BlockPos> route,
+                                            TrackbedLayout trackbedLayout,
+                                            Set<Long> clearFootprint,
+                                            IBlockState platformState,
+                                            boolean mirrored)
+            throws TunnelBuildException {
+        List<TurnPlatformAdjustment> adjustments = new ArrayList<>();
+        for (TurnSectionTransition transition : transitions) {
+            TurnPlatformAdjustment adjustment = turnPlatformAdjustment(transition, mirrored);
+            adjustments.add(adjustment);
+            for (BlockPos removed : adjustment.removed) {
+                put(states, removed, Blocks.AIR.getDefaultState(), 70);
+            }
+            put(states, adjustment.added, platformState, 71);
+        }
+
+        Set<Long> platformCells = new HashSet<>();
+        List<PlannedState> plannedStates = new ArrayList<>(states.values());
+        for (PlannedState planned : plannedStates) {
+            if (planned.state.getBlock() != platformState.getBlock()) {
+                continue;
+            }
+            if (trackbedLayout.contains(planned.pos.down())) {
+                put(states, planned.pos, Blocks.AIR.getDefaultState(), 72);
+            } else {
+                platformCells.add(planned.pos.toLong());
+            }
+        }
+
+        for (int i = 1; i < adjustments.size(); i++) {
+            BlockPos from = adjustments.get(i - 1).added;
+            BlockPos to = adjustments.get(i).added;
+            if (from.getY() != to.getY()
+                    || platformCellsConnected(platformCells, from, to)) {
+                continue;
+            }
+            List<BlockPos> bridge = findSafePlatformBridge(
+                    states, from, to, route, trackbedLayout,
+                    clearFootprint, platformState);
+            if (bridge.isEmpty()) {
+                throw new TunnelBuildException("金属平台无法在不侵占道床的情况下连续连接");
+            }
+            for (BlockPos platform : bridge) {
+                put(states, platform, platformState, 71);
+                platformCells.add(platform.toLong());
+            }
+            for (int j = 1; j < bridge.size(); j++) {
+                reservePlatformElbow(clearFootprint, route,
+                        bridge.get(j - 1), bridge.get(j));
+            }
+        }
+
+        if (!platformCellsFormContinuousLane(platformCells)) {
+            throw new TunnelBuildException("金属平台无法在不侵占道床的情况下连续连接");
+        }
+        for (long packed : platformCells) {
+            clearFootprint.add(BlockPos.fromLong(packed).down().toLong());
         }
     }
 
-    /**
-     * Keep the two straight platform runs diagonally separated at a one-block lateral move.
-     * Connecting the platform at both rail-corner cells produces a two-block-wide bridge across
-     * the transition. On the side toward the move, trim the last two incoming cells and start the
-     * outgoing run one cell early. On the opposite side, apply the longitudinal mirror image.
-     */
-    private static void adjustTurnPlatform(Map<Long, PlannedState> states, BlockPos before,
-                                           BlockPos oldCorner, BlockPos newCorner, BlockPos after,
-                                           EnumFacing incoming, EnumFacing shift,
-                                           IBlockState platformState, boolean mirrored) {
+    private static boolean platformCellsConnected(Set<Long> platformCells,
+                                                   BlockPos start, BlockPos end) {
+        if (!platformCells.contains(start.toLong())
+                || !platformCells.contains(end.toLong())) {
+            return false;
+        }
+        Deque<BlockPos> queue = new ArrayDeque<>();
+        Set<Long> visited = new HashSet<>();
+        queue.add(start);
+        visited.add(start.toLong());
+        while (!queue.isEmpty()) {
+            BlockPos current = queue.removeFirst();
+            if (current.equals(end)) {
+                return true;
+            }
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx == 0 && dz == 0) {
+                        continue;
+                    }
+                    BlockPos next = current.add(dx, 0, dz);
+                    long packed = next.toLong();
+                    if (platformCells.contains(packed) && visited.add(packed)) {
+                        queue.addLast(next);
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean platformCellsFormContinuousLane(Set<Long> platformCells) {
+        if (platformCells.isEmpty()) {
+            return true;
+        }
+        Deque<BlockPos> queue = new ArrayDeque<>();
+        Set<Long> visited = new HashSet<>();
+        BlockPos start = BlockPos.fromLong(platformCells.iterator().next());
+        queue.add(start);
+        visited.add(start.toLong());
+        while (!queue.isEmpty()) {
+            BlockPos current = queue.removeFirst();
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    for (int dz = -1; dz <= 1; dz++) {
+                        if (dx == 0 && dy == 0 && dz == 0) {
+                            continue;
+                        }
+                        BlockPos next = current.add(dx, dy, dz);
+                        long packed = next.toLong();
+                        if (platformCells.contains(packed) && visited.add(packed)) {
+                            queue.addLast(next);
+                        }
+                    }
+                }
+            }
+        }
+        return visited.size() == platformCells.size();
+    }
+
+    private static TurnPlatformAdjustment turnPlatformAdjustment(
+            TurnSectionTransition transition, boolean mirrored) {
+        BlockPos before = transition.before;
+        BlockPos oldCorner = transition.oldCorner;
+        BlockPos newCorner = transition.newCorner;
+        BlockPos after = transition.after;
+        EnumFacing incoming = transition.incoming;
+        EnumFacing shift = transition.shift;
         EnumFacing platformSide = mirrored ? incoming.rotateY() : incoming.rotateYCCW();
+        List<BlockPos> removed = new ArrayList<>();
+        BlockPos added;
         if (shift == platformSide) {
-            put(states, platformPosition(before, incoming, mirrored), Blocks.AIR.getDefaultState(), 70);
-            put(states, platformPosition(oldCorner, incoming, mirrored), Blocks.AIR.getDefaultState(), 70);
-            put(states, platformPosition(before.offset(shift), incoming, mirrored), platformState, 71);
+            removed.add(platformPosition(before, incoming, mirrored));
+            removed.add(platformPosition(oldCorner, incoming, mirrored));
+            added = platformPosition(before.offset(shift), incoming, mirrored);
         } else {
-            put(states, platformPosition(newCorner, incoming, mirrored), Blocks.AIR.getDefaultState(), 70);
-            put(states, platformPosition(after, incoming, mirrored), Blocks.AIR.getDefaultState(), 70);
-            put(states, platformPosition(after.offset(shift.getOpposite()), incoming, mirrored),
-                    platformState, 71);
+            removed.add(platformPosition(newCorner, incoming, mirrored));
+            removed.add(platformPosition(after, incoming, mirrored));
+            added = platformPosition(after.offset(shift.getOpposite()), incoming, mirrored);
         }
+        return new TurnPlatformAdjustment(removed, added);
+    }
+
+    /**
+     * Connect only consecutive transition anchors, inside their small local corridor. A fixed
+     * rounded line has two equally short phases; choosing the wrong phase can cross one 43/44 cell
+     * and cause the complete bridge to be discarded. Bounded 8-neighbour search selects the short
+     * phase that is already inside final clearance and outside the semantic trackbed.
+     */
+    private static List<BlockPos> findSafePlatformBridge(
+            Map<Long, PlannedState> states, BlockPos from, BlockPos to,
+            List<BlockPos> route, TrackbedLayout trackbedLayout,
+            Set<Long> clearFootprint, IBlockState platformState) {
+        if (from.getY() != to.getY()) {
+            return Collections.emptyList();
+        }
+        int shortest = boundaryPathDistance(from, to);
+        if (shortest > LOCAL_TRANSITION_PATH_LIMIT
+                || !isSafePlatformBridgeCell(states, from, route, trackbedLayout,
+                clearFootprint, platformState)
+                || !isSafePlatformBridgeCell(states, to, route, trackbedLayout,
+                clearFootprint, platformState)) {
+            return Collections.emptyList();
+        }
+
+        int minX = Math.min(from.getX(), to.getX());
+        int maxX = Math.max(from.getX(), to.getX());
+        int minZ = Math.min(from.getZ(), to.getZ());
+        int maxZ = Math.max(from.getZ(), to.getZ());
+        int maxDepth = shortest + 2;
+        Deque<BlockPos> queue = new ArrayDeque<>();
+        Set<Long> visited = new HashSet<>();
+        Map<Long, Long> previous = new HashMap<>();
+        Map<Long, Integer> depths = new HashMap<>();
+        queue.add(from);
+        visited.add(from.toLong());
+        depths.put(from.toLong(), 0);
+        while (!queue.isEmpty()) {
+            BlockPos current = queue.removeFirst();
+            int depth = depths.get(current.toLong());
+            if (depth >= maxDepth) {
+                continue;
+            }
+            List<BlockPos> neighbours = new ArrayList<>();
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dz = -1; dz <= 1; dz++) {
+                    if (dx == 0 && dz == 0) {
+                        continue;
+                    }
+                    BlockPos next = current.add(dx, 0, dz);
+                    long packed = next.toLong();
+                    if (next.getX() < minX || next.getX() > maxX
+                            || next.getZ() < minZ || next.getZ() > maxZ
+                            || visited.contains(packed)
+                            || !isSafePlatformBridgeCell(states, next, route,
+                            trackbedLayout, clearFootprint, platformState)
+                            || !platformDiagonalStepHasClearElbow(
+                            current, next, clearFootprint)) {
+                        continue;
+                    }
+                    neighbours.add(next);
+                }
+            }
+            Collections.sort(neighbours, Comparator.comparingInt(
+                    value -> boundaryPathDistance(value, to)));
+            for (BlockPos next : neighbours) {
+                long packed = next.toLong();
+                visited.add(packed);
+                previous.put(packed, current.toLong());
+                depths.put(packed, depth + 1);
+                if (next.equals(to)) {
+                    return reconstructBoundaryPath(previous, from, to);
+                }
+                queue.addLast(next);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private static boolean isSafePlatformBridgeCell(
+            Map<Long, PlannedState> states, BlockPos platform,
+            List<BlockPos> route, TrackbedLayout trackbedLayout,
+            Set<Long> clearFootprint, IBlockState platformState) {
+        BlockPos floor = platform.down();
+        int routeDistance = distanceToRoute(floor, route);
+        if (!clearFootprint.contains(floor.toLong())
+                || trackbedLayout.contains(floor)
+                || isBeyondOpenRouteEnd(floor, route)
+                || routeDistance < 2 || routeDistance > 3) {
+            return false;
+        }
+        PlannedState existing = states.get(platform.toLong());
+        return existing == null || existing.priority < 45
+                || existing.state.getBlock() == Blocks.AIR
+                || existing.state.getBlock() == platformState.getBlock();
+    }
+
+    private static boolean platformDiagonalStepHasClearElbow(
+            BlockPos from, BlockPos to, Set<Long> clearFootprint) {
+        if (from.getX() == to.getX() || from.getZ() == to.getZ()) {
+            return true;
+        }
+        BlockPos xThenZ = new BlockPos(to.getX(), from.getY(), from.getZ()).down();
+        BlockPos zThenX = new BlockPos(from.getX(), from.getY(), to.getZ()).down();
+        return clearFootprint.contains(xThenZ.toLong())
+                || clearFootprint.contains(zThenX.toLong());
+    }
+
+    private static void reservePlatformElbow(Set<Long> clearFootprint,
+                                             List<BlockPos> route,
+                                             BlockPos from, BlockPos to) {
+        if (from.getX() == to.getX() || from.getZ() == to.getZ()) {
+            return;
+        }
+        BlockPos xThenZ = new BlockPos(to.getX(), from.getY(), from.getZ()).down();
+        BlockPos zThenX = new BlockPos(from.getX(), from.getY(), to.getZ()).down();
+        int firstDistance = distanceToRoute(xThenZ, route);
+        int secondDistance = distanceToRoute(zThenX, route);
+        boolean firstClear = clearFootprint.contains(xThenZ.toLong());
+        boolean secondClear = clearFootprint.contains(zThenX.toLong());
+        BlockPos elbow;
+        if (firstClear != secondClear) {
+            elbow = firstClear ? xThenZ : zThenX;
+        } else if (firstDistance != secondDistance) {
+            elbow = firstDistance < secondDistance ? xThenZ : zThenX;
+        } else if (firstClear) {
+            elbow = xThenZ;
+        } else {
+            elbow = zThenX;
+        }
+        clearFootprint.add(elbow.toLong());
     }
 
     private static BlockPos platformPosition(BlockPos center, EnumFacing forward, boolean mirrored) {
@@ -326,43 +1177,29 @@ public final class TunnelBuilder {
         return center.offset(platformSide, 2).up();
     }
 
-    /**
-     * A light on the old-center half of an outward transition (or the new-center half of the
-     * mirrored transition) is one block inside the widened wall. Move only those lights outward;
-     * lights on the other half already coincide with the transition wall.
-     */
-    private static boolean turnLightNeedsOutset(List<BlockPos> route, List<EnumFacing> sectionFacings,
-                                                int lightIndex, EnumFacing platformSide,
-                                                boolean mirrored) {
-        int first = Math.max(1, lightIndex - 2);
-        int last = Math.min(route.size() - 3, lightIndex + 1);
-        for (int i = first; i <= last; i++) {
-            BlockPos before = route.get(i - 1);
-            BlockPos oldCorner = route.get(i);
-            BlockPos newCorner = route.get(i + 1);
-            BlockPos after = route.get(i + 2);
-            if (before.getY() != oldCorner.getY() || oldCorner.getY() != newCorner.getY()
-                    || newCorner.getY() != after.getY()) {
-                continue;
+    /** Place each light in the last clear cell before the final platform-side wall. */
+    private static void placeTunnelLights(Map<Long, PlannedState> states,
+                                          List<BlockPos> route,
+                                          List<EnumFacing> sectionFacings,
+                                          Set<Long> clearFootprint,
+                                          Block tunnelLight,
+                                          int spacing,
+                                          boolean mirrored)
+            throws TunnelBuildException {
+        int safeSpacing = Math.max(1, spacing);
+        for (int i = 0; i < route.size(); i += safeSpacing) {
+            EnumFacing forward = sectionFacings.get(i);
+            EnumFacing outward = mirrored ? forward.rotateY() : forward.rotateYCCW();
+            BlockPos lightFloor = route.get(i);
+            BlockPos next = lightFloor.offset(outward);
+            while (clearFootprint.contains(next.toLong())) {
+                lightFloor = next;
+                next = lightFloor.offset(outward);
             }
-            EnumFacing incoming = horizontalDirection(before, oldCorner);
-            EnumFacing shift = horizontalDirection(oldCorner, newCorner);
-            EnumFacing outgoing = horizontalDirection(newCorner, after);
-            if (incoming == null || shift == null || outgoing != incoming
-                    || shift.getAxis() == incoming.getAxis()
-                    || sectionFacings.get(i).getAxis() != incoming.getAxis()) {
-                continue;
-            }
-            EnumFacing transitionPlatformSide = mirrored ? incoming.rotateY() : incoming.rotateYCCW();
-            if (platformSide != transitionPlatformSide) {
-                continue;
-            }
-            if (shift == transitionPlatformSide) {
-                return lightIndex == i - 1 || lightIndex == i;
-            }
-            return lightIndex == i + 1 || lightIndex == i + 2;
+            IBlockState lightState = sideMountedState(tunnelLight, outward);
+            int lightY = isSlopeRailCell(route, i) ? 5 : 4;
+            put(states, lightFloor.up(lightY), lightState, 60);
         }
-        return false;
     }
 
     private static void putTurnSectionRow(Map<Long, PlannedState> states, BlockPos oldCenter,
@@ -411,6 +1248,24 @@ public final class TunnelBuilder {
         for (int offset : centerOffsets) {
             put(states, oldCenter.offset(shift, offset), centerBed, 37);
             put(states, oldCenter.offset(shift, offset).up(catenaryY), Blocks.AIR.getDefaultState(), 37);
+        }
+    }
+
+    private static void putTurnCatenaryRow(Map<Long, PlannedState> states,
+                                            BlockPos center, EnumFacing shift,
+                                            IBlockState concrete, IBlockState horizontalSlab,
+                                            int clearHeight,
+                                            int[] sideOffsets, int[] centerOffsets) {
+        int catenaryY = clearHeight + 1;
+        for (int offset = -3; offset <= 4; offset++) {
+            put(states, center.offset(shift, offset).up(catenaryY), concrete, 35);
+        }
+        for (int offset : sideOffsets) {
+            put(states, center.offset(shift, offset).up(catenaryY), horizontalSlab, 36);
+        }
+        for (int offset : centerOffsets) {
+            put(states, center.offset(shift, offset).up(catenaryY),
+                    Blocks.AIR.getDefaultState(), 37);
         }
     }
 
@@ -481,11 +1336,14 @@ public final class TunnelBuilder {
             throw new TunnelBuildException(String.format(Locale.ROOT,
                     "最大坡度 %.2f%% 超过预设限制 %.2f%%", maxGrade * 100, preset.maximumGrade * 100));
         }
-        List<BlockPos> route = rasterize(points, start.pos, end.pos);
-        if (route.size() < 2) {
+        RasterizedRoute rasterized = rasterize(points, start.pos, end.pos);
+        if (rasterized.positions.size() < 2) {
             throw new TunnelBuildException("无法将曲线转换为连续轨道");
         }
-        return new Geometry(route, length, minRadius, maxGrade);
+        List<EnumFacing> sectionFacings = curveTangentFacings(
+                rasterized.parameters, p0, p1, v0, v1);
+        return new Geometry(rasterized.positions, sectionFacings,
+                length, minRadius, maxGrade);
     }
 
     private static Vec quintic(Vec p0, Vec p1, Vec v0, Vec v1, double t) {
@@ -497,13 +1355,42 @@ public final class TunnelBuilder {
                 .add(c4.scale(t * t * t * t)).add(c5.scale(t * t * t * t * t));
     }
 
-    private static List<BlockPos> rasterize(List<Vec> points, BlockPos start, BlockPos end) throws TunnelBuildException {
+    private static Vec quinticTangent(Vec p0, Vec p1, Vec v0, Vec v1, double t) {
+        Vec d = p1.subtract(p0);
+        Vec c3 = d.scale(10).subtract(v0.scale(6)).subtract(v1.scale(4));
+        Vec c4 = d.scale(-15).add(v0.scale(8)).add(v1.scale(7));
+        Vec c5 = d.scale(6).subtract(v0.scale(3)).subtract(v1.scale(3));
+        return v0.add(c3.scale(3 * t * t))
+                .add(c4.scale(4 * t * t * t))
+                .add(c5.scale(5 * t * t * t * t));
+    }
+
+    private static List<EnumFacing> curveTangentFacings(
+            List<Double> parameters, Vec p0, Vec p1, Vec v0, Vec v1) {
+        List<EnumFacing> facings = new ArrayList<>(parameters.size());
+        EnumFacing previous = dominantFacing(v0.x, v0.z);
+        for (double parameter : parameters) {
+            Vec tangent = quinticTangent(p0, p1, v0, v1, parameter);
+            if (Math.abs(tangent.x) > 1.0E-8 || Math.abs(tangent.z) > 1.0E-8) {
+                previous = dominantFacing(tangent.x, tangent.z);
+            }
+            facings.add(previous);
+        }
+        return facings;
+    }
+
+    private static RasterizedRoute rasterize(List<Vec> points, BlockPos start, BlockPos end)
+            throws TunnelBuildException {
         List<BlockPos> result = new ArrayList<>();
+        List<Double> parameters = new ArrayList<>();
         BlockPos current = start;
         result.add(current);
+        parameters.add(0.0);
         Set<Long> visitedXZ = new HashSet<>();
         visitedXZ.add(xzKey(current.getX(), current.getZ()));
-        for (Vec point : points) {
+        for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
+            Vec point = points.get(pointIndex);
+            double parameter = pointIndex / (double) (points.size() - 1);
             int targetX = (int) Math.round(point.x);
             int targetZ = (int) Math.round(point.z);
             int targetY = (int) Math.round(point.y);
@@ -524,6 +1411,7 @@ public final class TunnelBuilder {
                 }
                 visitedXZ.add(key);
                 result.add(next);
+                parameters.add(parameter);
                 current = next;
             }
         }
@@ -536,7 +1424,7 @@ public final class TunnelBuilder {
             }
             result.set(result.size() - 1, new BlockPos(end.getX(), end.getY(), end.getZ()));
         }
-        return result;
+        return new RasterizedRoute(result, parameters);
     }
 
     private static int railMeta(List<BlockPos> route, int index) {
@@ -573,7 +1461,7 @@ public final class TunnelBuilder {
     }
 
     private static IBlockState thirdRailState(boolean yellow, List<BlockPos> route, int index,
-                                               EnumFacing pathForward, EnumFacing railSide,
+                                               EnumFacing curveForward, EnumFacing railSide,
                                                int diagonalType, EnumFacing diagonalFacing,
                                                boolean support)
             throws TunnelBuildException {
@@ -582,7 +1470,7 @@ public final class TunnelBuilder {
         int grade = gradeDirection(route, index);
         EnumFacing modelFacing = railSide;
         if (isSlopeRailCell(route, index)) {
-            EnumFacing ascending = grade > 0 ? pathForward : pathForward.getOpposite();
+            EnumFacing ascending = grade > 0 ? curveForward : curveForward.getOpposite();
             if (ascending == railSide.rotateYCCW()) {
                 id += "_slope_1";
             } else if (ascending == railSide.rotateY()) {
@@ -638,23 +1526,11 @@ public final class TunnelBuilder {
         // Re-anchor every one-block lateral-shift unit aligned with the section direction.
         // Consecutive units tile a long 45-degree run as adjacent diagonal_1/diagonal_2 pairs;
         // the section-axis check selects one tessellation and prevents overlapping pairs.
-        for (int i = 1; i + 2 < size; i++) {
-            BlockPos before = route.get(i - 1);
-            BlockPos oldCorner = route.get(i);
-            BlockPos newCorner = route.get(i + 1);
-            BlockPos after = route.get(i + 2);
-            if (before.getY() != oldCorner.getY() || oldCorner.getY() != newCorner.getY()
-                    || newCorner.getY() != after.getY()) {
-                continue;
-            }
-            EnumFacing incoming = horizontalDirection(before, oldCorner);
-            EnumFacing shift = horizontalDirection(oldCorner, newCorner);
-            EnumFacing outgoing = horizontalDirection(newCorner, after);
-            if (incoming == null || shift == null || outgoing != incoming
-                    || shift.getAxis() == incoming.getAxis()
-                    || sectionFacings.get(i).getAxis() != incoming.getAxis()) {
-                continue;
-            }
+        for (TurnSectionTransition transition
+                : findTurnSectionLayout(route, sectionFacings).transitions) {
+            int i = transition.index;
+            EnumFacing incoming = transition.incoming;
+            EnumFacing shift = transition.shift;
             EnumFacing firstFacing = cornerFacing(route, i);
             EnumFacing secondFacing = cornerFacing(route, i + 1);
             diagonalTypes[i + 1] = 0;
@@ -703,22 +1579,26 @@ public final class TunnelBuilder {
         return new ThirdRailLayout(diagonalTypes, diagonalFacings, placementOffsets, supports);
     }
 
-    private static IBlockState catenaryState(List<BlockPos> route, int index, EnumFacing facing, boolean support)
+    private static IBlockState catenaryState(List<BlockPos> route, int index,
+                                             EnumFacing curveFacing, boolean support)
             throws TunnelBuildException {
         String id;
         if (support) {
             id = "nebulaecraft:catenary_steel_support";
         } else if (isSlopeRailCell(route, index)) {
             id = "nebulaecraft:catenary_steel_slope";
-            facing = gradeDirection(route, index) > 0 ? facing : facing.getOpposite();
+            curveFacing = gradeDirection(route, index) > 0
+                    ? curveFacing : curveFacing.getOpposite();
         } else if (turn(route, index) != 0) {
             id = "nebulaecraft:catenary_steel_diagonal";
-            facing = cornerFacing(route, index);
+            // A diagonal model must retain its two actual graph connections. The curve tangent
+            // chooses the axis for straight/slope wire; the local corner selects this quadrant.
+            curveFacing = cornerFacing(route, index);
         } else {
             id = "nebulaecraft:catenary_steel";
         }
         Block block = resolveBlock(id + "@0");
-        return nebulaFacingState(block, facing);
+        return nebulaFacingState(block, curveFacing);
     }
 
     /**
@@ -818,39 +1698,11 @@ public final class TunnelBuilder {
         return EnumFacing.NORTH;
     }
 
-    private static List<EnumFacing> sectionFacings(List<BlockPos> route) {
-        List<EnumFacing> result = new ArrayList<>(route.size());
-        EnumFacing facing = routeFacing(route, 0);
-        final int radius = 6;
-        for (int i = 0; i < route.size(); i++) {
-            BlockPos from = route.get(Math.max(0, i - radius));
-            BlockPos to = route.get(Math.min(route.size() - 1, i + radius));
-            int dx = to.getX() - from.getX();
-            int dz = to.getZ() - from.getZ();
-            int alongCurrent = facing.getAxis() == EnumFacing.Axis.X ? Math.abs(dx) : Math.abs(dz);
-            int alongOther = facing.getAxis() == EnumFacing.Axis.X ? Math.abs(dz) : Math.abs(dx);
-            if (alongOther > alongCurrent * 3 / 2) {
-                facing = dominantFacing(dx, dz);
-            } else {
-                int signed = facing.getAxis() == EnumFacing.Axis.X ? dx : dz;
-                if (signed != 0 && Integer.signum(signed) != axisSign(facing)) {
-                    facing = facing.getOpposite();
-                }
-            }
-            result.add(facing);
-        }
-        return result;
-    }
-
-    private static EnumFacing dominantFacing(int dx, int dz) {
+    private static EnumFacing dominantFacing(double dx, double dz) {
         if (Math.abs(dx) >= Math.abs(dz)) {
             return dx < 0 ? EnumFacing.WEST : EnumFacing.EAST;
         }
         return dz < 0 ? EnumFacing.NORTH : EnumFacing.SOUTH;
-    }
-
-    private static int axisSign(EnumFacing facing) {
-        return facing.getAxis() == EnumFacing.Axis.X ? facing.getFrontOffsetX() : facing.getFrontOffsetZ();
     }
 
     private static EnumFacing horizontalDirection(BlockPos from, BlockPos to) {
@@ -995,14 +1847,103 @@ public final class TunnelBuilder {
         }
     }
 
+    private static final class TrackbedLayout {
+        final Set<Long> centerCells;
+        final Map<Long, Boolean> sideCells;
+
+        TrackbedLayout(Set<Long> centerCells, Map<Long, Boolean> sideCells) {
+            this.centerCells = centerCells;
+            this.sideCells = sideCells;
+        }
+
+        boolean contains(BlockPos pos) {
+            long packed = pos.toLong();
+            return centerCells.contains(packed) || sideCells.containsKey(packed);
+        }
+    }
+
+    private static final class SideTrackbedBridge {
+        final int firstComponent;
+        final int secondComponent;
+        final BlockPos pos;
+        final boolean solid;
+
+        SideTrackbedBridge(int firstComponent, int secondComponent,
+                           BlockPos pos, boolean solid) {
+            this.firstComponent = firstComponent;
+            this.secondComponent = secondComponent;
+            this.pos = pos;
+            this.solid = solid;
+        }
+    }
+
+    private static final class TurnPlatformAdjustment {
+        final List<BlockPos> removed;
+        final BlockPos added;
+
+        TurnPlatformAdjustment(List<BlockPos> removed, BlockPos added) {
+            this.removed = removed;
+            this.added = added;
+        }
+    }
+
+    private static final class TurnSectionTransition {
+        final int index;
+        final BlockPos before;
+        final BlockPos oldCorner;
+        final BlockPos newCorner;
+        final BlockPos after;
+        final BlockPos projectedOldCenter;
+        final EnumFacing incoming;
+        final EnumFacing shift;
+
+        TurnSectionTransition(int index, BlockPos before, BlockPos oldCorner,
+                              BlockPos newCorner, BlockPos after,
+                              BlockPos projectedOldCenter,
+                              EnumFacing incoming, EnumFacing shift) {
+            this.index = index;
+            this.before = before;
+            this.oldCorner = oldCorner;
+            this.newCorner = newCorner;
+            this.after = after;
+            this.projectedOldCenter = projectedOldCenter;
+            this.incoming = incoming;
+            this.shift = shift;
+        }
+    }
+
+    private static final class TurnSectionLayout {
+        final List<TurnSectionTransition> transitions;
+        final List<TurnSectionTransition> allTransitions;
+
+        TurnSectionLayout(List<TurnSectionTransition> transitions,
+                          List<TurnSectionTransition> allTransitions) {
+            this.transitions = transitions;
+            this.allTransitions = allTransitions;
+        }
+    }
+
+    private static final class RasterizedRoute {
+        final List<BlockPos> positions;
+        final List<Double> parameters;
+
+        RasterizedRoute(List<BlockPos> positions, List<Double> parameters) {
+            this.positions = positions;
+            this.parameters = parameters;
+        }
+    }
+
     private static final class Geometry {
         final List<BlockPos> route;
+        final List<EnumFacing> sectionFacings;
         final double length;
         final double minimumRadius;
         final double maximumGrade;
 
-        Geometry(List<BlockPos> route, double length, double minimumRadius, double maximumGrade) {
+        Geometry(List<BlockPos> route, List<EnumFacing> sectionFacings,
+                 double length, double minimumRadius, double maximumGrade) {
             this.route = route;
+            this.sectionFacings = sectionFacings;
             this.length = length;
             this.minimumRadius = minimumRadius;
             this.maximumGrade = maximumGrade;

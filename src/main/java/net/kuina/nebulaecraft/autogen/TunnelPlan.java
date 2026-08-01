@@ -36,10 +36,16 @@ public final class TunnelPlan {
     public static final class Operation {
         public final BlockPos pos;
         public final IBlockState state;
+        public final boolean captureUndo;
 
         public Operation(BlockPos pos, IBlockState state) {
+            this(pos, state, true);
+        }
+
+        public Operation(BlockPos pos, IBlockState state, boolean captureUndo) {
             this.pos = pos;
             this.state = state;
+            this.captureUndo = captureUndo;
         }
     }
 }
