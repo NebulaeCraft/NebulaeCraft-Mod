@@ -391,7 +391,14 @@ public final class TunnelBuilder {
             clearFootprint.add(packed);
             for (EnumFacing direction : EnumFacing.HORIZONTALS) {
                 BlockPos floor = trackbed.offset(direction);
-                if (!isBeyondOpenRouteEnd(floor, route)) {
+                // At a one-block grade change, the next slice's bed occupies this XZ column one
+                // level higher or lower. Dilating either bed into the other slice would make the
+                // rebuilt floor place concrete above the low 43:8 row and below the high row.
+                // Level curves still receive the full cardinal dilation used by their widened
+                // transition templates.
+                if (!trackbedCells.contains(floor.up().toLong())
+                        && !trackbedCells.contains(floor.down().toLong())
+                        && !isBeyondOpenRouteEnd(floor, route)) {
                     clearFootprint.add(floor.toLong());
                 }
             }
