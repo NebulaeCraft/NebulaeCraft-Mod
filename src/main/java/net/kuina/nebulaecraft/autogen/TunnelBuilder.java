@@ -8,6 +8,7 @@ import net.kuina.nebulaecraft.block.BlockAutogenMarker;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 
@@ -235,9 +236,11 @@ public final class TunnelBuilder {
             operations.add(new TunnelPlan.Operation(planned.pos, planned.state));
         }
         operations.addAll(railFinalizations);
-        return new TunnelPlan(world.provider.getDimension(), operations, new ArrayList<>(route), geometry.length,
-                geometry.minimumRadius, geometry.maximumGrade, presetId, normalizeColor(platformColor),
-                normalizedPower, mirrored);
+        List<TunnelPlan.PreviewFrame> previewFrames = createPreviewFrames(
+                states, route, sectionFacings, preset);
+        return new TunnelPlan(world.provider.getDimension(), operations, new ArrayList<>(route),
+                previewFrames, geometry.length, geometry.minimumRadius, geometry.maximumGrade,
+                presetId, normalizeColor(platformColor), normalizedPower, mirrored);
     }
 
     /**
@@ -2347,6 +2350,106 @@ public final class TunnelBuilder {
         if (current == null || priority >= current.priority) {
             states.put(key, new PlannedState(pos, state, priority));
         }
+    }
+
+    /**
+     * Extract the four longitudinal outside edges from the final planned voxel columns. The
+     * analytic section facing keeps these frames aligned with the same cross-sections used by the
+     * builder, while the column scan includes widened turns and raised slope shells.
+     */
+    private static List<TunnelPlan.PreviewFrame> createPreviewFrames(
+            Map<Long, PlannedState> states, List<BlockPos> route,
+            List<EnumFacing> sectionFacings, TunnelConfig.Preset preset) {
+        int shellLateral = preset.clearWidth / 2 + 1;
+        int scanLateral = shellLateral + 3;
+        int roofY = preset.clearHeight + 1 + preset.catenaryRecessHeight;
+        int scanMinY = -1;
+        int scanMaxY = roofY + 3;
+        int columnCount = scanLateral * 2 + 1;
+        List<TunnelPlan.PreviewFrame> frames = new ArrayList<>(route.size());
+
+        for (int i = 0; i < route.size(); i++) {
+            BlockPos center = route.get(i);
+            EnumFacing forward = sectionFacings.get(i);
+            int nx = -forward.getFrontOffsetZ();
+            int nz = forward.getFrontOffsetX();
+            int[] columnMinY = new int[columnCount];
+            int[] columnMaxY = new int[columnCount];
+            Arrays.fill(columnMinY, Integer.MAX_VALUE);
+            Arrays.fill(columnMaxY, Integer.MIN_VALUE);
+
+            for (int lateral = -scanLateral; lateral <= scanLateral; lateral++) {
+                int column = lateral + scanLateral;
+                for (int dy = scanMinY; dy <= scanMaxY; dy++) {
+                    BlockPos pos = offset(center, nx, nz, lateral, dy);
+                    PlannedState planned = states.get(pos.toLong());
+                    if (planned != null && planned.state.getBlock() != Blocks.AIR) {
+                        columnMinY[column] = Math.min(columnMinY[column], pos.getY());
+                        columnMaxY[column] = Math.max(columnMaxY[column], pos.getY());
+                    }
+                }
+            }
+
+            int left = findOuterWallColumn(columnMinY, columnMaxY, preset.clearHeight, true);
+            int right = findOuterWallColumn(columnMinY, columnMaxY, preset.clearHeight, false);
+            if (left < 0 || right < 0 || left >= right) {
+                left = scanLateral - shellLateral;
+                right = scanLateral + shellLateral;
+                columnMinY[left] = center.getY();
+                columnMaxY[left] = center.getY() + roofY;
+                columnMinY[right] = center.getY();
+                columnMaxY[right] = center.getY() + roofY;
+            }
+
+            int leftLateral = left - scanLateral;
+            int rightLateral = right - scanLateral;
+            double sectionX = center.getX() + 0.5D;
+            double sectionZ = center.getZ() + 0.5D;
+            if (i == 0) {
+                sectionX -= forward.getFrontOffsetX() * 0.5D;
+                sectionZ -= forward.getFrontOffsetZ() * 0.5D;
+            } else if (i == route.size() - 1) {
+                sectionX += forward.getFrontOffsetX() * 0.5D;
+                sectionZ += forward.getFrontOffsetZ() * 0.5D;
+            }
+            double leftX = sectionX + nx * (leftLateral - 0.5D);
+            double leftZ = sectionZ + nz * (leftLateral - 0.5D);
+            double rightX = sectionX + nx * (rightLateral + 0.5D);
+            double rightZ = sectionZ + nz * (rightLateral + 0.5D);
+            boolean ring = i == 0 || i == route.size() - 1 || i % 8 == 0
+                    || previewFrameChanged(route, sectionFacings, i);
+            frames.add(new TunnelPlan.PreviewFrame(
+                    new Vec3d(leftX, columnMinY[left], leftZ),
+                    new Vec3d(leftX, columnMaxY[left] + 1.0D, leftZ),
+                    new Vec3d(rightX, columnMaxY[right] + 1.0D, rightZ),
+                    new Vec3d(rightX, columnMinY[right], rightZ), ring));
+        }
+        return frames;
+    }
+
+    private static int findOuterWallColumn(int[] minY, int[] maxY, int clearHeight,
+                                           boolean fromLeft) {
+        int index = fromLeft ? 0 : minY.length - 1;
+        int step = fromLeft ? 1 : -1;
+        while (index >= 0 && index < minY.length) {
+            if (minY[index] != Integer.MAX_VALUE
+                    && maxY[index] - minY[index] >= clearHeight) {
+                return index;
+            }
+            index += step;
+        }
+        return -1;
+    }
+
+    private static boolean previewFrameChanged(List<BlockPos> route,
+                                               List<EnumFacing> sectionFacings, int index) {
+        if (index == 0) {
+            return true;
+        }
+        BlockPos previous = route.get(index - 1);
+        BlockPos current = route.get(index);
+        return previous.getY() != current.getY()
+                || sectionFacings.get(index - 1).getAxis() != sectionFacings.get(index).getAxis();
     }
 
     private static long xzKey(int x, int z) {

@@ -26,4 +26,9 @@ public class ServerProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 	public void openRoadmarkGui(net.minecraft.tileentity.TileEntity te) {
 		// 服务端留空，安全隔离
 	}
+
+	@Override
+	public void handleTunnelPreview(net.kuina.nebulaecraft.network.PacketTunnelPreview message) {
+		// 仅由客户端处理
+	}
 }

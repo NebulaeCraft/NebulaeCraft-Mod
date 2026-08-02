@@ -8,6 +8,7 @@
 
 ## Coding Instructions
 - 非批量注册大量方块时，不使用 RegistryHandler。
+- 所有功能都应保证在多人游戏下正常工作。
 
 ## Testing Instructions
 - 编译测试通过即可。

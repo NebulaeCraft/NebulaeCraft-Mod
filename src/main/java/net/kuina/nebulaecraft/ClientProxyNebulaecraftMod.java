@@ -5,6 +5,7 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.client.model.obj.OBJLoader;
+import net.minecraftforge.common.MinecraftForge;
 
 public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 	@Override
@@ -18,6 +19,8 @@ public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 				net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText.class,
 				new net.kuina.nebulaecraft.client.render.RenderRoadmarkText()
 		);
+		MinecraftForge.EVENT_BUS.register(
+				net.kuina.nebulaecraft.client.render.TunnelPreviewRenderer.INSTANCE);
 	}
 
 	@Override
@@ -35,5 +38,11 @@ public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 					new net.kuina.nebulaecraft.gui.GuiRoadmarkText((net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText) te)
 			);
 		}
+	}
+
+	@Override
+	public void handleTunnelPreview(net.kuina.nebulaecraft.network.PacketTunnelPreview message) {
+		net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
+				net.kuina.nebulaecraft.client.render.TunnelPreviewRenderer.INSTANCE.handle(message));
 	}
 }

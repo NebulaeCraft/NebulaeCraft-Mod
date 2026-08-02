@@ -1,16 +1,16 @@
 package net.kuina.nebulaecraft.autogen;
 
+import net.kuina.nebulaecraft.NebulaecraftMod;
+import net.kuina.nebulaecraft.network.PacketTunnelPreview;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.network.play.server.SPacketParticles;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.util.EnumParticleTypes;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -24,9 +24,11 @@ public final class TunnelGenerationManager {
     }
 
     public void setPreview(EntityPlayerMP player, TunnelPlan plan) {
-        long expiresAt = System.currentTimeMillis() + TunnelConfig.get().settings.previewSeconds * 1000L;
-        previews.put(player.getUniqueID(), new Preview(plan, expiresAt));
-        sendParticles(player, plan.route);
+        int lifetimeMillis = TunnelConfig.get().settings.previewSeconds * 1000;
+        long expiresAt = System.currentTimeMillis() + lifetimeMillis;
+        previews.put(player.getUniqueID(), new Preview(plan, expiresAt, player.getServer()));
+        NebulaecraftMod.PACKET_HANDLER.sendTo(
+                PacketTunnelPreview.show(plan, lifetimeMillis), player);
     }
 
     public String confirm(EntityPlayerMP player) {
@@ -36,6 +38,7 @@ public final class TunnelGenerationManager {
         Preview preview = previews.get(player.getUniqueID());
         if (preview == null || preview.expiresAt < System.currentTimeMillis()) {
             previews.remove(player.getUniqueID());
+            clearPreview(player);
             return "没有有效预览，请重新执行 preview";
         }
         WorldServer world = player.getServer().getWorld(preview.plan.dimension);
@@ -46,12 +49,16 @@ public final class TunnelGenerationManager {
         undo.begin(preview.plan.dimension);
         activeJob = ActiveJob.build(player.getUniqueID(), world, preview.plan, undo);
         previews.remove(player.getUniqueID());
+        clearPreview(player);
         return "隧道生成已开始，共 " + preview.plan.operations.size() + " 个方块";
     }
 
     public String cancel(EntityPlayerMP player) {
         if (activeJob == null) {
             Preview removed = previews.remove(player.getUniqueID());
+            if (removed != null) {
+                clearPreview(player);
+            }
             return removed == null ? "没有可取消的预览或任务" : "预览已取消";
         }
         if (activeJob.undoing) {
@@ -85,13 +92,21 @@ public final class TunnelGenerationManager {
         if (preview != null && preview.expiresAt >= System.currentTimeMillis()) {
             return "预览等待确认，预计修改 " + preview.plan.operations.size() + " 个方块";
         }
+        if (preview != null) {
+            previews.remove(player.getUniqueID());
+            clearPreview(player);
+        }
         TunnelUndoData data = TunnelUndoData.get(player.getServer());
         return data.hasEntries() ? "空闲；最近一次生成可撤销（" + data.size() + " 个方块）" : "空闲";
     }
 
     @SubscribeEvent
     public void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END || activeJob == null) {
+        if (event.phase != TickEvent.Phase.END) {
+            return;
+        }
+        expirePreviews();
+        if (activeJob == null) {
             return;
         }
         int budget = TunnelConfig.get().settings.blocksPerTick;
@@ -128,19 +143,26 @@ public final class TunnelGenerationManager {
         }
     }
 
-    private static void sendParticles(EntityPlayerMP player, List<BlockPos> route) {
-        int stride = Math.max(1, route.size() / 384);
-        for (int i = 0; i < route.size(); i += stride) {
-            BlockPos pos = route.get(i);
-            player.connection.sendPacket(new SPacketParticles(EnumParticleTypes.REDSTONE, true,
-                    pos.getX() + 0.5F, pos.getY() + 1.25F, pos.getZ() + 0.5F,
-                    0, 0, 0, 0, 1));
-            if (i % (stride * 4) == 0) {
-                player.connection.sendPacket(new SPacketParticles(EnumParticleTypes.END_ROD, true,
-                        pos.getX() + 0.5F, pos.getY() + 6.25F, pos.getZ() + 0.5F,
-                        3.0F, 0, 3.0F, 0, 2));
+    private void expirePreviews() {
+        long now = System.currentTimeMillis();
+        Iterator<Map.Entry<UUID, Preview>> iterator = previews.entrySet().iterator();
+        while (iterator.hasNext()) {
+            Map.Entry<UUID, Preview> entry = iterator.next();
+            Preview preview = entry.getValue();
+            if (preview.expiresAt >= now) {
+                continue;
             }
+            EntityPlayerMP player = preview.server.getPlayerList()
+                    .getPlayerByUUID(entry.getKey());
+            if (player != null) {
+                clearPreview(player);
+            }
+            iterator.remove();
         }
+    }
+
+    private static void clearPreview(EntityPlayerMP player) {
+        NebulaecraftMod.PACKET_HANDLER.sendTo(PacketTunnelPreview.clear(), player);
     }
 
     private static void message(MinecraftServer server, UUID playerId, String text) {
@@ -153,10 +175,12 @@ public final class TunnelGenerationManager {
     private static final class Preview {
         final TunnelPlan plan;
         final long expiresAt;
+        final MinecraftServer server;
 
-        Preview(TunnelPlan plan, long expiresAt) {
+        Preview(TunnelPlan plan, long expiresAt, MinecraftServer server) {
             this.plan = plan;
             this.expiresAt = expiresAt;
+            this.server = server;
         }
     }
 

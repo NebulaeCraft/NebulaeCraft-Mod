@@ -74,6 +74,8 @@ public class ElementsNebulaecraftMod implements IFuelHandler, IWorldGenerator {
 		this.addNetworkMessage(NebulaecraftModVariables.WorldSavedDataSyncMessageHandler.class,
 				NebulaecraftModVariables.WorldSavedDataSyncMessage.class, Side.SERVER, Side.CLIENT);
 		this.addNetworkMessage(net.kuina.nebulaecraft.network.PacketRoadmarkText.Handler.class, net.kuina.nebulaecraft.network.PacketRoadmarkText.class, Side.SERVER);
+		this.addNetworkMessage(net.kuina.nebulaecraft.network.PacketTunnelPreview.Handler.class,
+				net.kuina.nebulaecraft.network.PacketTunnelPreview.class, Side.CLIENT);
 	}
 
 	public void registerSounds(RegistryEvent.Register<net.minecraft.util.SoundEvent> event) {

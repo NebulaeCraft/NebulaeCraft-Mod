@@ -15,4 +15,6 @@ public interface IProxyNebulaecraftMod {
 	void serverLoad(FMLServerStartingEvent event);
 
 	void openRoadmarkGui(net.minecraft.tileentity.TileEntity te);
+
+	void handleTunnelPreview(net.kuina.nebulaecraft.network.PacketTunnelPreview message);
 }
