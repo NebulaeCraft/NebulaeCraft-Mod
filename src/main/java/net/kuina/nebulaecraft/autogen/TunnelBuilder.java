@@ -324,6 +324,8 @@ public final class TunnelBuilder {
                 concrete, clearHeight, recessHeight);
         restoreTurnCatenaryRecess(states, transitionLayout.highGradeRecessTransitions,
                 horizontalSlab, clearHeight);
+        sealCorrectedSlopeWallCaps(states, gradeLayout, wallBoundary,
+                concrete, clearHeight + 1);
         rebuildContinuousTrackbed(states, trackbedLayout, concrete,
                 sideBed, centerBed, clearFootprint);
         return clearFootprint;
@@ -517,6 +519,7 @@ public final class TunnelBuilder {
             }
         }
 
+        Set<Long> raisedSlopeWalls = gradeLayout.raisedSlopeWallColumns(boundary);
         for (long packed : boundary) {
             BlockPos wall = BlockPos.fromLong(packed);
             List<EnumFacing> inwardDirections = new ArrayList<>();
@@ -529,7 +532,7 @@ public final class TunnelBuilder {
                     wall, inwardDirections, route, sectionFacings);
             IBlockState middleWallState = sideMountedState(
                     verticalSlab.getBlock(), inward.getOpposite());
-            boolean slopeTop = gradeLayout.isSlopeSection(wall);
+            boolean slopeTop = raisedSlopeWalls.contains(packed);
             int wallRoofY = roofY + (slopeTop ? 1 : 0);
             for (int y = 0; y <= wallRoofY; y++) {
                 BlockPos target = wall.up(y);
@@ -550,6 +553,21 @@ public final class TunnelBuilder {
             removePlannedState(states, wall.up(wallRoofY + 1), concrete);
         }
         return boundary;
+    }
+
+    /**
+     * When integer rasterization assigns one edge of the five-cell slope section to the adjacent
+     * high slice, its raised wall row has to move toward the grade midpoint. The vacated wall's
+     * inward ceiling corner is then concrete rather than slope clearance; sealing it here keeps the
+     * shifted wall tied into the ordinary high-side roof.
+     */
+    private static void sealCorrectedSlopeWallCaps(
+            Map<Long, PlannedState> states, GradeLayout gradeLayout,
+            Set<Long> wallBoundary, IBlockState concrete, int catenaryY) {
+        for (BlockPos cap : gradeLayout.correctedSlopeWallCaps(
+                wallBoundary, catenaryY)) {
+            put(states, cap, concrete, 41);
+        }
     }
 
     /**
@@ -2468,6 +2486,8 @@ public final class TunnelBuilder {
         final List<BlockPos> route;
         final List<Vec> tangents;
         final List<GradeTransition> transitions = new ArrayList<>();
+        final Map<Long, GradeTransition> slopeInteriors = new HashMap<>();
+        final Set<GradeTransition> boundaryCorrections = new HashSet<>();
 
         GradeLayout(List<BlockPos> route, List<Vec> tangents) {
             this.route = route;
@@ -2478,18 +2498,131 @@ public final class TunnelBuilder {
                     continue;
                 }
                 int lowIndex = deltaY > 0 ? i - 1 : i;
+                int highIndex = deltaY > 0 ? i : i - 1;
                 transitions.add(new GradeTransition(
-                        route.get(lowIndex), tangents.get(lowIndex)));
+                        route.get(lowIndex), route.get(highIndex),
+                        tangents.get(lowIndex)));
+            }
+            for (GradeTransition transition : transitions) {
+                for (int lateral = -2; lateral <= 2; lateral++) {
+                    BlockPos interior = transition.normalOffset(lateral);
+                    slopeInteriors.put(xzKey(
+                            interior.getX(), interior.getZ()), transition);
+                }
+                if (needsBoundaryCorrection(transition)) {
+                    boundaryCorrections.add(transition);
+                }
             }
         }
 
         BlockPos floorAt(BlockPos horizontal) {
+            GradeTransition slope = slopeInteriorAt(horizontal);
+            if (slope != null) {
+                return new BlockPos(horizontal.getX(), slope.lowCenter.getY(),
+                        horizontal.getZ());
+            }
             int grade = route.get(sectionIndex(horizontal)).getY();
             return new BlockPos(horizontal.getX(), grade, horizontal.getZ());
         }
 
         boolean isSlopeSection(BlockPos horizontal) {
+            if (slopeInteriorAt(horizontal) != null) {
+                return true;
+            }
             return isSlopeRailCell(route, sectionIndex(horizontal));
+        }
+
+        boolean isSlopeSectionAtGrade(BlockPos pos) {
+            GradeTransition slope = slopeInteriorAt(pos);
+            if (slope != null) {
+                return pos.getY() == slope.lowCenter.getY();
+            }
+            int index = sectionIndex(pos);
+            return route.get(index).getY() == pos.getY()
+                    && isSlopeRailCell(route, index);
+        }
+
+        /** The analytic slope's five clear cells are authoritative at the low grade. */
+        private GradeTransition slopeInteriorAt(BlockPos pos) {
+            return slopeInteriors.get(xzKey(pos.getX(), pos.getZ()));
+        }
+
+        /**
+         * Select the third vertical-slab row where the real cardinal wall crosses the midpoint of
+         * the slope edge. Normally this is the analytic +/-3 endpoint. If one of the five interior
+         * cells was previously attributed to the high slice, compare that endpoint with its
+         * high-side neighbour and use whichever is closer to the half-block grade plane.
+         */
+        Set<Long> raisedSlopeWallColumns(Set<Long> wallBoundary) {
+            Set<Long> result = new HashSet<>();
+            for (long packed : wallBoundary) {
+                BlockPos wall = BlockPos.fromLong(packed);
+                if (isSlopeSectionAtGrade(wall)) {
+                    result.add(packed);
+                }
+            }
+            for (GradeTransition transition : transitions) {
+                if (!boundaryCorrections.contains(transition)) {
+                    continue;
+                }
+                for (int sign = -1; sign <= 1; sign += 2) {
+                    BlockPos original = transition.normalOffset(sign * 3);
+                    result.remove(original.toLong());
+                    BlockPos selected = correctedSlopeWall(
+                            transition, original, wallBoundary);
+                    if (selected != null) {
+                        result.add(selected.toLong());
+                    }
+                }
+            }
+            return result;
+        }
+
+        Set<BlockPos> correctedSlopeWallCaps(
+                Set<Long> wallBoundary, int catenaryY) {
+            Set<BlockPos> result = new HashSet<>();
+            for (GradeTransition transition : transitions) {
+                if (!boundaryCorrections.contains(transition)) {
+                    continue;
+                }
+                for (int sign = -1; sign <= 1; sign += 2) {
+                    BlockPos original = transition.normalOffset(sign * 3);
+                    BlockPos selected = correctedSlopeWall(
+                            transition, original, wallBoundary);
+                    if (selected != null && !selected.equals(original)
+                            && wallBoundary.contains(original.toLong())) {
+                        result.add(transition.normalOffset(sign * 2).up(catenaryY));
+                    }
+                }
+            }
+            return result;
+        }
+
+        private boolean needsBoundaryCorrection(GradeTransition transition) {
+            for (int lateral = -2; lateral <= 2; lateral++) {
+                BlockPos interior = transition.normalOffset(lateral);
+                if (route.get(sectionIndex(interior)).getY()
+                        != transition.lowCenter.getY()) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private BlockPos correctedSlopeWall(
+                GradeTransition transition, BlockPos original,
+                Set<Long> wallBoundary) {
+            BlockPos shifted = transition.towardHigh(original);
+            boolean originalWall = wallBoundary.contains(original.toLong());
+            boolean shiftedWall = wallBoundary.contains(shifted.toLong());
+            if (!originalWall) {
+                return shiftedWall ? shifted : null;
+            }
+            if (!shiftedWall) {
+                return original;
+            }
+            return transition.midpointDistance(shifted)
+                    < transition.midpointDistance(original) ? shifted : original;
         }
 
         /**
@@ -2532,11 +2665,15 @@ public final class TunnelBuilder {
 
     private static final class GradeTransition {
         final BlockPos lowCenter;
+        final BlockPos highCenter;
         final double normalX;
         final double normalZ;
+        final double highTangentX;
+        final double highTangentZ;
 
-        GradeTransition(BlockPos lowCenter, Vec tangent) {
+        GradeTransition(BlockPos lowCenter, BlockPos highCenter, Vec tangent) {
             this.lowCenter = lowCenter;
+            this.highCenter = highCenter;
             // Scale the normal by its dominant component instead of Euclidean length. With a
             // near-45-degree unit normal, round(normal * 1) and round(normal * 2) can identify the
             // same lattice block, collapsing a seven-cell slope section to five cells and placing
@@ -2545,6 +2682,18 @@ public final class TunnelBuilder {
             double rasterScale = Math.max(Math.abs(tangent.x), Math.abs(tangent.z));
             normalX = -tangent.z / rasterScale;
             normalZ = tangent.x / rasterScale;
+            double tangentLength = Math.sqrt(
+                    tangent.x * tangent.x + tangent.z * tangent.z);
+            double orientedX = tangent.x / tangentLength;
+            double orientedZ = tangent.z / tangentLength;
+            double highDot = (highCenter.getX() - lowCenter.getX()) * orientedX
+                    + (highCenter.getZ() - lowCenter.getZ()) * orientedZ;
+            if (highDot < 0) {
+                orientedX = -orientedX;
+                orientedZ = -orientedZ;
+            }
+            highTangentX = orientedX;
+            highTangentZ = orientedZ;
         }
 
         BlockPos normalOffset(int lateral) {
@@ -2552,6 +2701,19 @@ public final class TunnelBuilder {
                     Math.round(lowCenter.getX() + normalX * lateral),
                     lowCenter.getY(),
                     Math.round(lowCenter.getZ() + normalZ * lateral));
+        }
+
+        BlockPos towardHigh(BlockPos pos) {
+            return pos.add(
+                    Integer.signum(highCenter.getX() - lowCenter.getX()), 0,
+                    Integer.signum(highCenter.getZ() - lowCenter.getZ()));
+        }
+
+        double midpointDistance(BlockPos pos) {
+            double dx = pos.getX() - lowCenter.getX();
+            double dz = pos.getZ() - lowCenter.getZ();
+            double station = dx * highTangentX + dz * highTangentZ;
+            return Math.abs(station - 0.5);
         }
     }
 
