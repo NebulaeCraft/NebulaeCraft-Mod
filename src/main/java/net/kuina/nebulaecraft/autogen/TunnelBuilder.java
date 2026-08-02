@@ -322,6 +322,8 @@ public final class TunnelBuilder {
                 clearHeight, recessHeight);
         addTurnWallCornerBackings(states, route, clearFootprint, wallBoundary,
                 concrete, clearHeight, recessHeight);
+        restoreTurnCatenaryRecess(states, transitionLayout.highGradeRecessTransitions,
+                horizontalSlab, clearHeight);
         rebuildContinuousTrackbed(states, trackbedLayout, concrete,
                 sideBed, centerBed, clearFootprint);
         return clearFootprint;
@@ -337,6 +339,7 @@ public final class TunnelBuilder {
                                                             List<EnumFacing> sectionFacings) {
         List<TurnSectionTransition> transitions = new ArrayList<>();
         List<TurnSectionTransition> allTransitions = new ArrayList<>();
+        List<TurnSectionTransition> highGradeRecessTransitions = new ArrayList<>();
         for (int i = 1; i + 2 < route.size(); i++) {
             BlockPos before = route.get(i - 1);
             BlockPos oldCorner = route.get(i);
@@ -358,13 +361,29 @@ public final class TunnelBuilder {
             EnumFacing shift = horizontalDirection(oldCorner, newCorner);
             EnumFacing outgoing = horizontalDirection(newCorner, after);
             if (incoming == null || shift == null || outgoing != incoming
-                    || shift.getAxis() == incoming.getAxis()
-                    || sectionFacings.get(i).getAxis() != incoming.getAxis()) {
+                    || shift.getAxis() == incoming.getAxis()) {
                 continue;
             }
 
             TurnSectionTransition candidate = new TurnSectionTransition(i, before, oldCorner,
                     newCorner, after, after.offset(shift.getOpposite()), incoming, shift);
+            // The level turn immediately on the high side of a grade shares its recess ceiling
+            // with the raised low-side slope shell. It may be perpendicular to the dominant smooth
+            // section axis and therefore excluded from full 3x8 structures, but its explicit
+            // slab/air recess row still owns that overlap.
+            boolean levelTransition = before.getY() == oldCorner.getY()
+                    && oldCorner.getY() == newCorner.getY()
+                    && newCorner.getY() == after.getY();
+            boolean lowerBefore = i >= 2
+                    && route.get(i - 2).getY() < before.getY();
+            boolean lowerAfter = i + 3 < route.size()
+                    && route.get(i + 3).getY() < after.getY();
+            if (levelTransition && (lowerBefore || lowerAfter)) {
+                highGradeRecessTransitions.add(candidate);
+            }
+            if (sectionFacings.get(i).getAxis() != incoming.getAxis()) {
+                continue;
+            }
             allTransitions.add(candidate);
             if (!transitions.isEmpty()) {
                 TurnSectionTransition previous = transitions.get(transitions.size() - 1);
@@ -378,7 +397,8 @@ public final class TunnelBuilder {
             }
             transitions.add(candidate);
         }
-        return new TurnSectionLayout(transitions, allTransitions);
+        return new TurnSectionLayout(
+                transitions, allTransitions, highGradeRecessTransitions);
     }
 
     private static Set<Long> levelRouteClearFootprint(
@@ -524,6 +544,10 @@ public final class TunnelBuilder {
                 }
                 put(states, target, wallState, 38);
             }
+            // A neighbouring slice can initially classify this X/Z one floor higher and leave its
+            // low-priority roof above the finalized wall cap. Delete that obsolete plan entry;
+            // writing AIR here would unnecessarily replace whatever the world originally contains.
+            removePlannedState(states, wall.up(wallRoofY + 1), concrete);
         }
         return boundary;
     }
@@ -1431,6 +1455,44 @@ public final class TunnelBuilder {
         for (int offset : centerOffsets) {
             put(states, center.offset(shift, offset).up(catenaryY),
                     Blocks.AIR.getDefaultState(), 37);
+        }
+    }
+
+    /**
+     * Reapply only the explicit recess semantics after slope and wall reconstruction. A turn row
+     * beside a one-block grade change can share its ceiling coordinate with the slope shell; the
+     * subtype1 slab or central opening belongs to the widened turn and must win that final merge.
+     * Concrete defaults are intentionally not replayed, so this pass cannot create exterior blocks.
+     */
+    private static void restoreTurnCatenaryRecess(
+            Map<Long, PlannedState> states,
+            List<TurnSectionTransition> transitions,
+            IBlockState horizontalSlab, int clearHeight) {
+        for (TurnSectionTransition transition : transitions) {
+            restoreTurnCatenaryRow(states, transition.before, transition.shift,
+                    horizontalSlab, clearHeight,
+                    new int[]{-1, 1, 2}, new int[]{0});
+            restoreTurnCatenaryRow(states, transition.oldCorner, transition.shift,
+                    horizontalSlab, clearHeight,
+                    new int[]{-1, 2}, new int[]{0, 1});
+            restoreTurnCatenaryRow(states, transition.projectedOldCenter, transition.shift,
+                    horizontalSlab, clearHeight,
+                    new int[]{-1, 0, 2}, new int[]{1});
+        }
+    }
+
+    private static void restoreTurnCatenaryRow(
+            Map<Long, PlannedState> states, BlockPos center, EnumFacing shift,
+            IBlockState horizontalSlab, int clearHeight,
+            int[] sideOffsets, int[] centerOffsets) {
+        int catenaryY = clearHeight + 1;
+        for (int offset : sideOffsets) {
+            put(states, center.offset(shift, offset).up(catenaryY),
+                    horizontalSlab, 41);
+        }
+        for (int offset : centerOffsets) {
+            put(states, center.offset(shift, offset).up(catenaryY),
+                    Blocks.AIR.getDefaultState(), 42);
         }
     }
 
@@ -2380,11 +2442,14 @@ public final class TunnelBuilder {
     private static final class TurnSectionLayout {
         final List<TurnSectionTransition> transitions;
         final List<TurnSectionTransition> allTransitions;
+        final List<TurnSectionTransition> highGradeRecessTransitions;
 
         TurnSectionLayout(List<TurnSectionTransition> transitions,
-                          List<TurnSectionTransition> allTransitions) {
+                          List<TurnSectionTransition> allTransitions,
+                          List<TurnSectionTransition> highGradeRecessTransitions) {
             this.transitions = transitions;
             this.allTransitions = allTransitions;
+            this.highGradeRecessTransitions = highGradeRecessTransitions;
         }
     }
 
