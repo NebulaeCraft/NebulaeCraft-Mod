@@ -9,8 +9,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
 import javax.annotation.Nullable;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -59,9 +57,6 @@ public class CommandNebulaeTunnel extends CommandBase {
             case "undo":
                 player.sendMessage(new TextComponentString(TunnelGenerationManager.INSTANCE.undo(player)));
                 return;
-            case "reload":
-                player.sendMessage(new TextComponentString(TunnelConfig.reload() ? "隧道配置已重新加载" : "隧道配置加载失败，请查看日志"));
-                return;
             case "clear":
                 AutogenSelection.clear(player);
                 player.sendMessage(new TextComponentString("自动生成标记选区已清除"));
@@ -96,7 +91,7 @@ public class CommandNebulaeTunnel extends CommandBase {
     public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
                                           @Nullable BlockPos targetPos) {
         if (args.length == 1) {
-            return getListOfStringsMatchingLastWord(args, "preview", "confirm", "cancel", "status", "undo", "reload", "clear");
+            return getListOfStringsMatchingLastWord(args, "preview", "confirm", "cancel", "status", "undo", "clear");
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("preview")) {
             return getListOfStringsMatchingLastWord(args, TunnelConfig.get().presets.keySet());

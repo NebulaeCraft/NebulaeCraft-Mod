@@ -22,8 +22,18 @@ import net.minecraft.world.World;
 
 public class BlockAutogenMarker extends Block {
     public static final PropertyDirection FACING = BlockHorizontal.FACING;
-    private static final AxisAlignedBB BOX_NS = new AxisAlignedBB(0.0625, 0.0, 0.3125, 0.9375, 1.0, 0.6875);
-    private static final AxisAlignedBB BOX_EW = new AxisAlignedBB(0.3125, 0.0, 0.0625, 0.6875, 1.0, 0.9375);
+    private static final AxisAlignedBB BOX_NORTH = new AxisAlignedBB(
+            7.0 / 16.0, 0.0, 1.5 / 16.0,
+            9.0 / 16.0, 13.5 / 16.0, 9.0 / 16.0);
+    private static final AxisAlignedBB BOX_EAST = new AxisAlignedBB(
+            7.0 / 16.0, 0.0, 7.0 / 16.0,
+            14.5 / 16.0, 13.5 / 16.0, 9.0 / 16.0);
+    private static final AxisAlignedBB BOX_SOUTH = new AxisAlignedBB(
+            7.0 / 16.0, 0.0, 7.0 / 16.0,
+            9.0 / 16.0, 13.5 / 16.0, 14.5 / 16.0);
+    private static final AxisAlignedBB BOX_WEST = new AxisAlignedBB(
+            1.5 / 16.0, 0.0, 7.0 / 16.0,
+            9.0 / 16.0, 13.5 / 16.0, 9.0 / 16.0);
 
     public BlockAutogenMarker() {
         super(Material.IRON);
@@ -93,7 +103,17 @@ public class BlockAutogenMarker extends Block {
 
     @Override
     public AxisAlignedBB getBoundingBox(IBlockState state, IBlockAccess source, BlockPos pos) {
-        return state.getValue(FACING).getAxis() == EnumFacing.Axis.Z ? BOX_NS : BOX_EW;
+        switch (state.getValue(FACING)) {
+            case EAST:
+                return BOX_EAST;
+            case SOUTH:
+                return BOX_SOUTH;
+            case WEST:
+                return BOX_WEST;
+            case NORTH:
+            default:
+                return BOX_NORTH;
+        }
     }
 
     @Override
