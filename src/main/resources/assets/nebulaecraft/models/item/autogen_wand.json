@@ -1,9 +1,6 @@
 {
-  "parent": "item/handheld",
+  "parent": "item/generated",
   "textures": {
-    "layer0": "nebulaecraft:items/tree_killer"
-  },
-  "display": {
-    "gui": { "rotation": [0, 0, 45], "scale": [0.75, 0.75, 0.75] }
+    "layer0": "nebulaecraft:items/autogen_wand"
   }
 }
