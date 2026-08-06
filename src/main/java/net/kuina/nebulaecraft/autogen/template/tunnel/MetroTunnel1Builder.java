@@ -1,10 +1,19 @@
-package net.kuina.nebulaecraft.autogen;
+package net.kuina.nebulaecraft.autogen.template.tunnel;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
+import net.kuina.nebulaecraft.autogen.AutogenBuildException;
+import net.kuina.nebulaecraft.autogen.AutogenConfig;
+import net.kuina.nebulaecraft.autogen.AutogenSelection;
+import net.kuina.nebulaecraft.autogen.TunnelBuildException;
+import net.kuina.nebulaecraft.autogen.AutogenPlan;
 import net.kuina.nebulaecraft.block.BlockAutogenMarker;
+import net.kuina.nebulaecraft.autogen.route.RouteGeometry;
+import net.kuina.nebulaecraft.autogen.route.RoutePlanner;
+import net.kuina.nebulaecraft.autogen.route.RouteVector;
+import net.kuina.nebulaecraft.autogen.template.AutogenTemplateKind;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
@@ -26,18 +35,26 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-public final class TunnelBuilder {
+public final class MetroTunnel1Builder {
     private static final int LOCAL_TRANSITION_PATH_LIMIT = 7;
     private static final String[] COLORS = {
             "white", "orange", "magenta", "light_blue", "yellow", "lime", "pink", "gray",
             "light_gray", "cyan", "purple", "blue", "brown", "green", "red", "black"
     };
 
-    private TunnelBuilder() {
+    private MetroTunnel1Builder() {
     }
 
-    public static TunnelPlan build(WorldServer world, AutogenSelection.Selection selection, String presetId,
-                                   String platformColor, String power, boolean mirrored) throws TunnelBuildException {
+    /**
+     * Build the original tunnel_metro_1 section algorithm for the owning template module.
+     *
+     * <p>New tunnel sizes and bridge types should implement {@code AutogenTemplate} and reuse the
+     * shared route package instead of adding type switches to this class.</p>
+     */
+    public static AutogenPlan build(WorldServer world, AutogenSelection.Selection selection,
+                                   String templateId, String displayName,
+                                   TunnelTemplateProfile preset, String platformColor,
+                                   String power, boolean mirrored) throws AutogenBuildException {
         if (selection == null || !selection.isComplete()) {
             throw new TunnelBuildException("请先用自动生成魔杖选择两个标记方块");
         }
@@ -51,10 +68,6 @@ public final class TunnelBuilder {
                 || world.getBlockState(selection.end.pos).getValue(BlockAutogenMarker.FACING) != selection.end.facing) {
             throw new TunnelBuildException("标记在选择后被旋转，请用魔杖重新选择两个标记");
         }
-        TunnelConfig.Preset preset = TunnelConfig.getPreset(presetId);
-        if (preset == null) {
-            throw new TunnelBuildException("未知隧道预设: " + presetId);
-        }
         int colorMeta = colorMeta(platformColor);
         String normalizedPower = power.toLowerCase(Locale.ENGLISH);
         if (!normalizedPower.equals("none") && !normalizedPower.equals("catenary")
@@ -62,8 +75,9 @@ public final class TunnelBuilder {
             throw new TunnelBuildException("未知供电方式: " + power);
         }
 
-        Geometry geometry = createGeometry(selection, preset);
-        TunnelConfig.Settings settings = TunnelConfig.get().settings;
+        RouteGeometry geometry = RoutePlanner.plan(
+                selection, preset.minimumRadius, preset.maximumGrade);
+        AutogenConfig.Settings settings = AutogenConfig.get();
         if (geometry.length > settings.maxPathLength) {
             throw new TunnelBuildException("路线长度超过配置上限 " + settings.maxPathLength);
         }
@@ -79,7 +93,7 @@ public final class TunnelBuilder {
         IBlockState platformState = platform.getStateFromMeta(colorMeta);
 
         LinkedHashMap<Long, PlannedState> states = new LinkedHashMap<>();
-        List<TunnelPlan.Operation> railFinalizations = new ArrayList<>();
+        List<AutogenPlan.Operation> railFinalizations = new ArrayList<>();
         List<BlockPos> route = geometry.route;
         List<EnumFacing> sectionFacings = geometry.sectionFacings;
         GradeLayout gradeLayout = new GradeLayout(route, geometry.sectionTangents);
@@ -185,7 +199,7 @@ public final class TunnelBuilder {
             // Railcraft recalculates a flex track's shape in onBlockAdded. During the first pass
             // the next route cell does not exist yet, so a requested corner can be changed into
             // a straight rail. Reapply the explicit route shape after every track is present.
-            railFinalizations.add(new TunnelPlan.Operation(center.up(), railState, false));
+            railFinalizations.add(new AutogenPlan.Operation(center.up(), railState, false));
 
             // The optional colored maintenance platform sits on the intact left floor block.
             put(states, gradedOffset(center, nx, nz, -2, gradeLayout).up(), platformState, 40);
@@ -231,16 +245,16 @@ public final class TunnelBuilder {
         }
         List<PlannedState> orderedStates = new ArrayList<>(states.values());
         Collections.sort(orderedStates, Comparator.comparingInt(value -> value.priority));
-        List<TunnelPlan.Operation> operations = new ArrayList<>(orderedStates.size());
+        List<AutogenPlan.Operation> operations = new ArrayList<>(orderedStates.size());
         for (PlannedState planned : orderedStates) {
-            operations.add(new TunnelPlan.Operation(planned.pos, planned.state));
+            operations.add(new AutogenPlan.Operation(planned.pos, planned.state));
         }
         operations.addAll(railFinalizations);
-        List<TunnelPlan.PreviewFrame> previewFrames = createPreviewFrames(
+        List<AutogenPlan.PreviewFrame> previewFrames = createPreviewFrames(
                 states, route, sectionFacings, preset);
-        return new TunnelPlan(world.provider.getDimension(), operations, new ArrayList<>(route),
+        return new AutogenPlan(world.provider.getDimension(), operations, new ArrayList<>(route),
                 previewFrames, geometry.length, geometry.minimumRadius, geometry.maximumGrade,
-                presetId, normalizeColor(platformColor), normalizedPower, mirrored);
+                templateId, displayName, AutogenTemplateKind.TUNNEL);
     }
 
     /**
@@ -1525,336 +1539,6 @@ public final class TunnelBuilder {
         return result;
     }
 
-    private static Geometry createGeometry(AutogenSelection.Selection selection, TunnelConfig.Preset preset)
-            throws TunnelBuildException {
-        AutogenSelection.Anchor start = selection.start;
-        AutogenSelection.Anchor end = selection.end;
-        double dx = end.pos.getX() - start.pos.getX();
-        double dz = end.pos.getZ() - start.pos.getZ();
-        double horizontalDistance = Math.sqrt(dx * dx + dz * dz);
-        if (horizontalDistance < 3.0) {
-            throw new TunnelBuildException("两个标记的水平距离至少需要 3 格");
-        }
-        double startDot = start.facing.getFrontOffsetX() * dx + start.facing.getFrontOffsetZ() * dz;
-        double endDot = end.facing.getFrontOffsetX() * -dx + end.facing.getFrontOffsetZ() * -dz;
-        if (startDot <= 0 || endDot <= 0) {
-            throw new TunnelBuildException("两个标记的箭头必须朝向彼此所在的一侧");
-        }
-
-        Vec p0 = new Vec(start.pos.getX(), start.pos.getY(), start.pos.getZ());
-        Vec p1 = new Vec(end.pos.getX(), end.pos.getY(), end.pos.getZ());
-        Vec v0 = new Vec(start.facing.getFrontOffsetX() * horizontalDistance, 0, start.facing.getFrontOffsetZ() * horizontalDistance);
-        Vec v1 = new Vec(-end.facing.getFrontOffsetX() * horizontalDistance, 0, -end.facing.getFrontOffsetZ() * horizontalDistance);
-        int samples = Math.max(64, (int) Math.ceil(horizontalDistance * 8.0));
-        List<Vec> points = new ArrayList<>(samples + 1);
-        double length = 0;
-        double minRadius = Double.POSITIVE_INFINITY;
-        double maxGrade = 0;
-        for (int i = 0; i <= samples; i++) {
-            double t = i / (double) samples;
-            Vec point = quintic(p0, p1, v0, v1, t);
-            points.add(point);
-            if (i > 0) {
-                Vec delta = point.subtract(points.get(i - 1));
-                length += delta.length();
-                double horizontal = Math.sqrt(delta.x * delta.x + delta.z * delta.z);
-                if (horizontal > 1.0E-6) {
-                    maxGrade = Math.max(maxGrade, Math.abs(delta.y) / horizontal);
-                }
-            }
-            if (i > 1) {
-                Vec a = points.get(i - 1).subtract(points.get(i - 2));
-                Vec b = point.subtract(points.get(i - 1));
-                double ah = Math.sqrt(a.x * a.x + a.z * a.z);
-                double bh = Math.sqrt(b.x * b.x + b.z * b.z);
-                if (ah > 1.0E-6 && bh > 1.0E-6) {
-                    double cosine = clamp((a.x * b.x + a.z * b.z) / (ah * bh), -1, 1);
-                    double angle = Math.acos(cosine);
-                    if (angle > 1.0E-5) {
-                        minRadius = Math.min(minRadius, ((ah + bh) * 0.5) / angle);
-                    }
-                }
-            }
-        }
-        if (minRadius < preset.minimumRadius) {
-            throw new TunnelBuildException(String.format(Locale.ROOT,
-                    "曲线最小半径 %.2f 小于预设限制 %.2f", minRadius, preset.minimumRadius));
-        }
-        if (maxGrade > preset.maximumGrade) {
-            throw new TunnelBuildException(String.format(Locale.ROOT,
-                    "最大坡度 %.2f%% 超过预设限制 %.2f%%", maxGrade * 100, preset.maximumGrade * 100));
-        }
-        RasterizedRoute rasterized = rasterize(points, start.pos, end.pos);
-        if (rasterized.positions.size() < 2) {
-            throw new TunnelBuildException("无法将曲线转换为连续轨道");
-        }
-        List<Vec> sectionTangents = curveTangents(
-                rasterized.parameters, p0, p1, v0, v1);
-        List<EnumFacing> sectionFacings = curveTangentFacings(sectionTangents, v0);
-        List<BlockPos> gradedRoute = alignGradesToCurveSections(
-                rasterized.positions, rasterized.parameters, sectionFacings,
-                p0, p1, v0, v1, preset.maximumGrade);
-        return new Geometry(gradedRoute, sectionFacings, sectionTangents,
-                length, minRadius, maxGrade);
-    }
-
-    private static Vec quintic(Vec p0, Vec p1, Vec v0, Vec v1, double t) {
-        Vec d = p1.subtract(p0);
-        Vec c3 = d.scale(10).subtract(v0.scale(6)).subtract(v1.scale(4));
-        Vec c4 = d.scale(-15).add(v0.scale(8)).add(v1.scale(7));
-        Vec c5 = d.scale(6).subtract(v0.scale(3)).subtract(v1.scale(3));
-        return p0.add(v0.scale(t)).add(c3.scale(t * t * t))
-                .add(c4.scale(t * t * t * t)).add(c5.scale(t * t * t * t * t));
-    }
-
-    private static Vec quinticTangent(Vec p0, Vec p1, Vec v0, Vec v1, double t) {
-        Vec d = p1.subtract(p0);
-        Vec c3 = d.scale(10).subtract(v0.scale(6)).subtract(v1.scale(4));
-        Vec c4 = d.scale(-15).add(v0.scale(8)).add(v1.scale(7));
-        Vec c5 = d.scale(6).subtract(v0.scale(3)).subtract(v1.scale(3));
-        return v0.add(c3.scale(3 * t * t))
-                .add(c4.scale(4 * t * t * t))
-                .add(c5.scale(5 * t * t * t * t));
-    }
-
-    private static List<Vec> curveTangents(
-            List<Double> parameters, Vec p0, Vec p1, Vec v0, Vec v1) {
-        List<Vec> tangents = new ArrayList<>(parameters.size());
-        for (double parameter : parameters) {
-            tangents.add(quinticTangent(p0, p1, v0, v1, parameter));
-        }
-        return tangents;
-    }
-
-    private static List<EnumFacing> curveTangentFacings(
-            List<Vec> tangents, Vec initialTangent) {
-        List<EnumFacing> facings = new ArrayList<>(tangents.size());
-        EnumFacing previous = dominantFacing(initialTangent.x, initialTangent.z);
-        for (Vec tangent : tangents) {
-            if (Math.abs(tangent.x) > 1.0E-8 || Math.abs(tangent.z) > 1.0E-8) {
-                previous = dominantFacing(tangent.x, tangent.z);
-            }
-            facings.add(previous);
-        }
-        return facings;
-    }
-
-    private static RasterizedRoute rasterize(List<Vec> points, BlockPos start, BlockPos end)
-            throws TunnelBuildException {
-        List<BlockPos> result = new ArrayList<>();
-        List<Double> parameters = new ArrayList<>();
-        BlockPos current = start;
-        result.add(current);
-        parameters.add(0.0);
-        Set<Long> visitedXZ = new HashSet<>();
-        visitedXZ.add(xzKey(current.getX(), current.getZ()));
-        for (int pointIndex = 0; pointIndex < points.size(); pointIndex++) {
-            Vec point = points.get(pointIndex);
-            double parameter = pointIndex / (double) (points.size() - 1);
-            int targetX = (int) Math.round(point.x);
-            int targetZ = (int) Math.round(point.z);
-            while (current.getX() != targetX || current.getZ() != targetZ) {
-                int sx = Integer.signum(targetX - current.getX());
-                int sz = Integer.signum(targetZ - current.getZ());
-                boolean moveX = sx != 0 && (sz == 0 || Math.abs(point.x - current.getX()) >= Math.abs(point.z - current.getZ()));
-                int nextX = current.getX() + (moveX ? sx : 0);
-                int nextZ = current.getZ() + (moveX ? 0 : sz);
-                BlockPos next = new BlockPos(nextX, start.getY(), nextZ);
-                long key = xzKey(nextX, nextZ);
-                if (visitedXZ.contains(key)) {
-                    throw new TunnelBuildException("曲线在方格化后发生自交，请增大标记间距或调整方向");
-                }
-                visitedXZ.add(key);
-                result.add(next);
-                parameters.add(parameter);
-                current = next;
-            }
-        }
-        if (current.getX() != end.getX() || current.getZ() != end.getZ()) {
-            throw new TunnelBuildException("轨道路径没有到达终点");
-        }
-        return new RasterizedRoute(result, parameters);
-    }
-
-    /**
-     * Snap every one-block grade change to a complete tangent-normal section. A rasterized lateral
-     * shift consists of incoming, transverse, and outgoing edges; changing Y on any of those three
-     * edges splits the widened 3x8 curve template between two levels. Match all thresholds to
-     * tangent-aligned edges globally so the relocated steps remain separated and no ascending rail
-     * is combined with a horizontal curve corner.
-     */
-    private static List<BlockPos> alignGradesToCurveSections(
-            List<BlockPos> horizontalRoute, List<Double> parameters,
-            List<EnumFacing> sectionFacings,
-            Vec p0, Vec p1, Vec v0, Vec v1,
-            double maximumGrade) throws TunnelBuildException {
-        int startY = (int) Math.round(p0.y);
-        int endY = (int) Math.round(p1.y);
-        if (startY == endY) {
-            return horizontalRoute;
-        }
-        int direction = Integer.signum(endY - startY);
-        int transitionCount = Math.abs(endY - startY);
-        Set<Integer> forbiddenEdges = turnTransitionEdges(
-                horizontalRoute, sectionFacings, direction);
-        boolean[] eligible = new boolean[horizontalRoute.size()];
-        for (int i = 1; i < horizontalRoute.size(); i++) {
-            EnumFacing edge = horizontalDirection(
-                    horizontalRoute.get(i - 1), horizontalRoute.get(i));
-            eligible[i] = edge != null
-                    && edge.getAxis() == sectionFacings.get(i).getAxis()
-                    && isStraightSlopeEdge(horizontalRoute, i, direction)
-                    && !forbiddenEdges.contains(i);
-        }
-
-        List<Integer> desiredEdges = new ArrayList<>(transitionCount);
-        for (int step = 1; step <= transitionCount; step++) {
-            double threshold = startY + direction * (step - 0.5);
-            int desired = -1;
-            for (int i = 1; i < parameters.size(); i++) {
-                double curveY = quintic(p0, p1, v0, v1, parameters.get(i)).y;
-                if (direction > 0 ? curveY >= threshold : curveY <= threshold) {
-                    desired = i;
-                    break;
-                }
-            }
-            if (desired < 0) {
-                desired = horizontalRoute.size() - 1;
-            }
-            desiredEdges.add(desired);
-        }
-
-        int minimumSlopeSpacing = Math.max(1,
-                (int) Math.ceil(1.0 / maximumGrade - 1.0E-9));
-        List<Integer> selectedEdges = selectGradeEdges(
-                eligible, desiredEdges, minimumSlopeSpacing, direction);
-
-        List<BlockPos> result = new ArrayList<>(horizontalRoute.size());
-        int applied = 0;
-        for (int i = 0; i < horizontalRoute.size(); i++) {
-            while (applied < selectedEdges.size() && selectedEdges.get(applied) <= i) {
-                applied++;
-            }
-            BlockPos horizontal = horizontalRoute.get(i);
-            result.add(new BlockPos(horizontal.getX(), startY + direction * applied,
-                    horizontal.getZ()));
-        }
-        if (result.get(result.size() - 1).getY() != endY) {
-            throw new TunnelBuildException("坡度无法转换为连续的轨道台阶");
-        }
-        return result;
-    }
-
-    /**
-     * Match all analytic height thresholds to usable rail edges at once. A greedy snap can move
-     * one threshold across a long run of overlapping curve templates and leave the following
-     * threshold on the first edge after it, clustering two slopes even though usable space exists
-     * later. Dynamic programming keeps every pair at least one configured grade run apart while
-     * minimizing the total displacement from the smooth height curve.
-     */
-    private static List<Integer> selectGradeEdges(
-            boolean[] eligible, List<Integer> desiredEdges,
-            int minimumSpacing, int direction) throws TunnelBuildException {
-        final long unreachable = Long.MAX_VALUE / 4;
-        int stepCount = desiredEdges.size();
-        int edgeCount = eligible.length;
-        long[] previousCosts = new long[edgeCount];
-        Arrays.fill(previousCosts, unreachable);
-        int[][] parents = new int[stepCount][edgeCount];
-        for (int[] row : parents) {
-            Arrays.fill(row, -1);
-        }
-        for (int edge = 1; edge < edgeCount; edge++) {
-            if (eligible[edge]) {
-                previousCosts[edge] = gradeEdgeCost(
-                        edge, desiredEdges.get(0), direction);
-            }
-        }
-
-        for (int step = 1; step < stepCount; step++) {
-            long[] currentCosts = new long[edgeCount];
-            Arrays.fill(currentCosts, unreachable);
-            long bestPreviousCost = unreachable;
-            int bestPreviousEdge = -1;
-            for (int edge = 1; edge < edgeCount; edge++) {
-                int predecessor = edge - minimumSpacing;
-                if (predecessor >= 1
-                        && previousCosts[predecessor] < bestPreviousCost) {
-                    bestPreviousCost = previousCosts[predecessor];
-                    bestPreviousEdge = predecessor;
-                }
-                if (eligible[edge] && bestPreviousEdge >= 0) {
-                    currentCosts[edge] = bestPreviousCost + gradeEdgeCost(
-                            edge, desiredEdges.get(step), direction);
-                    parents[step][edge] = bestPreviousEdge;
-                }
-            }
-            previousCosts = currentCosts;
-        }
-
-        int selected = -1;
-        long selectedCost = unreachable;
-        for (int edge = 1; edge < edgeCount; edge++) {
-            if (previousCosts[edge] < selectedCost) {
-                selected = edge;
-                selectedCost = previousCosts[edge];
-            }
-        }
-        if (selected < 0) {
-            throw new TunnelBuildException(String.format(Locale.ROOT,
-                    "坡度附近没有足够间距的完整切线断面（至少 %d 格）",
-                    minimumSpacing));
-        }
-
-        List<Integer> selectedEdges = new ArrayList<>(
-                Collections.nCopies(stepCount, 0));
-        for (int step = stepCount - 1; step >= 0; step--) {
-            selectedEdges.set(step, selected);
-            if (step > 0) {
-                selected = parents[step][selected];
-            }
-        }
-        return selectedEdges;
-    }
-
-    private static long gradeEdgeCost(int edge, int desired, int direction) {
-        long distance = Math.abs((long) edge - desired);
-        boolean onPreferredLowSide = direction > 0
-                ? edge <= desired : edge >= desired;
-        return distance * distance * 2 + (onPreferredLowSide ? 0 : 1);
-    }
-
-    /**
-     * Keep a grade off the transverse edge and the high-side boundary of a widened curve template.
-     * The low-side outer edge is safe when its slope rail is straight: the three template rows can
-     * then follow their respective grades and meet the dedicated low-end slope section. Blocking
-     * all three edges makes overlapping diagonal templates exclude very long stretches of route.
-     */
-    private static Set<Integer> turnTransitionEdges(
-            List<BlockPos> route, List<EnumFacing> sectionFacings,
-            int gradeDirection) {
-        Set<Integer> result = new HashSet<>();
-        for (int i = 1; i + 2 < route.size(); i++) {
-            EnumFacing incoming = horizontalDirection(route.get(i - 1), route.get(i));
-            EnumFacing shift = horizontalDirection(route.get(i), route.get(i + 1));
-            EnumFacing outgoing = horizontalDirection(route.get(i + 1), route.get(i + 2));
-            if (incoming != null && outgoing == incoming && shift != null
-                    && shift.getAxis() != incoming.getAxis()
-                    && sectionFacings.get(i).getAxis() == incoming.getAxis()) {
-                result.add(i + 1);
-                result.add(gradeDirection > 0 ? i + 2 : i);
-            }
-        }
-        return result;
-    }
-
-    private static boolean isStraightSlopeEdge(
-            List<BlockPos> route, int edgeIndex, int gradeDirection) {
-        int lowIndex = gradeDirection > 0 ? edgeIndex - 1 : edgeIndex;
-        return lowIndex > 0 && lowIndex + 1 < route.size()
-                && turn(route, lowIndex) == 0;
-    }
-
     private static int railMeta(List<BlockPos> route, int index) {
         BlockPos current = route.get(index);
         BlockPos previous = index > 0 ? route.get(index - 1) : null;
@@ -2233,13 +1917,6 @@ public final class TunnelBuilder {
         return EnumFacing.NORTH;
     }
 
-    private static EnumFacing dominantFacing(double dx, double dz) {
-        if (Math.abs(dx) >= Math.abs(dz)) {
-            return dx < 0 ? EnumFacing.WEST : EnumFacing.EAST;
-        }
-        return dz < 0 ? EnumFacing.NORTH : EnumFacing.SOUTH;
-    }
-
     private static EnumFacing horizontalDirection(BlockPos from, BlockPos to) {
         int dx = Integer.signum(to.getX() - from.getX());
         int dz = Integer.signum(to.getZ() - from.getZ());
@@ -2357,16 +2034,16 @@ public final class TunnelBuilder {
      * analytic section facing keeps these frames aligned with the same cross-sections used by the
      * builder, while the column scan includes widened turns and raised slope shells.
      */
-    private static List<TunnelPlan.PreviewFrame> createPreviewFrames(
+    private static List<AutogenPlan.PreviewFrame> createPreviewFrames(
             Map<Long, PlannedState> states, List<BlockPos> route,
-            List<EnumFacing> sectionFacings, TunnelConfig.Preset preset) {
+            List<EnumFacing> sectionFacings, TunnelTemplateProfile preset) {
         int shellLateral = preset.clearWidth / 2 + 1;
         int scanLateral = shellLateral + 3;
         int roofY = preset.clearHeight + 1 + preset.catenaryRecessHeight;
         int scanMinY = -1;
         int scanMaxY = roofY + 3;
         int columnCount = scanLateral * 2 + 1;
-        List<TunnelPlan.PreviewFrame> frames = new ArrayList<>(route.size());
+        List<AutogenPlan.PreviewFrame> frames = new ArrayList<>(route.size());
 
         for (int i = 0; i < route.size(); i++) {
             BlockPos center = route.get(i);
@@ -2418,7 +2095,7 @@ public final class TunnelBuilder {
             double rightZ = sectionZ + nz * (rightLateral + 0.5D);
             boolean ring = i == 0 || i == route.size() - 1 || i % 8 == 0
                     || previewFrameChanged(route, sectionFacings, i);
-            frames.add(new TunnelPlan.PreviewFrame(
+            frames.add(new AutogenPlan.PreviewFrame(
                     new Vec3d(leftX, columnMinY[left], leftZ),
                     new Vec3d(leftX, columnMaxY[left] + 1.0D, leftZ),
                     new Vec3d(rightX, columnMaxY[right] + 1.0D, rightZ),
@@ -2454,10 +2131,6 @@ public final class TunnelBuilder {
 
     private static long xzKey(int x, int z) {
         return ((long) x << 32) ^ (z & 0xffffffffL);
-    }
-
-    private static double clamp(double value, double min, double max) {
-        return Math.max(min, Math.min(max, value));
     }
 
     private static final class PlannedState {
@@ -2574,25 +2247,15 @@ public final class TunnelBuilder {
         }
     }
 
-    private static final class RasterizedRoute {
-        final List<BlockPos> positions;
-        final List<Double> parameters;
-
-        RasterizedRoute(List<BlockPos> positions, List<Double> parameters) {
-            this.positions = positions;
-            this.parameters = parameters;
-        }
-    }
-
     /** Assign every horizontal tunnel cell to a level using tangent-normal grade planes. */
     private static final class GradeLayout {
         final List<BlockPos> route;
-        final List<Vec> tangents;
+        final List<RouteVector> tangents;
         final List<GradeTransition> transitions = new ArrayList<>();
         final Map<Long, GradeTransition> slopeInteriors = new HashMap<>();
         final Set<GradeTransition> boundaryCorrections = new HashSet<>();
 
-        GradeLayout(List<BlockPos> route, List<Vec> tangents) {
+        GradeLayout(List<BlockPos> route, List<RouteVector> tangents) {
             this.route = route;
             this.tangents = tangents;
             for (int i = 1; i < route.size(); i++) {
@@ -2743,7 +2406,7 @@ public final class TunnelBuilder {
             long bestDistance = Long.MAX_VALUE;
             for (int i = first; i <= last; i++) {
                 BlockPos center = route.get(i);
-                Vec tangent = tangents.get(i);
+                RouteVector tangent = tangents.get(i);
                 double length = Math.sqrt(
                         tangent.x * tangent.x + tangent.z * tangent.z);
                 if (length <= 1.0E-8) {
@@ -2774,7 +2437,7 @@ public final class TunnelBuilder {
         final double highTangentX;
         final double highTangentZ;
 
-        GradeTransition(BlockPos lowCenter, BlockPos highCenter, Vec tangent) {
+        GradeTransition(BlockPos lowCenter, BlockPos highCenter, RouteVector tangent) {
             this.lowCenter = lowCenter;
             this.highCenter = highCenter;
             // Scale the normal by its dominant component instead of Euclidean length. With a
@@ -2820,40 +2483,4 @@ public final class TunnelBuilder {
         }
     }
 
-    private static final class Geometry {
-        final List<BlockPos> route;
-        final List<EnumFacing> sectionFacings;
-        final List<Vec> sectionTangents;
-        final double length;
-        final double minimumRadius;
-        final double maximumGrade;
-
-        Geometry(List<BlockPos> route, List<EnumFacing> sectionFacings,
-                 List<Vec> sectionTangents,
-                 double length, double minimumRadius, double maximumGrade) {
-            this.route = route;
-            this.sectionFacings = sectionFacings;
-            this.sectionTangents = sectionTangents;
-            this.length = length;
-            this.minimumRadius = minimumRadius;
-            this.maximumGrade = maximumGrade;
-        }
-    }
-
-    private static final class Vec {
-        final double x;
-        final double y;
-        final double z;
-
-        Vec(double x, double y, double z) {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-        }
-
-        Vec add(Vec other) { return new Vec(x + other.x, y + other.y, z + other.z); }
-        Vec subtract(Vec other) { return new Vec(x - other.x, y - other.y, z - other.z); }
-        Vec scale(double scale) { return new Vec(x * scale, y * scale, z * scale); }
-        double length() { return Math.sqrt(x * x + y * y + z * z); }
-    }
 }

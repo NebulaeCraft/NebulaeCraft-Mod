@@ -23,8 +23,8 @@ public final class TunnelGenerationManager {
     private TunnelGenerationManager() {
     }
 
-    public void setPreview(EntityPlayerMP player, TunnelPlan plan) {
-        int lifetimeMillis = TunnelConfig.get().settings.previewSeconds * 1000;
+    public void setPreview(EntityPlayerMP player, AutogenPlan plan) {
+        int lifetimeMillis = AutogenConfig.get().previewSeconds * 1000;
         long expiresAt = System.currentTimeMillis() + lifetimeMillis;
         previews.put(player.getUniqueID(), new Preview(plan, expiresAt, player.getServer()));
         NebulaecraftMod.PACKET_HANDLER.sendTo(
@@ -33,7 +33,7 @@ public final class TunnelGenerationManager {
 
     public String confirm(EntityPlayerMP player) {
         if (activeJob != null) {
-            return "已有隧道生成或撤销任务正在运行";
+            return "已有自动生成或撤销任务正在运行";
         }
         Preview preview = previews.get(player.getUniqueID());
         if (preview == null || preview.expiresAt < System.currentTimeMillis()) {
@@ -50,7 +50,8 @@ public final class TunnelGenerationManager {
         activeJob = ActiveJob.build(player.getUniqueID(), world, preview.plan, undo);
         previews.remove(player.getUniqueID());
         clearPreview(player);
-        return "隧道生成已开始，共 " + preview.plan.operations.size() + " 个方块";
+        return preview.plan.displayName + "生成已开始，共 "
+                + preview.plan.operations.size() + " 个方块";
     }
 
     public String cancel(EntityPlayerMP player) {
@@ -70,18 +71,18 @@ public final class TunnelGenerationManager {
 
     public String undo(EntityPlayerMP player) {
         if (activeJob != null) {
-            return "已有隧道生成或撤销任务正在运行";
+            return "已有自动生成或撤销任务正在运行";
         }
         TunnelUndoData data = TunnelUndoData.get(player.getServer());
         if (!data.hasEntries()) {
-            return "没有可撤销的隧道生成记录";
+            return "没有可撤销的自动生成记录";
         }
         WorldServer world = player.getServer().getWorld(data.getDimension());
         if (world == null) {
             return "撤销记录所在维度当前不可用";
         }
         activeJob = ActiveJob.undo(player.getUniqueID(), world, data);
-        return data.isIncomplete() ? "正在恢复上次未完成的生成任务" : "隧道撤销已开始";
+        return data.isIncomplete() ? "正在恢复上次未完成的生成任务" : "结构撤销已开始";
     }
 
     public String status(EntityPlayerMP player) {
@@ -109,12 +110,12 @@ public final class TunnelGenerationManager {
         if (activeJob == null) {
             return;
         }
-        int budget = TunnelConfig.get().settings.blocksPerTick;
+        int budget = AutogenConfig.get().blocksPerTick;
         while (budget-- > 0 && activeJob.index < activeJob.total()) {
             if (activeJob.undoing) {
                 activeJob.undoEntries.get(activeJob.index).restore(activeJob.world);
             } else {
-                TunnelPlan.Operation operation = activeJob.plan.operations.get(activeJob.index);
+                AutogenPlan.Operation operation = activeJob.plan.operations.get(activeJob.index);
                 if (operation.captureUndo) {
                     activeJob.undoData.capture(activeJob.world, operation.pos);
                 }
@@ -132,13 +133,15 @@ public final class TunnelGenerationManager {
         activeJob = null;
         if (finished.undoing) {
             finished.undoData.clear();
-            message(finished.world.getMinecraftServer(), finished.owner, "隧道撤销完成");
+            message(finished.world.getMinecraftServer(), finished.owner, "结构撤销完成");
         } else {
             finished.undoData.finish();
             EntityPlayerMP owner = finished.world.getMinecraftServer().getPlayerList().getPlayerByUUID(finished.owner);
             if (owner != null) {
                 AutogenSelection.clear(owner);
-                owner.sendMessage(new TextComponentString("隧道生成完成，共修改 " + finished.index + " 个方块"));
+                owner.sendMessage(new TextComponentString(
+                        finished.plan.displayName + "生成完成，共修改 "
+                                + finished.index + " 个方块"));
             }
         }
     }
@@ -173,11 +176,11 @@ public final class TunnelGenerationManager {
     }
 
     private static final class Preview {
-        final TunnelPlan plan;
+        final AutogenPlan plan;
         final long expiresAt;
         final MinecraftServer server;
 
-        Preview(TunnelPlan plan, long expiresAt, MinecraftServer server) {
+        Preview(AutogenPlan plan, long expiresAt, MinecraftServer server) {
             this.plan = plan;
             this.expiresAt = expiresAt;
             this.server = server;
@@ -187,13 +190,13 @@ public final class TunnelGenerationManager {
     private static final class ActiveJob {
         final UUID owner;
         final WorldServer world;
-        final TunnelPlan plan;
+        final AutogenPlan plan;
         final TunnelUndoData undoData;
         final List<TunnelUndoData.Entry> undoEntries;
         final boolean undoing;
         int index;
 
-        private ActiveJob(UUID owner, WorldServer world, TunnelPlan plan, TunnelUndoData undoData,
+        private ActiveJob(UUID owner, WorldServer world, AutogenPlan plan, TunnelUndoData undoData,
                           List<TunnelUndoData.Entry> undoEntries, boolean undoing) {
             this.owner = owner;
             this.world = world;
@@ -203,7 +206,7 @@ public final class TunnelGenerationManager {
             this.undoing = undoing;
         }
 
-        static ActiveJob build(UUID owner, WorldServer world, TunnelPlan plan, TunnelUndoData undoData) {
+        static ActiveJob build(UUID owner, WorldServer world, AutogenPlan plan, TunnelUndoData undoData) {
             return new ActiveJob(owner, world, plan, undoData, null, false);
         }
 

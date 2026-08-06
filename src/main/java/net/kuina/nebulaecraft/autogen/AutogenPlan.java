@@ -1,13 +1,16 @@
 package net.kuina.nebulaecraft.autogen;
 
+import net.kuina.nebulaecraft.autogen.template.AutogenTemplateKind;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public final class TunnelPlan {
+/** A template-independent structure plan consumed by preview, execution, and undo services. */
+public class AutogenPlan {
     public final int dimension;
     public final List<Operation> operations;
     public final List<BlockPos> route;
@@ -15,26 +18,28 @@ public final class TunnelPlan {
     public final double length;
     public final double minimumRadius;
     public final double maximumGrade;
-    public final String preset;
-    public final String platformColor;
-    public final String power;
-    public final boolean mirrored;
+    public final String templateId;
+    public final String displayName;
+    public final AutogenTemplateKind kind;
 
-    public TunnelPlan(int dimension, List<Operation> operations, List<BlockPos> route,
-                      List<PreviewFrame> previewFrames, double length, double minimumRadius,
-                      double maximumGrade, String preset, String platformColor, String power,
-                      boolean mirrored) {
+    public AutogenPlan(int dimension, List<Operation> operations, List<BlockPos> route,
+                       List<PreviewFrame> previewFrames, double length, double minimumRadius,
+                       double maximumGrade, String templateId, String displayName,
+                       AutogenTemplateKind kind) {
         this.dimension = dimension;
-        this.operations = Collections.unmodifiableList(operations);
-        this.route = Collections.unmodifiableList(route);
-        this.previewFrames = Collections.unmodifiableList(previewFrames);
+        this.operations = immutableCopy(operations);
+        this.route = immutableCopy(route);
+        this.previewFrames = immutableCopy(previewFrames);
         this.length = length;
         this.minimumRadius = minimumRadius;
         this.maximumGrade = maximumGrade;
-        this.preset = preset;
-        this.platformColor = platformColor;
-        this.power = power;
-        this.mirrored = mirrored;
+        this.templateId = templateId;
+        this.displayName = displayName;
+        this.kind = kind;
+    }
+
+    private static <T> List<T> immutableCopy(List<T> source) {
+        return Collections.unmodifiableList(new ArrayList<>(source));
     }
 
     public static final class PreviewFrame {

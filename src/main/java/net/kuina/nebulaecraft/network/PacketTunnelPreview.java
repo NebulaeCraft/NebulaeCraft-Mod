@@ -2,7 +2,7 @@ package net.kuina.nebulaecraft.network;
 
 import io.netty.buffer.ByteBuf;
 import net.kuina.nebulaecraft.NebulaecraftMod;
-import net.kuina.nebulaecraft.autogen.TunnelPlan;
+import net.kuina.nebulaecraft.autogen.AutogenPlan;
 import net.minecraft.util.math.Vec3d;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
@@ -31,9 +31,9 @@ public final class PacketTunnelPreview implements IMessage {
         this.frames = frames;
     }
 
-    public static PacketTunnelPreview show(TunnelPlan plan, int lifetimeMillis) {
+    public static PacketTunnelPreview show(AutogenPlan plan, int lifetimeMillis) {
         List<Frame> frames = new ArrayList<>(plan.previewFrames.size());
-        for (TunnelPlan.PreviewFrame frame : plan.previewFrames) {
+        for (AutogenPlan.PreviewFrame frame : plan.previewFrames) {
             frames.add(new Frame(frame.leftBottom, frame.leftTop, frame.rightTop,
                     frame.rightBottom, frame.ring));
         }

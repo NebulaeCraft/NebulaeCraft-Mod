@@ -1,4 +1,4 @@
-# 参考截面自动隧道生成工具
+# 参考截面自动线性结构生成工具
 
 > 日期：2026-07-26  
 > 适用：NebulaeCraft / Minecraft Forge 1.12.2 / Java 8
@@ -7,14 +7,14 @@
 
 - `nebulaecraft:autogen_marker`：跨栏式方向标记，橙色箭头表示方向。放置后可空手右键旋转；选择与碰撞范围按模型原始 `X 7..9、Y 0..13.5、Z 1.5..9` 及当前朝向旋转计算。
 - `nebulaecraft:autogen_wand`：依次右键起点和终点标记以记录选区；潜行右键空气可清除选区。
-- 两个箭头必须相向。标记所在方块会成为中央道床方块，生成完成后由道床替换，执行撤销时恢复。
+- 两个箭头必须相向。标记所在方块是模板的中心路线基准；`tunnel_metro_1` 会在该格生成中央道床，`tunnel_metro_2` 会将该格作为双轨之间的空气。执行撤销时均恢复原标记。
 
 ## 指令
 
-完整指令名为 `/nebulaetunnel`，可缩写为 `/ntunnel`，需要权限等级 2。
+完整指令名为 `/nebulaetunnel`，可缩写为 `/ntunnel` 或 `/nautogen`，需要权限等级 2。
 
 ```text
-/ntunnel preview <preset> <platformColor> <power> [mirror]
+/ntunnel preview <template> <template arguments>
 /ntunnel confirm
 /ntunnel cancel
 /ntunnel status
@@ -22,7 +22,8 @@
 /ntunnel clear
 ```
 
-默认预设命名为 `tunnel_metro_1`。供电参数：
+当前内置模板为 `tunnel_metro_1` 与 `tunnel_metro_2`。
+`tunnel_metro_1` 的参数格式为 `<platformColor> <power> [mirror]`。供电参数：
 
 - `none`
 - `catenary`
@@ -34,12 +35,14 @@
 ```text
 /ntunnel preview tunnel_metro_1 cyan catenary
 /ntunnel preview tunnel_metro_1 yellow thirdrail_yellow mirror
+/ntunnel preview tunnel_metro_2
 /ntunnel confirm
 ```
 
 平台颜色支持 Railcraft 的 16 色英文名，额外接受 `silver`、`lightGray`、`lightBlue` 别名。
+`tunnel_metro_2` 不接受额外参数，固定生成双轨、双刚性接触网与双侧墙灯。
 
-## 默认断面与材料
+## `tunnel_metro_1` 断面与材料
 
 - 断面固定为 7×7；从上至下逐层为：
   - `7×强化混凝土`
@@ -96,9 +99,61 @@
 - 若方格取整曾令上述五格中的边缘格落入相邻高层，坡道墙的第三排垂直台阶会在真实正交墙边界中比较法线端点及其高侧邻格，选择最接近坡步中点的一列；被移走墙列的内侧顶角同时用强化混凝土封闭。该规则使曲线两侧墙顶与平台在同一高低分界换层，不会让第三排台阶单独向低侧偏出一格。
 - 坡道与 3×8 弯道过渡重合时，最终阶段会重新应用坡步高侧水平过渡实际拥有的接触网凹槽语义：两侧 subtype1 上台阶和中央空气覆盖坡道及外壳的默认混凝土，但不重放外围混凝土，也不恢复低侧已由坡道专用断面接管的旧凹槽。最终墙列封顶后，其正上方由相邻高层普通断面遗留的低优先级顶板计划会直接删除而不是改写为空气，因此既不会覆盖凹槽台阶，也不会在隧道外生成孤立方块或短条。
 
+## `tunnel_metro_2` 双轨断面
+
+该模板的 11×9 直线样板读取自世界 `Hello World!` 的
+`-1213 12 -743` 至 `-1213 4 -733`。标记 Y 对应轨床层；以中心路线为横向 0、标记 Y 为高度 0，断面为：
+
+```text
++7  CCCCCCCCCCC
++6  CCCs...sCCC
++5  CC.k...k.CC
++4  Cv.......vC
++3  Cl.......lC
++2  C.........C
++1  Cv.r...r.vC
+ 0  CCbBb.bBbCC
+-1  CCCCCCCCCCC
+```
+
+- `C` 为 `railcraft:reinforced_concrete@8`，`s` 为 `reinforced_concrete_slab@1`，`v` 为朝向净空的垂直强化混凝土台阶。
+- `r` 是横向 `-2/+2` 的两条 `railcraft:track_flex_reinforced`；`b/B` 分别是 `stone_slab@0` 与 `double_stone_slab@8`，中心点保持空气。
+- `k` 是两条轨道各自的刚性接触网。直线、弯道和坡道使用对应模型；支撑件按 `catenarySupportSpacing` 成对放置，目标断面不可用时在前后两格内寻找两轨都为水平直线的断面。
+- `l` 是同时放置在最终两侧墙前的隧道灯，索引周期使用 `lightSpacing`。垂直台阶、墙灯以及直线/支架/坡线接触网统一使用最近中心曲线的解析切线判向，不跟随方格路线的瞬时锯齿方向；弯轨和斜线接触网仍按实际前后连接选择模型象限。
+- 两条轨道由中心解析断面左右偏移 2 格后分别方格化；内弯重复格会去重，外弯局部缺口只在不经过中心线或另一条轨道的范围内正交补齐。两轨各自按实际连接拓扑选择直轨、弯轨、坡轨和接触网模型。
+- 斜线过渡另读取自同一世界的 `-1170 3 -793` 至 `-1181 11 -798`。中心方格路线横移一格时，横移侧轨道提前一行转弯，另一条轨道延后一行转弯；若被省略的旧轨格还会在解析切线换轴处复用，则保留原轨格，避免连续曲线断轨。中心路线经过的两个正交转角格始终为空气，不允许 `44:0` 或轨道进入。
+- 斜线的两条内侧 `44:0` 锯齿带只保留对角相接的弱连接；两条外侧带只补远离中心线的正交肘点，保持共享边四向连续。外肘在道床占位合并后生成，轨道格会先从外带候选中剔除，避免把轨道误判成已经存在的连接肘点。
+- 双轨候选在解析切线主轴由 X 切换到 Z（或反向）时，还会检查其到整条中心方格路线的距离。会直接贴住其他中心路线格的候选被省略，局部正交连接也禁止进入该一格缓冲；这给两条内侧 `44:0` 留出弱连接空间。生成器分别验证两条外带的共享边连通和两条内带的八向连通，任一侧被切断都会中止预览并返回明确错误。
+- 最终道床占位向四个水平方向扩张一格作为混凝土地板和净空缓冲，再从该边界提取侧墙与对角背衬。因此斜线外侧墙会随额外 `44:0` 向外推移，不会占用轨道或紧贴侧道床；上述六行样板的道床和墙面轮廓已作为几何回归基准。
+- 九格净空、双轨床和坡道解析断面先合并，再从最终正交边界统一重建底板、侧墙、接触网凹槽及顶板。对角背衬只在两个正交墙格都存在时生成，因此弯道内部不会残留逐断面重叠产生的横墙或立柱。
+- 模板使用与 `tunnel_metro_1` 相同的最小半径 12 格和最大坡度 10%。坡步按解析切线法线同时划分两轨及九格断面；坡轨低端的凹槽和顶板抬高一格，坡轨不会同时承担水平弯轨。
+- 世界存档只用于开发时读取上述样板；运行与发布时模板不访问 `run/saves/Hello World!`。
+
+## 模板扩展架构
+
+自动生成已拆分为模板无关的执行层与模板自己的结构规划层：
+
+- `AutogenTemplate` 是隧道和桥梁共用的公开扩展接口。每个模板拥有自己的 ID、显示名、类型、参数说明、Tab 补全和 `build` 实现。
+- `AutogenTemplateRegistry` 保存运行时模板。内置模板在 `registerBuiltIns()` 中注册；新增本模组模板只需在这里追加一次注册，外部扩展也可在 pre-init 阶段调用公开的 `register(...)`。
+- `RoutePlanner` 根据两个方向标记生成五次曲线、连续方格路线、解析切线、断面朝向与轨道兼容坡步。隧道和铁路桥梁都可复用，无需依赖现有地铁隧道砌筑代码。
+- `AutogenPlan` 是模板无关的生成结果，统一承载方块操作、路线、预览线框和统计。命令、分 tick 执行、多人预览和撤销只消费该类型。
+- `MetroTunnel1Template` 与 `MetroTunnel1Builder` 完整封装原 `tunnel_metro_1` 的参数、材料、尺寸和七格断面特化逻辑。新模板不应向该构建器增加模板 ID 分支。
+- `MetroTunnel2Template` 与 `MetroTunnel2Builder` 独立封装 11×9 双轨断面、双轨方格路径与外壳重建，不修改 `tunnel_metro_1` 的生成分支。
+- `TunnelTemplateProfile` 只描述地铁模板使用的断面尺寸、曲率/坡度限制和材料。尺寸不同但仍采用相同七格特化算法时应先确认弯道过渡规则是否适用；全新尺寸应拥有独立 Builder，并复用公共路线与计划 API。
+
+新增模板的最小流程：
+
+1. 实现 `AutogenTemplate`，选择 `TUNNEL` 或 `BRIDGE` 类型并解析模板自己的参数。
+2. 在 Builder 中调用 `RoutePlanner.plan(selection, minimumRadius, maximumGrade)`。
+3. 沿 `RouteGeometry.route` 和 `sectionFacings` 生成该模板自己的断面、桥面、桥墩或洞门方块操作，并创建预览帧。
+4. 返回 `AutogenPlan`；通用命令会自动接管 preview、confirm、cancel、status 和 undo。
+5. 将实例注册到 `AutogenTemplateRegistry`。无需修改命令、网络包或任务管理器。
+
+桥梁模板已经具备代码接入点，但本次模块化没有内置具体桥梁样式；桥墩落地、跨距划分和水面/地形避让属于未来桥梁模板自己的 Builder 规则。
+
 ## 内置模板与安全
 
-隧道模板和运行限制均定义在 Java 源代码的 `TunnelConfig` 中，不会创建 `tunnel_presets.json`。默认最大坡度为 10%，其他限制为路线长度 2048 格、修改 500,000 个方块、每 tick 处理 4096 个方块；预览有效期为 60 秒。
+两个内置模板的断面资料分别定义在自己的 Template/Builder 模块，模板无关的运行限制定义在 `AutogenConfig`，不会创建 `tunnel_presets.json`。两个模板的默认最大坡度均为 10%；全局限制为路线长度 2048 格、修改 500,000 个方块、每 tick 处理 4096 个方块，预览有效期为 60 秒。
 
 生成前会向执行指令的玩家持续显示青色隧道外描边和统计，不修改世界。描边由最终方块计划提取，包含弯道扩宽与坡道抬高；可见线较亮，被现有方块遮挡的线较暗，并在 `confirm`、`cancel` 或 60 秒有效期结束时消失。系统按 tick 分批生成并在世界存档中保存最近一次撤销数据，包括 TileEntity NBT。生成途中执行 `cancel` 会自动回滚已修改部分。
 
@@ -322,14 +377,19 @@ CC | 44 | 44 | 43 | 44 | CC
 
 补充处理 ForgeGradle 3 开发运行缓存问题：增加 `prepareDevForgeJar`，从不含 `Side.BUKKIT` 的 `-recomp.jar` 生成带两条 MCP 名访问规则的本地开发副本，并在 `runClient`、`runServer` 启动前自动替换 joined 中间包。否则新增第二条 AT 后会在进入主菜单前先于世界加载触发 `NetworkRegistry.newChannel` 空指针，这不是隧道或 Railcraft 存档逻辑本身的异常。
 
-### 10. Java 内置模板
+### 10. Java 内置模板（迁移前记录）
 
-隧道模板和运行限制直接定义在 `TunnelConfig` 的 Java 常量对象中，不再创建或读取 `config/nebulaecraft/tunnel_presets.json`，因此也不再提供 `/ntunnel reload`。默认预设 ID 更名为 `tunnel_metro_1`，默认最大坡度调整为 10%。
+该阶段曾把隧道模板和运行限制直接定义在 `TunnelConfig` 的 Java 常量对象中，不再创建或读取 `config/nebulaecraft/tunnel_presets.json`，因此也不再提供 `/ntunnel reload`。默认预设 ID 更名为 `tunnel_metro_1`，默认最大坡度调整为 10%。当前架构已由后述模块化改造替代。
 
 ### 11. 主要实现文件
 
-- `src/main/java/net/kuina/nebulaecraft/autogen/TunnelBuilder.java`
-- `src/main/java/net/kuina/nebulaecraft/autogen/TunnelConfig.java`
+- `src/main/java/net/kuina/nebulaecraft/autogen/template/AutogenTemplate.java`
+- `src/main/java/net/kuina/nebulaecraft/autogen/template/AutogenTemplateRegistry.java`
+- `src/main/java/net/kuina/nebulaecraft/autogen/template/tunnel/MetroTunnel1Template.java`
+- `src/main/java/net/kuina/nebulaecraft/autogen/template/tunnel/MetroTunnel1Builder.java`
+- `src/main/java/net/kuina/nebulaecraft/autogen/route/RoutePlanner.java`
+- `src/main/java/net/kuina/nebulaecraft/autogen/AutogenPlan.java`
+- `src/main/java/net/kuina/nebulaecraft/autogen/AutogenConfig.java`
 - `src/main/java/net/kuina/nebulaecraft/autogen/CommandNebulaeTunnel.java`
 - `src/main/java/net/kuina/nebulaecraft/autogen/AutogenSelection.java`
 - `src/main/java/net/kuina/nebulaecraft/block/BlockAutogenMarker.java`
@@ -370,3 +430,19 @@ build/libs/NebulaeCraft-1.12.2-2.25.jar
 ```
 
 然后重新选择标记、执行 `preview` 并确认生成，避免旧结构影响观察结果。
+
+### 13. 2026-08-05 模板模块化
+
+- 删除同时承担预设和运行限制的 `TunnelConfig`；全局限制迁入 `AutogenConfig`，`tunnel_metro_1` 的资料迁入自己的模板模块。
+- 新增 `AutogenTemplateRegistry`，指令根据模板 ID 动态分发参数解析、Tab 补全和结构规划，不再硬编码模板参数位置。
+- 新增模板无关的 `AutogenPlan`；既有预览网络包、分 tick 执行与撤销链可直接处理隧道或桥梁计划。
+- 将五次曲线、方格化、解析切线和坡步匹配抽取到 `RoutePlanner`，原地铁隧道构建器只保留它独有的断面、弯道壳体、轨道、站台及供电设施逻辑。
+- 原 `TunnelBuilder` 移入 `template/tunnel` 并更名为 `MetroTunnel1Builder`，明确它不是所有模板都应修改的中心分发器。
+
+### 14. 2026-08-06 `tunnel_metro_2` 曲线复核
+
+- 从客户端日志确认最新双轨曲线为 `(-1135,18,-1114) → (-1035,18,-1013)`，中心路线共 202 格，解析切线主轴在索引 101 从 X 切换到 Z。
+- 旧结果的 `44:0` 八向连通分量为 `208 / 196 / 75 / 72 / 71 / 71`：两条外带完整，但两条内带都在主轴切换处被拆成两段。原因是卡迪纳尔偏移候选贴到另一格中心路线，中心留空阶段随后删除了对应内侧道床。
+- 轨道候选与局部连接现保留至少一个非中心格的缓冲；对同一路线静态复算后，`44:0` 只剩四条连续带，分量为 `208 / 196 / 149 / 144`。两条外带保持共享边连续，两条内带保持样板要求的对角弱连接，中心路线仍全部为空气。
+- 模板 2 的最终垂直台阶、成对墙灯以及普通/支架/坡线接触网改为复用模板 1 的解析切线判向。轨道与斜线接触网继续使用实际线路拓扑，避免以单一卡迪纳尔切线破坏弯角连接。
+- 同一路线整体上移到 Y=28 后再次生成，外轨在索引 98–104 的切线主轴切换处出现 `3×3` 的局部补线缺口。旧的有界最短路只按“离中心线更远”打破等长候选，因而把同样为 6 步的斜向连接方格化成 `EEE + SSS`，连同转角表现为两段各 4 格的直轨凸起；内轨没有这段大跨度缺口，所以不受影响。补线现在先比较候选到两端锚点斜率的垂直误差，按 `X/Z` 交替逼近解析切线，只有普通一格对角过渡误差相同时才沿用远离中心线的早移/晚移规则。静态复算中该段由 `(-1063,-1088) → (-1060,-1085)` 的 L 形改为连续锯齿，整条轨道数量仍为外轨 206、内轨 198；四条 `44:0` 带仍连续，八向分量为 `208 / 196 / 147 / 144`。

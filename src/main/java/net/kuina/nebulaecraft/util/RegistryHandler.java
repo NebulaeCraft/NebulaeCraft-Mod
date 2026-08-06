@@ -3,6 +3,7 @@ package net.kuina.nebulaecraft.util;
 import net.kuina.nebulaecraft.ElementsNebulaecraftMod;
 import net.kuina.nebulaecraft.autogen.CommandNebulaeTunnel;
 import net.kuina.nebulaecraft.autogen.TunnelGenerationManager;
+import net.kuina.nebulaecraft.autogen.template.AutogenTemplateRegistry;
 import net.kuina.nebulaecraft.block.*;
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.kuina.nebulaecraft.entities.*;
@@ -183,6 +184,7 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
 
     @Override
     public void preInit(FMLPreInitializationEvent event) {
+        AutogenTemplateRegistry.registerBuiltIns();
         MinecraftForge.EVENT_BUS.register(TunnelGenerationManager.INSTANCE);
     }
 

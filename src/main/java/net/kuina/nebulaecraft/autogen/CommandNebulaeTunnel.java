@@ -1,5 +1,7 @@
 package net.kuina.nebulaecraft.autogen;
 
+import net.kuina.nebulaecraft.autogen.template.AutogenTemplate;
+import net.kuina.nebulaecraft.autogen.template.AutogenTemplateRegistry;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
@@ -9,6 +11,7 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
 import javax.annotation.Nullable;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -21,12 +24,12 @@ public class CommandNebulaeTunnel extends CommandBase {
 
     @Override
     public List<String> getAliases() {
-        return Collections.singletonList("ntunnel");
+        return Arrays.asList("ntunnel", "nautogen");
     }
 
     @Override
     public String getUsage(ICommandSender sender) {
-        return "/ntunnel preview <preset> <platformColor> <none|catenary|thirdrail_white|thirdrail_yellow> [mirror]";
+        return "/ntunnel preview <template> <template arguments>";
     }
 
     @Override
@@ -67,22 +70,25 @@ public class CommandNebulaeTunnel extends CommandBase {
     }
 
     private void preview(EntityPlayerMP player, String[] args) throws CommandException {
-        if (args.length < 4) {
+        if (args.length < 2) {
             throw new CommandException(getUsage(player));
         }
-        String preset = args[1];
-        String color = args[2];
-        String power = args[3];
-        boolean mirrored = args.length >= 5 && args[4].equalsIgnoreCase("mirror");
+        AutogenTemplate template = AutogenTemplateRegistry.get(args[1]);
+        if (template == null) {
+            throw new CommandException("未知自动生成模板: " + args[1]);
+        }
+        String[] templateArguments = Arrays.copyOfRange(args, 2, args.length);
         try {
-            TunnelPlan plan = TunnelBuilder.build(player.getServerWorld(), AutogenSelection.get(player), preset, color, power, mirrored);
+            AutogenPlan plan = template.build(
+                    player.getServerWorld(), AutogenSelection.get(player), templateArguments);
+            AutogenPlanValidator.validate(player.getServerWorld(), plan);
             TunnelGenerationManager.INSTANCE.setPreview(player, plan);
             String radius = Double.isInfinite(plan.minimumRadius) ? "∞" : String.format(Locale.ROOT, "%.2f", plan.minimumRadius);
             player.sendMessage(new TextComponentString(String.format(Locale.ROOT,
-                    "预览完成：长度 %.1f，修改 %d 方块，最小半径 %s，最大坡度 %.2f%%，%d 秒内执行 /ntunnel confirm",
-                    plan.length, plan.operations.size(), radius, plan.maximumGrade * 100.0,
-                    TunnelConfig.get().settings.previewSeconds)));
-        } catch (TunnelBuildException e) {
+                    "%s 预览完成：长度 %.1f，修改 %d 方块，最小半径 %s，最大坡度 %.2f%%，%d 秒内执行 /ntunnel confirm",
+                    plan.displayName, plan.length, plan.operations.size(), radius,
+                    plan.maximumGrade * 100.0, AutogenConfig.get().previewSeconds)));
+        } catch (AutogenBuildException e) {
             throw new CommandException(e.getMessage());
         }
     }
@@ -94,16 +100,15 @@ public class CommandNebulaeTunnel extends CommandBase {
             return getListOfStringsMatchingLastWord(args, "preview", "confirm", "cancel", "status", "undo", "clear");
         }
         if (args.length == 2 && args[0].equalsIgnoreCase("preview")) {
-            return getListOfStringsMatchingLastWord(args, TunnelConfig.get().presets.keySet());
+            return getListOfStringsMatchingLastWord(args, AutogenTemplateRegistry.getIds());
         }
-        if (args.length == 3 && args[0].equalsIgnoreCase("preview")) {
-            return getListOfStringsMatchingLastWord(args, TunnelBuilder.colorNames());
-        }
-        if (args.length == 4 && args[0].equalsIgnoreCase("preview")) {
-            return getListOfStringsMatchingLastWord(args, "none", "catenary", "thirdrail_white", "thirdrail_yellow");
-        }
-        if (args.length == 5 && args[0].equalsIgnoreCase("preview")) {
-            return getListOfStringsMatchingLastWord(args, "mirror");
+        if (args.length >= 3 && args[0].equalsIgnoreCase("preview")) {
+            AutogenTemplate template = AutogenTemplateRegistry.get(args[1]);
+            if (template != null) {
+                String[] templateArguments = Arrays.copyOfRange(args, 2, args.length);
+                return getListOfStringsMatchingLastWord(
+                        args, template.getTabCompletions(templateArguments));
+            }
         }
         return Collections.emptyList();
     }
