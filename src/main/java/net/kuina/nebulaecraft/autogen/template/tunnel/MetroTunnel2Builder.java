@@ -87,7 +87,7 @@ public final class MetroTunnel2Builder {
         Set<Long> backingFloors = createCornerBackings(
                 clearFloors, wallFloors, geometry.route);
         Set<Long> recessFloors = createRecessFloors(
-                geometry, gradeLayout, firstTrack, secondTrack);
+                geometry, gradeLayout, firstTrack, secondTrack, clearFloors);
 
         LinkedHashMap<Long, PlannedState> states = new LinkedHashMap<>();
         planShell(states, clearFloors, wallFloors, backingFloors,
@@ -622,6 +622,8 @@ public final class MetroTunnel2Builder {
         validateOuterSideTrackbed(secondOuterCells, "右线外侧");
         validateInnerSideTrackbed(firstInnerCells, "左线内侧");
         validateInnerSideTrackbed(secondInnerCells, "右线内侧");
+        mergeSlopeTrackbedSections(
+                centerCells, sideCells, centerLine, gradeLayout);
         return new TrackbedLayout(centerCells, sideCells);
     }
 
@@ -651,13 +653,50 @@ public final class MetroTunnel2Builder {
                     BlockPos sideFloor = gradeLayout.floorAt(current.offset(side));
                     long key = sideFloor.toLong();
                     boolean solid = gradeLayout.isSlopeFloor(sideFloor)
-                            || isSlopeRailCell(lane, i);
+                            || (isSlopeRailCell(lane, i)
+                            && sideFloor.getY() == current.getY());
                     sideCells.put(key, Boolean.TRUE.equals(sideCells.get(key)) || solid);
                     if (horizontalDistanceToRoute(sideFloor, centerRoute) > trackDistance) {
                         outerCells.add(key);
                     } else {
                         innerCells.add(key);
                     }
+                }
+            }
+        }
+    }
+
+    /**
+     * Merge the authoritative analytic slope bed after both rasterized track bands are complete.
+     * Each rail owns three 43:8 cells at lateral -3..-1 or 1..3. Near a diagonal tangent the
+     * Chebyshev normal endpoint may sit one cardinal cell short of the rasterized outer corner;
+     * fill that corner only when no existing 43:8/44:0 cell already owns it.
+     */
+    private static void mergeSlopeTrackbedSections(
+            Set<Long> centerCells, Map<Long, Boolean> sideCells,
+            Set<Long> centerLine, GradeLayout gradeLayout) {
+        for (GradeTransition transition : gradeLayout.transitions) {
+            for (int lateral = -3; lateral <= 3; lateral++) {
+                if (lateral == 0) continue;
+                BlockPos floor = transition.normalOffset(lateral);
+                long packed = floor.toLong();
+                if (!centerLine.contains(xzKey(floor.getX(), floor.getZ()))
+                        && !centerCells.contains(packed)) {
+                    sideCells.put(packed, true);
+                }
+            }
+            for (int lateral : new int[]{-3, 3}) {
+                BlockPos normal = transition.normalOffset(lateral);
+                BlockPos corner = transition.diagonalOffset(lateral);
+                if (horizontalManhattanDistance(normal, corner) != 1
+                        || centerLine.contains(xzKey(
+                        corner.getX(), corner.getZ()))) {
+                    continue;
+                }
+                long packed = corner.toLong();
+                if (!centerCells.contains(packed)
+                        && !sideCells.containsKey(packed)) {
+                    sideCells.put(packed, true);
                 }
             }
         }
@@ -925,7 +964,8 @@ public final class MetroTunnel2Builder {
 
     private static Set<Long> createRecessFloors(
             RouteGeometry geometry, GradeLayout gradeLayout,
-            LanePath firstTrack, LanePath secondTrack) {
+            LanePath firstTrack, LanePath secondTrack,
+            Set<Long> clearFloors) {
         Set<Long> result = new HashSet<>();
         for (int i = 0; i < geometry.route.size(); i++) {
             EnumFacing facing = geometry.sectionFacings.get(i);
@@ -935,6 +975,7 @@ public final class MetroTunnel2Builder {
         }
         for (BlockPos pos : firstTrack.positions) result.add(pos.toLong());
         for (BlockPos pos : secondTrack.positions) result.add(pos.toLong());
+        gradeLayout.addSlopeRecessBridges(result, clearFloors);
         return result;
     }
 
@@ -977,12 +1018,13 @@ public final class MetroTunnel2Builder {
         for (Map.Entry<Long, EnumFacing> entry : innerWallDirections.entrySet()) {
             BlockPos floor = BlockPos.fromLong(entry.getKey());
             EnumFacing outward = entry.getValue();
+            int lift = gradeLayout.shellLift(floor);
             IBlockState verticalSlab = sideMountedState(
                     materials.verticalSlab, outward);
             put(states, floor, materials.concrete, 31);
             put(states, floor.up(), verticalSlab, 32);
-            put(states, floor.up(4), verticalSlab, 32);
-            put(states, floor.up(5), materials.concrete, 31);
+            put(states, floor.up(4 + lift), verticalSlab, 32);
+            put(states, floor.up(5 + lift), materials.concrete, 31);
         }
         for (long packed : recessFloors) {
             BlockPos floor = BlockPos.fromLong(packed);
@@ -1561,19 +1603,13 @@ public final class MetroTunnel2Builder {
         int shellLift(BlockPos floor) {
             GradeTransition transition = slopeShellCells.get(
                     xzKey(floor.getX(), floor.getZ()));
-            if (transition != null && floor.getY() == transition.lowCenter.getY()) {
-                return 1;
+            if (transition != null) {
+                return floor.getY() == transition.lowCenter.getY() ? 1 : 0;
             }
-            for (EnumFacing direction : EnumFacing.HORIZONTALS) {
-                BlockPos adjacent = floor.offset(direction);
-                transition = slopeShellCells.get(xzKey(
-                        adjacent.getX(), adjacent.getZ()));
-                if (transition != null && Math.abs(
-                        floor.getY() - transition.lowCenter.getY()) <= 1) {
-                    return 1;
-                }
-            }
-            return 0;
+            int section = sectionIndex(floor);
+            transition = transitionsByLowIndex.get(section);
+            return transition != null
+                    && floor.getY() == route.get(section).getY() ? 1 : 0;
         }
 
         void addSlopeClearFloors(Set<Long> result) {
@@ -1582,6 +1618,41 @@ public final class MetroTunnel2Builder {
                      lateral <= CLEAR_HALF_WIDTH; lateral++) {
                     result.add(transition.normalOffset(lateral).toLong());
                 }
+            }
+        }
+
+        /**
+         * Keep the central recess connected where an analytic slope normal crosses the cardinal
+         * curve raster. Near a diagonal tangent the normal's central cells touch only at corners,
+         * while adjacent level sections contribute cardinal clear cells on both grades. Without
+         * these bridge cells the default recess-height concrete remains inside the tunnel.
+         */
+        void addSlopeRecessBridges(Set<Long> recessFloors,
+                                   Set<Long> clearFloors) {
+            for (GradeTransition transition : transitions) {
+                addSlopeRecessBridge(recessFloors, clearFloors,
+                        transition.lowCenter, transition.lowCenter.getY());
+                addSlopeRecessBridge(recessFloors, clearFloors,
+                        transition.lowCenter, transition.highCenter.getY());
+            }
+        }
+
+        private void addSlopeRecessBridge(Set<Long> recessFloors,
+                                          Set<Long> clearFloors,
+                                          BlockPos center, int floorY) {
+            BlockPos floor = new BlockPos(center.getX(), floorY, center.getZ());
+            addRecessIfClear(recessFloors, clearFloors, floor);
+            for (EnumFacing direction : EnumFacing.HORIZONTALS) {
+                addRecessIfClear(recessFloors, clearFloors,
+                        floor.offset(direction));
+            }
+        }
+
+        private void addRecessIfClear(Set<Long> recessFloors,
+                                      Set<Long> clearFloors, BlockPos floor) {
+            long packed = floor.toLong();
+            if (clearFloors.contains(packed)) {
+                recessFloors.add(packed);
             }
         }
 
@@ -1637,6 +1708,12 @@ public final class MetroTunnel2Builder {
                     Math.round(lowCenter.getX() + normalX * lateral),
                     lowCenter.getY(),
                     Math.round(lowCenter.getZ() + normalZ * lateral));
+        }
+
+        BlockPos diagonalOffset(int lateral) {
+            return lowCenter.add(
+                    (int) Math.signum(normalX) * lateral, 0,
+                    (int) Math.signum(normalZ) * lateral);
         }
     }
 
