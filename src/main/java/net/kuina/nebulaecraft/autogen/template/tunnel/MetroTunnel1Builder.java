@@ -54,7 +54,7 @@ public final class MetroTunnel1Builder {
     public static AutogenPlan build(WorldServer world, AutogenSelection.Selection selection,
                                    String templateId, String displayName,
                                    TunnelTemplateProfile preset, String platformColor,
-                                   String power, boolean mirrored) throws AutogenBuildException {
+                                   boolean mirrored) throws AutogenBuildException {
         if (selection == null || !selection.isComplete()) {
             throw new TunnelBuildException("请先用自动生成魔杖选择两个标记方块");
         }
@@ -69,11 +69,6 @@ public final class MetroTunnel1Builder {
             throw new TunnelBuildException("标记在选择后被旋转，请用魔杖重新选择两个标记");
         }
         int colorMeta = colorMeta(platformColor);
-        String normalizedPower = power.toLowerCase(Locale.ENGLISH);
-        if (!normalizedPower.equals("none") && !normalizedPower.equals("catenary")
-                && !normalizedPower.equals("thirdrail_white") && !normalizedPower.equals("thirdrail_yellow")) {
-            throw new TunnelBuildException("未知供电方式: " + power);
-        }
 
         RouteGeometry geometry = RoutePlanner.plan(
                 selection, preset.minimumRadius, preset.maximumGrade);
@@ -97,13 +92,8 @@ public final class MetroTunnel1Builder {
         List<BlockPos> route = geometry.route;
         List<EnumFacing> sectionFacings = geometry.sectionFacings;
         GradeLayout gradeLayout = new GradeLayout(route, geometry.sectionTangents);
-        Set<Integer> catenarySupportIndices = normalizedPower.equals("catenary")
-                ? catenarySupportIndices(route, settings.catenarySupportSpacing)
-                : Collections.<Integer>emptySet();
-        ThirdRailLayout thirdRailLayout = normalizedPower.startsWith("thirdrail_")
-                ? createThirdRailLayout(route, sectionFacings, gradeLayout, mirrored,
-                settings.thirdRailSupportSpacing)
-                : null;
+        Set<Integer> catenarySupportIndices = catenarySupportIndices(
+                route, settings.catenarySupportSpacing);
         int halfClearWidth = preset.clearWidth / 2;
         int shellLateral = halfClearWidth + 1;
         int catenaryY = preset.clearHeight + 1;
@@ -204,31 +194,10 @@ public final class MetroTunnel1Builder {
             // The optional colored maintenance platform sits on the intact left floor block.
             put(states, gradedOffset(center, nx, nz, -2, gradeLayout).up(), platformState, 40);
 
-            if (normalizedPower.equals("catenary")) {
-                IBlockState catenary = catenaryState(route, i, forward,
-                        catenarySupportIndices.contains(i));
-                put(states, center.up(catenaryY), catenary, 45);
-            }
+            IBlockState catenary = catenaryState(route, i, forward,
+                    catenarySupportIndices.contains(i));
+            put(states, center.up(catenaryY), catenary, 45);
 
-        }
-
-        if (thirdRailLayout != null) {
-            boolean yellow = normalizedPower.endsWith("yellow");
-            for (ThirdRailPlacement placement : thirdRailLayout.placements) {
-                int routeIndex = placement.routeIndex;
-                EnumFacing forward = sectionFacings.get(routeIndex);
-                int nx = -forward.getFrontOffsetZ();
-                int nz = forward.getFrontOffsetX();
-                if (mirrored) {
-                    nx = -nx;
-                    nz = -nz;
-                }
-                EnumFacing towardTrack = lateralFacing(nx, nz, -1);
-                IBlockState thirdRail = thirdRailState(yellow, route, routeIndex, forward,
-                        towardTrack, placement.slope, placement.diagonalType,
-                        placement.diagonalFacing, placement.support);
-                put(states, placement.pos.up(), thirdRail, 45);
-            }
         }
 
         Set<Long> clearFootprint = applyTurnSectionTransitions(
@@ -1572,232 +1541,6 @@ public final class MetroTunnel1Builder {
         return routeFacing(route, index).getAxis() == EnumFacing.Axis.X ? 1 : 0;
     }
 
-    private static IBlockState thirdRailState(boolean yellow, List<BlockPos> route, int index,
-                                               EnumFacing curveForward, EnumFacing railSide,
-                                               boolean slope,
-                                               int diagonalType, EnumFacing diagonalFacing,
-                                               boolean support)
-            throws TunnelBuildException {
-        String color = yellow ? "yellow" : "white";
-        String id = "nebulaecraft:thirdrail_" + color;
-        int grade = gradeDirection(route, index);
-        EnumFacing modelFacing = railSide;
-        if (slope) {
-            EnumFacing ascending = grade > 0 ? curveForward : curveForward.getOpposite();
-            if (ascending == railSide.rotateYCCW()) {
-                id += "_slope_1";
-            } else if (ascending == railSide.rotateY()) {
-                id += "_slope_2";
-            } else {
-                throw new TunnelBuildException("无法匹配第三轨坡道的实际模型方向");
-            }
-        } else if (diagonalType != 0) {
-            if (support) {
-                id += "_support_diagonal";
-            } else {
-                id += diagonalType == 2 ? "_diagonal_2" : "_diagonal_1";
-            }
-            modelFacing = diagonalFacing;
-        } else if (support) {
-            id += "_support";
-        }
-        Block block = resolveBlock(id + "@0");
-        return nebulaFacingState(block, modelFacing);
-    }
-
-    /**
-     * Build the third rail as its own ordered lane instead of assuming that every track index has
-     * one usable side cell. On the inside of a rasterized curve the calibrated diagonal_1/2 pair
-     * is anchored before the two track corners. On the outside the same geometry is reversed and
-     * anchored after them; otherwise diagonal_2 lands directly on the centre track.
-     *
-     * The smooth tangent changes its dominant axis near the middle of a 90-degree curve. At that
-     * point the two offset lanes either overlap two cells (inside) or leave a two-cell gap
-     * (outside). Remove duplicate/track cells, bridge only the remaining local gap, then derive all
-     * diagonal models from the actual neighbouring third-rail positions. This keeps both curve
-     * sides, route directions, colours, and mirror mode under the same connectivity rule.
-     *
-     * Each adjacent diagonal_1/diagonal_2 pair consumes one effective spacing unit. If that unit
-     * receives a support, only its diagonal_1 cell may use the diagonal support model.
-     */
-    private static ThirdRailLayout createThirdRailLayout(List<BlockPos> route,
-                                                          List<EnumFacing> sectionFacings,
-                                                          GradeLayout gradeLayout,
-                                                          boolean mirrored, int supportSpacing)
-            throws TunnelBuildException {
-        int size = route.size();
-        BlockPos[] candidates = new BlockPos[size];
-        for (int i = 0; i < size; i++) {
-            EnumFacing placementSide = mirrored
-                    ? sectionFacings.get(i).rotateYCCW()
-                    : sectionFacings.get(i).rotateY();
-            candidates[i] = gradeLayout.floorAt(
-                    route.get(i).offset(placementSide));
-        }
-
-        // Re-anchor each selected one-block shift. The old formula is the inside case only. Its
-        // outside mirror must move the second corner forward and farther away from the centreline.
-        for (TurnSectionTransition transition
-                : findTurnSectionLayout(route, sectionFacings).transitions) {
-            int i = transition.index;
-            EnumFacing incoming = transition.incoming;
-            EnumFacing shift = transition.shift;
-            EnumFacing placementSide = mirrored ? incoming.rotateYCCW() : incoming.rotateY();
-            if (shift == placementSide) {
-                candidates[i] = candidates[i]
-                        .offset(incoming.getOpposite()).offset(shift);
-            } else {
-                candidates[i + 1] = candidates[i + 1]
-                        .offset(incoming).offset(placementSide);
-            }
-        }
-
-        Set<Long> trackCells = new HashSet<>();
-        for (BlockPos track : route) {
-            trackCells.add(track.toLong());
-        }
-        Set<Long> used = new HashSet<>();
-        List<ThirdRailPlacement> placements = new ArrayList<>();
-        for (int i = 0; i < size; i++) {
-            BlockPos candidate = candidates[i];
-            long packed = candidate.toLong();
-            // An inside-axis switch creates one centre-track candidate and one duplicate. Neither
-            // represents a physical third-rail length unit, so omit both before model selection.
-            if (trackCells.contains(packed) || used.contains(packed)) {
-                continue;
-            }
-            if (!placements.isEmpty()) {
-                ThirdRailPlacement previous = placements.get(placements.size() - 1);
-                int horizontalGap = horizontalManhattanDistance(previous.pos, candidate);
-                if (previous.pos.getY() == candidate.getY() && horizontalGap > 1) {
-                    List<BlockPos> bridge = findThirdRailBridge(
-                            previous.pos, candidate, trackCells, used);
-                    if (bridge.isEmpty()) {
-                        throw new TunnelBuildException("第三轨在切线方向转换处无法连续连接");
-                    }
-                    for (BlockPos bridgePos : bridge) {
-                        used.add(bridgePos.toLong());
-                        placements.add(new ThirdRailPlacement(bridgePos, i, false));
-                    }
-                } else if (horizontalGap != 1
-                        || Math.abs(previous.pos.getY() - candidate.getY()) > 1) {
-                    throw new TunnelBuildException("第三轨方格化路径不连续");
-                }
-            }
-            used.add(packed);
-            placements.add(new ThirdRailPlacement(
-                    candidate, i, gradeLayout.isSlopeSection(candidate)));
-        }
-
-        List<BlockPos> thirdRailRoute = new ArrayList<>(placements.size());
-        for (ThirdRailPlacement placement : placements) {
-            thirdRailRoute.add(placement.pos);
-        }
-        for (int i = 1; i + 1 < placements.size(); i++) {
-            ThirdRailPlacement placement = placements.get(i);
-            if (placement.slope) {
-                continue;
-            }
-            int physicalTurn = turn(thirdRailRoute, i);
-            if (physicalTurn == 0) {
-                continue;
-            }
-            placement.diagonalType = physicalTurn == (mirrored ? -1 : 1) ? 1 : 2;
-            EnumFacing physicalCorner = cornerFacing(thirdRailRoute, i);
-            placement.diagonalFacing = placement.diagonalType == 1
-                    ? physicalCorner.getOpposite() : physicalCorner;
-        }
-
-        int spacing = Math.max(1, supportSpacing);
-        int effectiveIndex = 0;
-        for (int i = 0; i < placements.size(); ) {
-            ThirdRailPlacement placement = placements.get(i);
-            if (placement.slope) {
-                effectiveIndex++;
-                i++;
-                continue;
-            }
-            if (placement.diagonalType != 0 && i + 1 < placements.size()) {
-                ThirdRailPlacement next = placements.get(i + 1);
-                if (!next.slope && next.diagonalType != 0
-                        && placement.diagonalType != next.diagonalType) {
-                    if (effectiveIndex % spacing == 0) {
-                        ThirdRailPlacement diagonalOne = placement.diagonalType == 1
-                                ? placement : next;
-                        diagonalOne.support = true;
-                    }
-                    effectiveIndex++;
-                    i += 2;
-                    continue;
-                }
-            }
-            if (effectiveIndex % spacing == 0 && placement.diagonalType != 2) {
-                placement.support = true;
-            }
-            effectiveIndex++;
-            i++;
-        }
-        return new ThirdRailLayout(placements);
-    }
-
-    private static int horizontalManhattanDistance(BlockPos first, BlockPos second) {
-        return Math.abs(first.getX() - second.getX())
-                + Math.abs(first.getZ() - second.getZ());
-    }
-
-    /** Return only the intermediate cells of a short, track-avoiding horizontal bridge. */
-    private static List<BlockPos> findThirdRailBridge(
-            BlockPos start, BlockPos end, Set<Long> trackCells, Set<Long> used) {
-        int shortest = horizontalManhattanDistance(start, end);
-        if (start.getY() != end.getY() || shortest <= 1
-                || shortest > LOCAL_TRANSITION_PATH_LIMIT) {
-            return Collections.emptyList();
-        }
-        int minX = Math.min(start.getX(), end.getX()) - 2;
-        int maxX = Math.max(start.getX(), end.getX()) + 2;
-        int minZ = Math.min(start.getZ(), end.getZ()) - 2;
-        int maxZ = Math.max(start.getZ(), end.getZ()) + 2;
-        int maxDepth = shortest + 4;
-        Deque<BlockPos> queue = new ArrayDeque<>();
-        Set<Long> visited = new HashSet<>();
-        Map<Long, Long> previous = new HashMap<>();
-        Map<Long, Integer> depths = new HashMap<>();
-        queue.add(start);
-        visited.add(start.toLong());
-        depths.put(start.toLong(), 0);
-        while (!queue.isEmpty()) {
-            BlockPos current = queue.removeFirst();
-            int depth = depths.get(current.toLong());
-            if (depth >= maxDepth) {
-                continue;
-            }
-            for (EnumFacing direction : EnumFacing.HORIZONTALS) {
-                BlockPos next = current.offset(direction);
-                if (next.getX() < minX || next.getX() > maxX
-                        || next.getZ() < minZ || next.getZ() > maxZ) {
-                    continue;
-                }
-                long packed = next.toLong();
-                if (trackCells.contains(packed)
-                        || used.contains(packed) && !next.equals(end)
-                        || !visited.add(packed)) {
-                    continue;
-                }
-                previous.put(packed, current.toLong());
-                depths.put(packed, depth + 1);
-                if (next.equals(end)) {
-                    List<BlockPos> path = reconstructBoundaryPath(previous, start, end);
-                    if (path.size() <= 2) {
-                        return Collections.emptyList();
-                    }
-                    return new ArrayList<>(path.subList(1, path.size() - 1));
-                }
-                queue.addLast(next);
-            }
-        }
-        return Collections.emptyList();
-    }
-
     private static IBlockState catenaryState(List<BlockPos> route, int index,
                                              EnumFacing curveFacing, boolean support)
             throws TunnelBuildException {
@@ -2142,29 +1885,6 @@ public final class MetroTunnel1Builder {
             this.pos = pos;
             this.state = state;
             this.priority = priority;
-        }
-    }
-
-    private static final class ThirdRailLayout {
-        final List<ThirdRailPlacement> placements;
-
-        ThirdRailLayout(List<ThirdRailPlacement> placements) {
-            this.placements = placements;
-        }
-    }
-
-    private static final class ThirdRailPlacement {
-        final BlockPos pos;
-        final int routeIndex;
-        final boolean slope;
-        int diagonalType;
-        EnumFacing diagonalFacing;
-        boolean support;
-
-        ThirdRailPlacement(BlockPos pos, int routeIndex, boolean slope) {
-            this.pos = pos;
-            this.routeIndex = routeIndex;
-            this.slope = slope;
         }
     }
 

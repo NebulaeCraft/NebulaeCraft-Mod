@@ -8,8 +8,7 @@ public final class AutogenConfig {
             500000,
             4096,
             9,
-            9,
-            3);
+            9);
 
     private AutogenConfig() {
     }
@@ -25,18 +24,15 @@ public final class AutogenConfig {
         public final int blocksPerTick;
         public final int lightSpacing;
         public final int catenarySupportSpacing;
-        public final int thirdRailSupportSpacing;
 
         private Settings(int previewSeconds, int maxPathLength, int maxChangedBlocks,
-                         int blocksPerTick, int lightSpacing, int catenarySupportSpacing,
-                         int thirdRailSupportSpacing) {
+                         int blocksPerTick, int lightSpacing, int catenarySupportSpacing) {
             this.previewSeconds = previewSeconds;
             this.maxPathLength = maxPathLength;
             this.maxChangedBlocks = maxChangedBlocks;
             this.blocksPerTick = blocksPerTick;
             this.lightSpacing = lightSpacing;
             this.catenarySupportSpacing = catenarySupportSpacing;
-            this.thirdRailSupportSpacing = thirdRailSupportSpacing;
         }
     }
 }

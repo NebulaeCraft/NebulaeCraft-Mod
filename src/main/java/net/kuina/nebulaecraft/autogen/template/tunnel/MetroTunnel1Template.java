@@ -8,7 +8,6 @@ import net.kuina.nebulaecraft.autogen.template.AutogenTemplate;
 import net.kuina.nebulaecraft.autogen.template.AutogenTemplateKind;
 import net.minecraft.world.WorldServer;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -47,7 +46,7 @@ public final class MetroTunnel1Template implements AutogenTemplate {
 
     @Override
     public String getUsage() {
-        return "<platformColor> <none|catenary|thirdrail_white|thirdrail_yellow> [mirror]";
+        return "<platformColor> [mirror]";
     }
 
     @Override
@@ -56,9 +55,6 @@ public final class MetroTunnel1Template implements AutogenTemplate {
             return MetroTunnel1Builder.colorNames();
         }
         if (arguments.length == 2) {
-            return Arrays.asList("none", "catenary", "thirdrail_white", "thirdrail_yellow");
-        }
-        if (arguments.length == 3) {
             return Collections.singletonList("mirror");
         }
         return Collections.emptyList();
@@ -67,14 +63,14 @@ public final class MetroTunnel1Template implements AutogenTemplate {
     @Override
     public AutogenPlan build(WorldServer world, AutogenSelection.Selection selection,
                              String[] arguments) throws AutogenBuildException {
-        if (arguments.length < 2 || arguments.length > 3) {
+        if (arguments.length < 1 || arguments.length > 2) {
             throw new TunnelBuildException("模板 " + ID + " 参数: " + getUsage());
         }
-        boolean mirrored = arguments.length == 3;
-        if (mirrored && !arguments[2].equalsIgnoreCase("mirror")) {
-            throw new TunnelBuildException("未知模板参数: " + arguments[2]);
+        boolean mirrored = arguments.length == 2;
+        if (mirrored && !arguments[1].equalsIgnoreCase("mirror")) {
+            throw new TunnelBuildException("未知模板参数: " + arguments[1]);
         }
         return MetroTunnel1Builder.build(world, selection, ID, DISPLAY_NAME, PROFILE,
-                arguments[0], arguments[1], mirrored);
+                arguments[0], mirrored);
     }
 }
