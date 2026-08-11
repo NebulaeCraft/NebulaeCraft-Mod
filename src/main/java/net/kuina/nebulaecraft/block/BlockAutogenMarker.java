@@ -1,6 +1,7 @@
 package net.kuina.nebulaecraft.block;
 
 import net.kuina.nebulaecraft.autogen.AutogenSelection;
+import net.kuina.nebulaecraft.autogen.AutogenPermissions;
 import net.kuina.nebulaecraft.creativetab.TabNebulaecraftMetro;
 import net.kuina.nebulaecraft.item.ItemAutogenWand;
 import net.minecraft.block.Block;
@@ -81,10 +82,14 @@ public class BlockAutogenMarker extends Block {
         ItemStack held = player.getHeldItem(hand);
         if (held.getItem() instanceof ItemAutogenWand) {
             if (!world.isRemote) {
-                int index = AutogenSelection.select(player, pos, state.getValue(FACING));
-                player.sendMessage(new TextComponentTranslation(index == 1
-                        ? "message.nebulaecraft.autogen.start_selected"
-                        : "message.nebulaecraft.autogen.end_selected", pos.getX(), pos.getY(), pos.getZ()));
+                if (!AutogenPermissions.canUse(player)) {
+                    AutogenPermissions.sendDenied(player);
+                } else {
+                    int index = AutogenSelection.select(player, pos, state.getValue(FACING));
+                    player.sendMessage(new TextComponentTranslation(index == 1
+                            ? "message.nebulaecraft.autogen.start_selected"
+                            : "message.nebulaecraft.autogen.end_selected", pos.getX(), pos.getY(), pos.getZ()));
+                }
             }
             return true;
         }

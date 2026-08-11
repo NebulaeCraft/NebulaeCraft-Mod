@@ -55,17 +55,21 @@ public final class TunnelGenerationManager {
     }
 
     public String cancel(EntityPlayerMP player) {
+        Preview removed = previews.remove(player.getUniqueID());
+        if (removed != null) {
+            clearPreview(player);
+            return "预览已取消";
+        }
         if (activeJob == null) {
-            Preview removed = previews.remove(player.getUniqueID());
-            if (removed != null) {
-                clearPreview(player);
-            }
-            return removed == null ? "没有可取消的预览或任务" : "预览已取消";
+            return "没有可取消的预览或任务";
         }
         if (activeJob.undoing) {
             return "撤销任务不能再次取消";
         }
-        activeJob = ActiveJob.undo(player.getUniqueID(), activeJob.world, activeJob.undoData);
+        if (!activeJob.owner.equals(player.getUniqueID())) {
+            return "当前生成任务由 " + activeOwnerName() + " 发起，只有发起者可以取消";
+        }
+        activeJob = ActiveJob.undo(activeJob.owner, activeJob.world, activeJob.undoData);
         return "生成已停止，正在恢复已经修改的方块";
     }
 
@@ -87,7 +91,9 @@ public final class TunnelGenerationManager {
 
     public String status(EntityPlayerMP player) {
         if (activeJob != null) {
-            return (activeJob.undoing ? "撤销" : "生成") + "进度: " + activeJob.index + "/" + activeJob.total();
+            return (activeJob.undoing ? "撤销" : "生成") + "进度: "
+                    + activeJob.index + "/" + activeJob.total()
+                    + "（发起者: " + activeOwnerName() + "）";
         }
         Preview preview = previews.get(player.getUniqueID());
         if (preview != null && preview.expiresAt >= System.currentTimeMillis()) {
@@ -99,6 +105,32 @@ public final class TunnelGenerationManager {
         }
         TunnelUndoData data = TunnelUndoData.get(player.getServer());
         return data.hasEntries() ? "空闲；最近一次生成可撤销（" + data.size() + " 个方块）" : "空闲";
+    }
+
+    public boolean hasPreview(EntityPlayerMP player) {
+        Preview preview = previews.get(player.getUniqueID());
+        if (preview == null) {
+            return false;
+        }
+        if (preview.expiresAt >= System.currentTimeMillis()) {
+            return true;
+        }
+        previews.remove(player.getUniqueID());
+        clearPreview(player);
+        return false;
+    }
+
+    public boolean hasActiveJob() {
+        return activeJob != null;
+    }
+
+    public boolean canCancelActiveJob(EntityPlayerMP player) {
+        return activeJob != null && !activeJob.undoing
+                && activeJob.owner.equals(player.getUniqueID());
+    }
+
+    public boolean canUndo(EntityPlayerMP player) {
+        return activeJob == null && TunnelUndoData.get(player.getServer()).hasEntries();
     }
 
     @SubscribeEvent
@@ -173,6 +205,15 @@ public final class TunnelGenerationManager {
         if (player != null) {
             player.sendMessage(new TextComponentString(text));
         }
+    }
+
+    private String activeOwnerName() {
+        if (activeJob == null) {
+            return "未知";
+        }
+        EntityPlayerMP owner = activeJob.world.getMinecraftServer().getPlayerList()
+                .getPlayerByUUID(activeJob.owner);
+        return owner == null ? activeJob.owner.toString() : owner.getName();
     }
 
     private static final class Preview {

@@ -45,4 +45,11 @@ public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 		net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
 				net.kuina.nebulaecraft.client.render.TunnelPreviewRenderer.INSTANCE.handle(message));
 	}
+
+	@Override
+	public void handleAutogenGui(net.kuina.nebulaecraft.network.PacketAutogenGui message) {
+		net.minecraft.client.Minecraft.getMinecraft().addScheduledTask(() ->
+				net.minecraft.client.Minecraft.getMinecraft().displayGuiScreen(
+						new net.kuina.nebulaecraft.gui.GuiAutogen(message)));
+	}
 }

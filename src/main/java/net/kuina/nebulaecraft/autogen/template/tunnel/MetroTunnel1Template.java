@@ -6,10 +6,12 @@ import net.kuina.nebulaecraft.autogen.AutogenSelection;
 import net.kuina.nebulaecraft.autogen.TunnelBuildException;
 import net.kuina.nebulaecraft.autogen.template.AutogenTemplate;
 import net.kuina.nebulaecraft.autogen.template.AutogenTemplateKind;
+import net.kuina.nebulaecraft.autogen.template.AutogenParameter;
 import net.minecraft.world.WorldServer;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Arrays;
 
 /** Complete module for the original seven-by-seven metro tunnel implementation. */
 public final class MetroTunnel1Template implements AutogenTemplate {
@@ -28,6 +30,11 @@ public final class MetroTunnel1Template implements AutogenTemplate {
             "minecraft:stone_slab@0",
             "railcraft:track_flex_reinforced@0",
             "railcraft:post_metal_platform@0");
+    private static final List<AutogenParameter> PARAMETERS = Collections.unmodifiableList(Arrays.asList(
+            AutogenParameter.choice("platform_color", "gui.nebulaecraft.autogen.platform_color",
+                    "cyan", MetroTunnel1Builder.colorNames()),
+            AutogenParameter.flag("mirror", "gui.nebulaecraft.autogen.mirror", "mirror")
+    ));
 
     @Override
     public String getId() {
@@ -42,6 +49,11 @@ public final class MetroTunnel1Template implements AutogenTemplate {
     @Override
     public AutogenTemplateKind getKind() {
         return AutogenTemplateKind.TUNNEL;
+    }
+
+    @Override
+    public List<AutogenParameter> getParameters() {
+        return PARAMETERS;
     }
 
     @Override

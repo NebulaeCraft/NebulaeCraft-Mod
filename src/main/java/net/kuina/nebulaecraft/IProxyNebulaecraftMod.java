@@ -17,4 +17,6 @@ public interface IProxyNebulaecraftMod {
 	void openRoadmarkGui(net.minecraft.tileentity.TileEntity te);
 
 	void handleTunnelPreview(net.kuina.nebulaecraft.network.PacketTunnelPreview message);
+
+	void handleAutogenGui(net.kuina.nebulaecraft.network.PacketAutogenGui message);
 }

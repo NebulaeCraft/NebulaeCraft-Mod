@@ -7,6 +7,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Locale;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Set;
 
@@ -51,6 +53,10 @@ public final class AutogenTemplateRegistry {
 
     public static synchronized Set<String> getIds() {
         return Collections.unmodifiableSet(new LinkedHashSet<>(TEMPLATES.keySet()));
+    }
+
+    public static synchronized List<AutogenTemplate> getAll() {
+        return Collections.unmodifiableList(new ArrayList<>(TEMPLATES.values()));
     }
 
     private static String normalizeId(String id) {

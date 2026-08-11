@@ -6,6 +6,7 @@ import net.kuina.nebulaecraft.autogen.AutogenSelection;
 import net.minecraft.world.WorldServer;
 
 import java.util.List;
+import java.util.Collections;
 
 /**
  * Public extension point for automatic linear structures.
@@ -20,6 +21,11 @@ public interface AutogenTemplate {
     String getDisplayName();
 
     AutogenTemplateKind getKind();
+
+    /** Structured controls shown by the autogen wand UI, in command-argument order. */
+    default List<AutogenParameter> getParameters() {
+        return Collections.emptyList();
+    }
 
     /** Usage fragment following the template id. */
     String getUsage();

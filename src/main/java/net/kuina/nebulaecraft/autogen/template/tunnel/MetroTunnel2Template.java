@@ -6,6 +6,7 @@ import net.kuina.nebulaecraft.autogen.AutogenSelection;
 import net.kuina.nebulaecraft.autogen.TunnelBuildException;
 import net.kuina.nebulaecraft.autogen.template.AutogenTemplate;
 import net.kuina.nebulaecraft.autogen.template.AutogenTemplateKind;
+import net.kuina.nebulaecraft.autogen.template.AutogenParameter;
 import net.minecraft.world.WorldServer;
 
 import java.util.Collections;
@@ -29,6 +30,11 @@ public final class MetroTunnel2Template implements AutogenTemplate {
     @Override
     public AutogenTemplateKind getKind() {
         return AutogenTemplateKind.TUNNEL;
+    }
+
+    @Override
+    public List<AutogenParameter> getParameters() {
+        return Collections.emptyList();
     }
 
     @Override

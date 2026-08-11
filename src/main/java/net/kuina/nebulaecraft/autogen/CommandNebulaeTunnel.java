@@ -34,7 +34,12 @@ public class CommandNebulaeTunnel extends CommandBase {
 
     @Override
     public int getRequiredPermissionLevel() {
-        return 2;
+        return AutogenPermissions.FALLBACK_OP_LEVEL;
+    }
+
+    @Override
+    public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+        return AutogenPermissions.canUse(sender);
     }
 
     @Override
@@ -49,20 +54,19 @@ public class CommandNebulaeTunnel extends CommandBase {
                 preview(player, args);
                 return;
             case "confirm":
-                player.sendMessage(new TextComponentString(TunnelGenerationManager.INSTANCE.confirm(player)));
+                player.sendMessage(new TextComponentString(callConfirm(player)));
                 return;
             case "cancel":
-                player.sendMessage(new TextComponentString(TunnelGenerationManager.INSTANCE.cancel(player)));
+                player.sendMessage(new TextComponentString(callCancel(player)));
                 return;
             case "status":
-                player.sendMessage(new TextComponentString(TunnelGenerationManager.INSTANCE.status(player)));
+                player.sendMessage(new TextComponentString(callStatus(player)));
                 return;
             case "undo":
-                player.sendMessage(new TextComponentString(TunnelGenerationManager.INSTANCE.undo(player)));
+                player.sendMessage(new TextComponentString(callUndo(player)));
                 return;
             case "clear":
-                AutogenSelection.clear(player);
-                player.sendMessage(new TextComponentString("自动生成标记选区已清除"));
+                player.sendMessage(new TextComponentString(callClear(player)));
                 return;
             default:
                 throw new CommandException(getUsage(sender));
@@ -73,21 +77,50 @@ public class CommandNebulaeTunnel extends CommandBase {
         if (args.length < 2) {
             throw new CommandException(getUsage(player));
         }
-        AutogenTemplate template = AutogenTemplateRegistry.get(args[1]);
-        if (template == null) {
-            throw new CommandException("未知自动生成模板: " + args[1]);
-        }
         String[] templateArguments = Arrays.copyOfRange(args, 2, args.length);
         try {
-            AutogenPlan plan = template.build(
-                    player.getServerWorld(), AutogenSelection.get(player), templateArguments);
-            AutogenPlanValidator.validate(player.getServerWorld(), plan);
-            TunnelGenerationManager.INSTANCE.setPreview(player, plan);
-            String radius = Double.isInfinite(plan.minimumRadius) ? "∞" : String.format(Locale.ROOT, "%.2f", plan.minimumRadius);
-            player.sendMessage(new TextComponentString(String.format(Locale.ROOT,
-                    "%s 预览完成：长度 %.1f，修改 %d 方块，最小半径 %s，最大坡度 %.2f%%，%d 秒内执行 /ntunnel confirm",
-                    plan.displayName, plan.length, plan.operations.size(), radius,
-                    plan.maximumGrade * 100.0, AutogenConfig.get().previewSeconds)));
+            player.sendMessage(new TextComponentString(
+                    AutogenService.preview(player, args[1], templateArguments)));
+        } catch (AutogenBuildException e) {
+            throw new CommandException(e.getMessage());
+        }
+    }
+
+    private static String callConfirm(EntityPlayerMP player) throws CommandException {
+        try {
+            return AutogenService.confirm(player);
+        } catch (AutogenBuildException e) {
+            throw new CommandException(e.getMessage());
+        }
+    }
+
+    private static String callCancel(EntityPlayerMP player) throws CommandException {
+        try {
+            return AutogenService.cancel(player);
+        } catch (AutogenBuildException e) {
+            throw new CommandException(e.getMessage());
+        }
+    }
+
+    private static String callStatus(EntityPlayerMP player) throws CommandException {
+        try {
+            return AutogenService.status(player);
+        } catch (AutogenBuildException e) {
+            throw new CommandException(e.getMessage());
+        }
+    }
+
+    private static String callUndo(EntityPlayerMP player) throws CommandException {
+        try {
+            return AutogenService.undo(player);
+        } catch (AutogenBuildException e) {
+            throw new CommandException(e.getMessage());
+        }
+    }
+
+    private static String callClear(EntityPlayerMP player) throws CommandException {
+        try {
+            return AutogenService.clear(player);
         } catch (AutogenBuildException e) {
             throw new CommandException(e.getMessage());
         }

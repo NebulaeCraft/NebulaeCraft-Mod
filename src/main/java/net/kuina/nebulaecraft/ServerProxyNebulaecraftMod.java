@@ -31,4 +31,9 @@ public class ServerProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 	public void handleTunnelPreview(net.kuina.nebulaecraft.network.PacketTunnelPreview message) {
 		// 仅由客户端处理
 	}
+
+	@Override
+	public void handleAutogenGui(net.kuina.nebulaecraft.network.PacketAutogenGui message) {
+		// 仅由客户端处理
+	}
 }
