@@ -592,6 +592,7 @@ gui.nebulaecraft.autogen.cancel=取消
 gui.nebulaecraft.autogen.undo=撤销
 gui.nebulaecraft.autogen.clear=清除选区
 gui.nebulaecraft.autogen.refresh=刷新
+gui.nebulaecraft.autogen.close=关闭
 gui.nebulaecraft.autogen.yes=是
 gui.nebulaecraft.autogen.no=否
 gui.nebulaecraft.autogen.value.white=白色

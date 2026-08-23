@@ -62,23 +62,11 @@ public final class MetroTunnel2Builder {
         }
 
         Materials materials = new Materials();
-        GradeLayout gradeLayout = new GradeLayout(
-                geometry.route, geometry.sectionTangents);
-        Set<Long> centerLine = horizontalKeys(geometry.route);
-        LanePath firstHorizontalTrack = buildLane(
-                geometry, gradeLayout, -TRACK_OFFSET,
-                centerLine, Collections.<Long>emptySet(), "左线");
-        LanePath secondHorizontalTrack = buildLane(
-                geometry, gradeLayout, TRACK_OFFSET,
-                centerLine, firstHorizontalTrack.horizontalKeys, "右线");
-        LanePath firstTrack = applyLaneGrades(
-                firstHorizontalTrack, geometry.route, "左线");
-        LanePath secondTrack = applyLaneGrades(
-                secondHorizontalTrack, geometry.route, "右线");
-        validateParallelTracks(firstTrack, secondTrack, geometry.route);
-
-        TrackbedLayout trackbed = createTrackbedLayout(
-                firstTrack, secondTrack, gradeLayout, geometry.route);
+        DoubleTrackPlan doubleTrack = planDoubleTrack(geometry);
+        GradeLayout gradeLayout = doubleTrack.gradeLayout;
+        LanePath firstTrack = doubleTrack.firstTrack;
+        LanePath secondTrack = doubleTrack.secondTrack;
+        TrackbedLayout trackbed = doubleTrack.trackbed;
         Set<Long> clearFloors = createClearFloors(
                 geometry, gradeLayout, trackbed);
         Set<Long> wallFloors = createWallFloors(clearFloors, geometry.route);
@@ -128,6 +116,32 @@ public final class MetroTunnel2Builder {
                 new ArrayList<>(geometry.route), previewFrames,
                 geometry.length, geometry.minimumRadius, geometry.maximumGrade,
                 templateId, displayName, AutogenTemplateKind.TUNNEL);
+    }
+
+    /**
+     * Plan the shared double-track alignment and trackbed semantics used by tunnel_metro_2.
+     * Bridge templates may consume this immutable view without inheriting any tunnel shell.
+     */
+    public static DoubleTrackPlan planDoubleTrack(RouteGeometry geometry)
+            throws TunnelBuildException {
+        GradeLayout gradeLayout = new GradeLayout(
+                geometry.route, geometry.sectionTangents);
+        Set<Long> centerLine = horizontalKeys(geometry.route);
+        LanePath firstHorizontalTrack = buildLane(
+                geometry, gradeLayout, -TRACK_OFFSET,
+                centerLine, Collections.<Long>emptySet(), "左线");
+        LanePath secondHorizontalTrack = buildLane(
+                geometry, gradeLayout, TRACK_OFFSET,
+                centerLine, firstHorizontalTrack.horizontalKeys, "右线");
+        LanePath firstTrack = applyLaneGrades(
+                firstHorizontalTrack, geometry.route, "左线");
+        LanePath secondTrack = applyLaneGrades(
+                secondHorizontalTrack, geometry.route, "右线");
+        validateParallelTracks(firstTrack, secondTrack, geometry.route);
+        TrackbedLayout trackbed = createTrackbedLayout(
+                firstTrack, secondTrack, gradeLayout, geometry.route);
+        return new DoubleTrackPlan(
+                gradeLayout, firstTrack, secondTrack, trackbed);
     }
 
     private static void validateSelection(WorldServer world,
@@ -1744,6 +1758,51 @@ public final class MetroTunnel2Builder {
             catenarySupport = resolveBlock("nebulaecraft:catenary_steel_support@0");
             catenaryDiagonal = resolveBlock("nebulaecraft:catenary_steel_diagonal@0");
             catenarySlope = resolveBlock("nebulaecraft:catenary_steel_slope@0");
+        }
+    }
+
+    /** Read-only bridge-facing view of the tunnel_metro_2 lane and trackbed planner. */
+    public static final class DoubleTrackPlan {
+        private final GradeLayout gradeLayout;
+        private final LanePath firstTrack;
+        private final LanePath secondTrack;
+        private final TrackbedLayout trackbed;
+
+        private DoubleTrackPlan(GradeLayout gradeLayout,
+                                LanePath firstTrack, LanePath secondTrack,
+                                TrackbedLayout trackbed) {
+            this.gradeLayout = gradeLayout;
+            this.firstTrack = firstTrack;
+            this.secondTrack = secondTrack;
+            this.trackbed = trackbed;
+        }
+
+        public List<BlockPos> getFirstTrack() {
+            return Collections.unmodifiableList(firstTrack.positions);
+        }
+
+        public List<BlockPos> getSecondTrack() {
+            return Collections.unmodifiableList(secondTrack.positions);
+        }
+
+        public int getFirstSourceSection(int trackIndex) {
+            return firstTrack.cells.get(trackIndex).sourceSection;
+        }
+
+        public int getSecondSourceSection(int trackIndex) {
+            return secondTrack.cells.get(trackIndex).sourceSection;
+        }
+
+        public Set<Long> getCenterTrackbedCells() {
+            return Collections.unmodifiableSet(trackbed.centerCells);
+        }
+
+        public Map<Long, Boolean> getSideTrackbedCells() {
+            return Collections.unmodifiableMap(trackbed.sideCells);
+        }
+
+        public BlockPos floorAt(BlockPos horizontal) {
+            return gradeLayout.floorAt(horizontal);
         }
     }
 

@@ -1,5 +1,7 @@
 package net.kuina.nebulaecraft.autogen.template;
 
+import net.kuina.nebulaecraft.autogen.template.bridge.MetroBridge1Template;
+import net.kuina.nebulaecraft.autogen.template.bridge.MetroBridge2Template;
 import net.kuina.nebulaecraft.autogen.template.tunnel.MetroTunnel1Template;
 import net.kuina.nebulaecraft.autogen.template.tunnel.MetroTunnel2Template;
 
@@ -26,6 +28,8 @@ public final class AutogenTemplateRegistry {
         }
         register(new MetroTunnel1Template());
         register(new MetroTunnel2Template());
+        register(new MetroBridge1Template());
+        register(new MetroBridge2Template());
         builtInsRegistered = true;
     }
 

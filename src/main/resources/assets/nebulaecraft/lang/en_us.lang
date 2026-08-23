@@ -592,6 +592,7 @@ gui.nebulaecraft.autogen.cancel=Cancel
 gui.nebulaecraft.autogen.undo=Undo
 gui.nebulaecraft.autogen.clear=Clear selection
 gui.nebulaecraft.autogen.refresh=Refresh
+gui.nebulaecraft.autogen.close=Close
 gui.nebulaecraft.autogen.yes=Yes
 gui.nebulaecraft.autogen.no=No
 gui.nebulaecraft.autogen.value.white=White

@@ -7,6 +7,8 @@ import net.kuina.nebulaecraft.network.PacketAutogenGui;
 import net.minecraft.client.gui.GuiButton;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.resources.I18n;
+import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,9 +24,17 @@ public final class GuiAutogen extends GuiScreen {
     private static final int UNDO_BUTTON = 23;
     private static final int CLEAR_BUTTON = 24;
     private static final int REFRESH_BUTTON = 25;
+    private static final int CLOSE_BUTTON = 26;
+
+    private static final int TEMPLATE_DROPDOWN_WIDTH = 260;
+    private static final int TEMPLATE_DROPDOWN_ROW_HEIGHT = 20;
+    private static final int TEMPLATE_DROPDOWN_MAX_ROWS = 6;
+    private static final int TEMPLATE_DROPDOWN_SCROLLBAR_WIDTH = 6;
 
     private final PacketAutogenGui state;
     private int templateIndex;
+    private boolean templateDropdownOpen;
+    private int templateDropdownScroll;
     private List<String> values = new ArrayList<>();
 
     public GuiAutogen(PacketAutogenGui state) {
@@ -38,7 +48,8 @@ public final class GuiAutogen extends GuiScreen {
         int left = width / 2 - 145;
         int top = height / 2 - 105;
 
-        GuiButton template = new GuiButton(TEMPLATE_BUTTON, left + 15, top + 49, 260, 20,
+        GuiButton template = new GuiButton(TEMPLATE_BUTTON, left + 15, top + 49,
+                TEMPLATE_DROPDOWN_WIDTH, TEMPLATE_DROPDOWN_ROW_HEIGHT,
                 templateText());
         template.enabled = state.templates.size() > 1;
         buttonList.add(template);
@@ -81,13 +92,20 @@ public final class GuiAutogen extends GuiScreen {
 
         buttonList.add(new GuiButton(REFRESH_BUTTON, left + 193, secondY, 82, 20,
                 I18n.format("gui.nebulaecraft.autogen.refresh")));
+
+        buttonList.add(new GuiButton(CLOSE_BUTTON, left + 15, secondY + 24, 260, 20,
+                I18n.format("gui.nebulaecraft.autogen.close")));
+
+        clampTemplateDropdownScroll();
     }
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
         if (button.id == TEMPLATE_BUTTON && !state.templates.isEmpty()) {
-            selectTemplate((templateIndex + 1) % state.templates.size());
-            initGui();
+            templateDropdownOpen = !templateDropdownOpen;
+            if (templateDropdownOpen) {
+                scrollSelectedTemplateIntoView();
+            }
             return;
         }
         if (button.id >= PARAMETER_BUTTON_BASE) {
@@ -121,6 +139,9 @@ public final class GuiAutogen extends GuiScreen {
             case REFRESH_BUTTON:
                 send(new PacketAutogenAction(PacketAutogenAction.REFRESH));
                 break;
+            case CLOSE_BUTTON:
+                mc.displayGuiScreen(null);
+                break;
             default:
                 break;
         }
@@ -144,6 +165,80 @@ public final class GuiAutogen extends GuiScreen {
                 I18n.format("gui.nebulaecraft.autogen.status") + ": " + state.status,
                 width / 2, top + 132, 0xD0D0D0);
         super.drawScreen(mouseX, mouseY, partialTicks);
+        if (templateDropdownOpen) {
+            drawTemplateDropdown(mouseX, mouseY);
+        }
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        if (!templateDropdownOpen) {
+            super.mouseClicked(mouseX, mouseY, mouseButton);
+            return;
+        }
+
+        if (mouseButton == 0 && isInsideTemplateButton(mouseX, mouseY)) {
+            templateDropdownOpen = false;
+            return;
+        }
+
+        if (mouseButton == 0 && isInsideTemplateDropdown(mouseX, mouseY)) {
+            int visibleRows = getVisibleTemplateRows();
+            int dropdownX = getTemplateDropdownX();
+            int dropdownY = getTemplateDropdownY();
+            if (state.templates.size() > visibleRows
+                    && mouseX >= dropdownX + TEMPLATE_DROPDOWN_WIDTH
+                    - TEMPLATE_DROPDOWN_SCROLLBAR_WIDTH) {
+                int maximumScroll = state.templates.size() - visibleRows;
+                int dropdownHeight = visibleRows * TEMPLATE_DROPDOWN_ROW_HEIGHT;
+                templateDropdownScroll = clamp((mouseY - dropdownY) * maximumScroll
+                        / Math.max(1, dropdownHeight - 1), 0, maximumScroll);
+                return;
+            }
+
+            int index = templateDropdownScroll
+                    + (mouseY - dropdownY) / TEMPLATE_DROPDOWN_ROW_HEIGHT;
+            if (index >= 0 && index < state.templates.size()) {
+                if (index != templateIndex) {
+                    selectTemplate(index);
+                    initGui();
+                }
+                templateDropdownOpen = false;
+                mc.getSoundHandler().playSound(net.minecraft.client.audio.PositionedSoundRecord
+                        .getMasterRecord(net.minecraft.init.SoundEvents.UI_BUTTON_CLICK, 1.0F));
+            }
+            return;
+        }
+
+        // Covered controls are handled above; clicks elsewhere may activate visible controls
+        // such as the dedicated close button in the same click.
+        templateDropdownOpen = false;
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    @Override
+    public void handleMouseInput() throws IOException {
+        int wheel = Mouse.getEventDWheel();
+        if (templateDropdownOpen && wheel != 0) {
+            int mouseX = Mouse.getEventX() * width / mc.displayWidth;
+            int mouseY = height - Mouse.getEventY() * height / mc.displayHeight - 1;
+            if (isInsideTemplateButton(mouseX, mouseY)
+                    || isInsideTemplateDropdown(mouseX, mouseY)) {
+                templateDropdownScroll += wheel > 0 ? -1 : 1;
+                clampTemplateDropdownScroll();
+                return;
+            }
+        }
+        super.handleMouseInput();
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        if (templateDropdownOpen && keyCode == Keyboard.KEY_ESCAPE) {
+            templateDropdownOpen = false;
+            return;
+        }
+        super.keyTyped(typedChar, keyCode);
     }
 
     @Override
@@ -170,7 +265,111 @@ public final class GuiAutogen extends GuiScreen {
     private String templateText() {
         PacketAutogenGui.TemplateData template = selectedTemplate();
         return I18n.format("gui.nebulaecraft.autogen.template") + ": "
-                + (template == null ? "-" : template.displayName);
+                + (template == null ? "-" : template.displayName)
+                + (state.templates.size() > 1 ? "  \u25BC" : "");
+    }
+
+    private void drawTemplateDropdown(int mouseX, int mouseY) {
+        int visibleRows = getVisibleTemplateRows();
+        if (visibleRows <= 0) {
+            return;
+        }
+
+        int x = getTemplateDropdownX();
+        int y = getTemplateDropdownY();
+        int height = visibleRows * TEMPLATE_DROPDOWN_ROW_HEIGHT;
+        boolean scrollable = state.templates.size() > visibleRows;
+        int textWidth = TEMPLATE_DROPDOWN_WIDTH - (scrollable
+                ? TEMPLATE_DROPDOWN_SCROLLBAR_WIDTH : 0) - 8;
+
+        drawRect(x - 1, y - 1, x + TEMPLATE_DROPDOWN_WIDTH + 1, y + height + 1,
+                0xFF000000);
+        for (int row = 0; row < visibleRows; row++) {
+            int index = templateDropdownScroll + row;
+            int rowY = y + row * TEMPLATE_DROPDOWN_ROW_HEIGHT;
+            boolean hovered = mouseX >= x && mouseX < x + TEMPLATE_DROPDOWN_WIDTH
+                    - (scrollable ? TEMPLATE_DROPDOWN_SCROLLBAR_WIDTH : 0)
+                    && mouseY >= rowY && mouseY < rowY + TEMPLATE_DROPDOWN_ROW_HEIGHT;
+            int background = hovered ? 0xFF4A6D8C
+                    : index == templateIndex ? 0xFF355A7A : 0xFF303030;
+            drawRect(x, rowY, x + TEMPLATE_DROPDOWN_WIDTH, rowY
+                    + TEMPLATE_DROPDOWN_ROW_HEIGHT, background);
+            if (row > 0) {
+                drawHorizontalLine(x, x + TEMPLATE_DROPDOWN_WIDTH - 1, rowY,
+                        0xFF555555);
+            }
+
+            String label = fontRenderer.trimStringToWidth(
+                    state.templates.get(index).displayName, textWidth);
+            drawCenteredString(fontRenderer, label,
+                    x + (TEMPLATE_DROPDOWN_WIDTH
+                            - (scrollable ? TEMPLATE_DROPDOWN_SCROLLBAR_WIDTH : 0)) / 2,
+                    rowY + 6, hovered ? 0xFFFFA0 : 0xFFFFFF);
+        }
+
+        if (scrollable) {
+            int scrollbarX = x + TEMPLATE_DROPDOWN_WIDTH - TEMPLATE_DROPDOWN_SCROLLBAR_WIDTH;
+            drawRect(scrollbarX, y, x + TEMPLATE_DROPDOWN_WIDTH, y + height, 0xFF181818);
+            int thumbHeight = Math.max(8, height * visibleRows / state.templates.size());
+            int maximumScroll = state.templates.size() - visibleRows;
+            int thumbY = y + (height - thumbHeight) * templateDropdownScroll / maximumScroll;
+            drawRect(scrollbarX + 1, thumbY, x + TEMPLATE_DROPDOWN_WIDTH - 1,
+                    thumbY + thumbHeight, 0xFFB0B0B0);
+        }
+    }
+
+    private int getTemplateDropdownX() {
+        return width / 2 - 130;
+    }
+
+    private int getTemplateButtonY() {
+        return height / 2 - 56;
+    }
+
+    private int getTemplateDropdownY() {
+        return getTemplateButtonY() + TEMPLATE_DROPDOWN_ROW_HEIGHT;
+    }
+
+    private int getVisibleTemplateRows() {
+        int rowsThatFit = Math.max(1,
+                (height - getTemplateDropdownY() - 4) / TEMPLATE_DROPDOWN_ROW_HEIGHT);
+        return Math.min(state.templates.size(),
+                Math.min(TEMPLATE_DROPDOWN_MAX_ROWS, rowsThatFit));
+    }
+
+    private boolean isInsideTemplateButton(int mouseX, int mouseY) {
+        int x = getTemplateDropdownX();
+        int y = getTemplateButtonY();
+        return mouseX >= x && mouseX < x + TEMPLATE_DROPDOWN_WIDTH
+                && mouseY >= y && mouseY < y + TEMPLATE_DROPDOWN_ROW_HEIGHT;
+    }
+
+    private boolean isInsideTemplateDropdown(int mouseX, int mouseY) {
+        int visibleRows = getVisibleTemplateRows();
+        int x = getTemplateDropdownX();
+        int y = getTemplateDropdownY();
+        return mouseX >= x && mouseX < x + TEMPLATE_DROPDOWN_WIDTH
+                && mouseY >= y && mouseY < y
+                + visibleRows * TEMPLATE_DROPDOWN_ROW_HEIGHT;
+    }
+
+    private void scrollSelectedTemplateIntoView() {
+        int visibleRows = getVisibleTemplateRows();
+        if (templateIndex < templateDropdownScroll) {
+            templateDropdownScroll = templateIndex;
+        } else if (templateIndex >= templateDropdownScroll + visibleRows) {
+            templateDropdownScroll = templateIndex - visibleRows + 1;
+        }
+        clampTemplateDropdownScroll();
+    }
+
+    private void clampTemplateDropdownScroll() {
+        templateDropdownScroll = clamp(templateDropdownScroll, 0,
+                Math.max(0, state.templates.size() - getVisibleTemplateRows()));
+    }
+
+    private static int clamp(int value, int minimum, int maximum) {
+        return Math.max(minimum, Math.min(maximum, value));
     }
 
     private void cycleParameter(int index) {
