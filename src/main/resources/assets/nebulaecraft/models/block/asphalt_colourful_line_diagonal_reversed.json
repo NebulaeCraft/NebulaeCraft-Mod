@@ -4,7 +4,7 @@
 	"textures": {
 		"0": "nebulaecraft:blocks/asphalt",
 		"1": "nebulaecraft:blocks/asphalt_colourful_line_diagonal_reversed",
-		"2": "nebulaecraft:blocks/asphalt_colourful_line_reversed",
+		"2": "nebulaecraft:blocks/asphalt_colourful_line",
 		"particle": "nebulaecraft:blocks/asphalt"
 	},
 	"elements": [

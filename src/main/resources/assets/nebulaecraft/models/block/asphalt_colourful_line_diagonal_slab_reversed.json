@@ -3,7 +3,7 @@
 	"credit": "Made with Blockbench",
 	"textures": {
 		"0": "nebulaecraft:blocks/asphalt",
-		"1": "nebulaecraft:blocks/asphalt_colourful_line_reversed",
+		"1": "nebulaecraft:blocks/asphalt_colourful_line",
 		"2": "nebulaecraft:blocks/asphalt_colourful_line_diagonal_reversed",
 		"particle": "nebulaecraft:blocks/asphalt"
 	},
