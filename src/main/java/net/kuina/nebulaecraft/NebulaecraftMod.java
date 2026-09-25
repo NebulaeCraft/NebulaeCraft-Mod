@@ -17,6 +17,7 @@ import net.minecraftforge.fluids.FluidRegistry;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.kuina.nebulaecraft.command.CommandSpeed;
 
 import net.minecraft.world.biome.Biome;
 import net.minecraft.potion.Potion;
@@ -61,6 +62,9 @@ public class NebulaecraftMod {
 	@Mod.EventHandler
 	public void serverLoad(FMLServerStartingEvent event) {
 		elements.getElements().forEach(element -> element.serverLoad(event));
+		if (event.getServer().isSinglePlayer()) {
+			event.registerServerCommand(new CommandSpeed());
+		}
 		proxy.serverLoad(event);
 	}
 
