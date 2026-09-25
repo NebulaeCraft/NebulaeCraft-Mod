@@ -10,7 +10,6 @@ import net.kuina.nebulaecraft.entities.*;
 import net.kuina.nebulaecraft.item.ItemAutogenWand;
 import net.kuina.nebulaecraft.tileentity.TileEntityTdt;
 import net.kuina.nebulaecraft.tileentity.TileEntityRoadmarkText;
-import net.kuina.nebulaecraft.util.ServerHandler;
 import net.minecraft.block.Block;
 import net.minecraft.block.SoundType;
 import net.minecraft.block.material.Material;
@@ -62,8 +61,6 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
     public void registerTileEntity(Class tileEntityClass, String tileEntityName) {
         GameRegistry.registerTileEntity(tileEntityClass, tileEntityName);
     }
-
-    ServerHandler handler = new ServerHandler();
 
     @Override
     public void initElements() {
