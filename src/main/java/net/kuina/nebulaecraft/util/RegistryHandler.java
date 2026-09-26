@@ -98,10 +98,6 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_yellow_line_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_yellow_line_diagonal");
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_yellow_line_diagonal_slab");
-        registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_colourful_line");
-        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_colourful_line_slab");
-        registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_colourful_line_diagonal");
-        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_colourful_line_diagonal_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_double_yellow_line_wye");
         registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_double_yellow_line_wye_slab");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_yellow_line_lean");
@@ -158,6 +154,12 @@ public class RegistryHandler extends ElementsNebulaecraftMod.ModElement {
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_white_line_small");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_yellow_line_small");
         registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_light_red");
+        registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_colourful_line");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_colourful_line_slab");
+        registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_colourful_line_diagonal");
+        registerBlock(new BlockAsphaltAddon.BlockCustom(), "asphalt_colourful_line_diagonal_v");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_colourful_line_diagonal_slab");
+        registerBlock(new BlockAsphaltSlabAddon.BlockCustom(), "asphalt_colourful_line_diagonal_slab_v");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_straight");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_right");
         registerBlock(new BlockRoadmarkArrow.BlockCustom(), "roadmark_arrow_left");

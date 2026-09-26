@@ -4,7 +4,7 @@
 	"textures": {
 		"0": "nebulaecraft:blocks/asphalt",
 		"1": "nebulaecraft:blocks/asphalt_colourful_line",
-		"2": "nebulaecraft:blocks/asphalt_colourful_line_diagonal_reversed",
+		"2": "nebulaecraft:blocks/asphalt_colourful_line_diagonal_v",
 		"particle": "nebulaecraft:blocks/asphalt"
 	},
 	"elements": [
@@ -12,7 +12,7 @@
 			"from": [0, 0, 0],
 			"to": [16, 8, 16],
 			"faces": {
-				"north": {"uv": [0, 0, 8, 16], "rotation": 90, "texture": "#1"},
+				"north": {"uv": [0, 0, 8, 16], "rotation": 270, "texture": "#1"},
 				"east": {"uv": [0, 0, 8, 16], "rotation": 90, "texture": "#1"},
 				"south": {"uv": [0, 0, 16, 8], "texture": "#0"},
 				"west": {"uv": [0, 0, 16, 8], "texture": "#0"},
