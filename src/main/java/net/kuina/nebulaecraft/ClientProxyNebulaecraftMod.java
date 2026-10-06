@@ -21,10 +21,13 @@ public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 		);
 		MinecraftForge.EVENT_BUS.register(
 				net.kuina.nebulaecraft.client.render.TunnelPreviewRenderer.INSTANCE);
+		MinecraftForge.EVENT_BUS.register(
+				net.kuina.nebulaecraft.client.render.EmissiveModels.INSTANCE);
 	}
 
 	@Override
 	public void postInit(FMLPostInitializationEvent event) {
+		net.kuina.nebulaecraft.client.render.EmissiveBlockRenderer.install();
 	}
 
 	@Override

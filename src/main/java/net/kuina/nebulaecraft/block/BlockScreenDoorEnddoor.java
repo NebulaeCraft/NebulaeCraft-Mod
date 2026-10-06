@@ -96,7 +96,7 @@ public class BlockScreenDoorEnddoor extends ElementsNebulaecraftMod.ModElement {
             AxisAlignedBB box;
             switch (state.getValue(SUBTYPE)) {
                 case SUBTYPE2:
-                    box = new AxisAlignedBB(0, 0, 0.5, 1, 1.53125, 0.625);
+                    box = new AxisAlignedBB(0, 0, 0.5, 1, 1.40625, 0.625);
                     break;
                 case SUBTYPE3:
                     box = new AxisAlignedBB(0, 0, 0.5, 1, 1.3125, 0.5625);
