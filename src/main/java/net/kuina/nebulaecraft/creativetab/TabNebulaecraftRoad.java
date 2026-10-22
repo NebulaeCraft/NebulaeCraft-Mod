@@ -49,6 +49,13 @@ public class TabNebulaecraftRoad extends ElementsNebulaecraftMod.ModElement {
 						String name1 = s1.getItem().getRegistryName() != null ? s1.getItem().getRegistryName().toString() : "";
 						String name2 = s2.getItem().getRegistryName() != null ? s2.getItem().getRegistryName().toString() : "";
 
+						if (name1.startsWith("nebulaecraft:asphalt") && name2.startsWith("nebulaecraft:asphalt")) {
+							int colorOrder = Integer.compare(getAsphaltColorOrder(name1), getAsphaltColorOrder(name2));
+							if (colorOrder != 0) {
+								return colorOrder;
+							}
+						}
+
 						int roadsignNumber1 = getRoadsignNumber(name1);
 						int roadsignNumber2 = getRoadsignNumber(name2);
 						if (roadsignNumber1 >= 0 && roadsignNumber2 >= 0) {
@@ -68,6 +75,16 @@ public class TabNebulaecraftRoad extends ElementsNebulaecraftMod.ModElement {
 				});
 			}
 		};
+	}
+
+	private static int getAsphaltColorOrder(String registryName) {
+		if (registryName.contains("white")) {
+			return 1;
+		}
+		if (registryName.contains("yellow")) {
+			return 2;
+		}
+		return 0;
 	}
 
 	private static int getRoadsignOrder(int roadsignNumber) {
