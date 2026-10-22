@@ -2,6 +2,7 @@ gui.nebulaecraft.autogen.cancel=Cancel
 gui.nebulaecraft.autogen.clear=Clear selection
 gui.nebulaecraft.autogen.close=Close
 gui.nebulaecraft.autogen.confirm=Generate
+gui.nebulaecraft.autogen.dash_pattern=Dash + gap (blocks)
 gui.nebulaecraft.autogen.end=End
 gui.nebulaecraft.autogen.mirror=Mirror to route right
 gui.nebulaecraft.autogen.no=No

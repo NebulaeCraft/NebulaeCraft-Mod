@@ -113,7 +113,7 @@ public final class RoutePlanner {
                 rasterized.positions, rasterized.parameters, sectionFacings,
                 p0, p1, v0, v1, maximumGrade);
         return new RouteGeometry(gradedRoute, sectionFacings, sectionTangents,
-                length, minRadius, maxGrade);
+                rasterized.parameters, points, length, minRadius, maxGrade);
     }
 
     private static RouteVector quintic(RouteVector p0, RouteVector p1,

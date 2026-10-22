@@ -11,7 +11,7 @@ import java.util.Collections;
 /**
  * Public extension point for automatic linear structures.
  *
- * <p>Every tunnel or bridge owns its command arguments and converts a shared marker selection into
+ * <p>Every tunnel, bridge, or ground structure owns its arguments and converts a marker selection into
  * an {@link AutogenPlan}. Implementations may reuse the route package without depending on the
  * existing metro tunnel section algorithm.</p>
  */

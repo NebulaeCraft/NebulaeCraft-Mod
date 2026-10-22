@@ -30,7 +30,10 @@
 /ntunnel clear
 ```
 
-当前内置模板为 `tunnel_metro_1`、`tunnel_metro_2`、`bridge_metro_1` 与 `bridge_metro_2`。
+当前内置模板为 `tunnel_metro_1`、`tunnel_metro_2`、`bridge_metro_1`、`bridge_metro_2`，
+以及地面道路 `ground_road_one_way_2`、`ground_road_two_way_4`、`ground_road_two_way_2`、
+`ground_road_one_way_1`。地面道路的参考方块和虚线间隔参数见
+[autogen 地面道路模板](autogen-ground-roads.md)。
 `tunnel_metro_1` 的参数格式为 `<platformColor> [mirror]`，固定生成单轨刚性接触网。
 
 示例：
@@ -177,7 +180,7 @@
 
 新增模板的最小流程：
 
-1. 实现 `AutogenTemplate`，选择 `TUNNEL` 或 `BRIDGE` 类型并解析模板自己的参数。
+1. 实现 `AutogenTemplate`，选择 `TUNNEL`、`BRIDGE` 或 `GROUND` 类型并解析模板自己的参数。
 2. 在 Builder 中调用 `RoutePlanner.plan(selection, minimumRadius, maximumGrade)`。
 3. 沿 `RouteGeometry.route` 和 `sectionFacings` 生成该模板自己的断面、桥面、桥墩或洞门方块操作，并创建预览帧。
 4. 返回 `AutogenPlan`；通用命令会自动接管 preview、confirm、cancel、status 和 undo。
