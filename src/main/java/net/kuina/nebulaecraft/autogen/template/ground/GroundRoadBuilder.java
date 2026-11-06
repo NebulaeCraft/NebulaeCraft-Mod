@@ -1,6 +1,7 @@
 package net.kuina.nebulaecraft.autogen.template.ground;
 
 import net.kuina.nebulaecraft.autogen.AutogenBuildException;
+import net.kuina.nebulaecraft.autogen.AutogenBuildOrder;
 import net.kuina.nebulaecraft.autogen.AutogenConfig;
 import net.kuina.nebulaecraft.autogen.AutogenPlan;
 import net.kuina.nebulaecraft.autogen.AutogenSelection;
@@ -96,6 +97,8 @@ final class GroundRoadBuilder {
             throw new AutogenBuildException("预计修改方块数超过配置上限 "
                     + settings.maxChangedBlocks);
         }
+        new AutogenBuildOrder(AutogenBuildOrder.Stage.SURFACE)
+                .sort(operations, geometry.route);
         return new AutogenPlan(world.provider.getDimension(), operations, geometry.route,
                 createPreviewFrames(geometry, logicalPositions, 2 * dashLength,
                         profile.halfWidth, layout),

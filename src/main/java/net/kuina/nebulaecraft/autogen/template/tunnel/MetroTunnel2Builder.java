@@ -1,6 +1,8 @@
 package net.kuina.nebulaecraft.autogen.template.tunnel;
 
 import net.kuina.nebulaecraft.autogen.AutogenBuildException;
+import net.kuina.nebulaecraft.autogen.AutogenBuildOrder;
+import net.kuina.nebulaecraft.autogen.AutogenBuildOrder.Stage;
 import net.kuina.nebulaecraft.autogen.AutogenConfig;
 import net.kuina.nebulaecraft.autogen.AutogenPlan;
 import net.kuina.nebulaecraft.autogen.AutogenSelection;
@@ -25,7 +27,6 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -101,14 +102,20 @@ public final class MetroTunnel2Builder {
             throw new TunnelBuildException(
                     "预计修改方块数超过配置上限 " + settings.maxChangedBlocks);
         }
-        List<PlannedState> ordered = new ArrayList<>(states.values());
-        Collections.sort(ordered, Comparator.comparingInt(value -> value.priority));
         List<AutogenPlan.Operation> operations = new ArrayList<>(
-                ordered.size() + railFinalizations.size());
-        for (PlannedState state : ordered) {
+                states.size() + railFinalizations.size());
+        for (PlannedState state : states.values()) {
             operations.add(new AutogenPlan.Operation(state.pos, state.state));
         }
         operations.addAll(railFinalizations);
+        new AutogenBuildOrder(Stage.CATENARY)
+                .materials(Stage.CONCRETE, materials.concrete.getBlock(),
+                        materials.horizontalSlab.getBlock(), materials.verticalSlab)
+                .materials(Stage.TRACKBED, materials.centerTrackbed.getBlock(),
+                        materials.sideTrackbed.getBlock())
+                .materials(Stage.TRACKS, materials.reinforcedTrack)
+                .materials(Stage.FIXTURES, materials.tunnelLight)
+                .sort(operations, geometry.route);
 
         List<AutogenPlan.PreviewFrame> previewFrames = createPreviewFrames(
                 states, geometry.route, geometry.sectionFacings);

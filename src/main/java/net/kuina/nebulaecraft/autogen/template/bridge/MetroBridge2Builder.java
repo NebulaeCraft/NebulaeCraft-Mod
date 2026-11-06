@@ -71,15 +71,12 @@ public final class MetroBridge2Builder {
             throw new AutogenBuildException(
                     "预计修改方块数超过配置上限 " + settings.maxChangedBlocks);
         }
-        List<MetroBridge1Builder.PlannedState> ordered =
-                new ArrayList<>(states.values());
-        Collections.sort(ordered,
-                Comparator.comparingInt(value -> value.priority));
         List<AutogenPlan.Operation> operations = new ArrayList<>(operationCount);
-        for (MetroBridge1Builder.PlannedState state : ordered) {
+        for (MetroBridge1Builder.PlannedState state : states.values()) {
             operations.add(new AutogenPlan.Operation(state.pos, state.state));
         }
         operations.addAll(railFinalizations);
+        MetroBridge1Builder.orderOperations(operations, geometry.route, materials);
 
         return new AutogenPlan(world.provider.getDimension(), operations,
                 new ArrayList<>(geometry.route),

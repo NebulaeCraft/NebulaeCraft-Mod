@@ -5,6 +5,8 @@ import net.minecraft.block.BlockRailBase;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.kuina.nebulaecraft.autogen.AutogenBuildException;
+import net.kuina.nebulaecraft.autogen.AutogenBuildOrder;
+import net.kuina.nebulaecraft.autogen.AutogenBuildOrder.Stage;
 import net.kuina.nebulaecraft.autogen.AutogenConfig;
 import net.kuina.nebulaecraft.autogen.AutogenSelection;
 import net.kuina.nebulaecraft.autogen.TunnelBuildException;
@@ -212,13 +214,19 @@ public final class MetroTunnel1Builder {
         if (states.size() > settings.maxChangedBlocks) {
             throw new TunnelBuildException("预计修改方块数超过配置上限 " + settings.maxChangedBlocks);
         }
-        List<PlannedState> orderedStates = new ArrayList<>(states.values());
-        Collections.sort(orderedStates, Comparator.comparingInt(value -> value.priority));
-        List<AutogenPlan.Operation> operations = new ArrayList<>(orderedStates.size());
-        for (PlannedState planned : orderedStates) {
+        List<AutogenPlan.Operation> operations = new ArrayList<>(
+                states.size() + railFinalizations.size());
+        for (PlannedState planned : states.values()) {
             operations.add(new AutogenPlan.Operation(planned.pos, planned.state));
         }
         operations.addAll(railFinalizations);
+        new AutogenBuildOrder(Stage.CATENARY)
+                .materials(Stage.CONCRETE, concrete.getBlock(),
+                        horizontalSlab.getBlock(), verticalSlab.getBlock())
+                .materials(Stage.TRACKBED, centerBed.getBlock(), sideBed.getBlock())
+                .materials(Stage.TRACKS, reinforcedTrack)
+                .materials(Stage.FIXTURES, platform, tunnelLight)
+                .sort(operations, route);
         List<AutogenPlan.PreviewFrame> previewFrames = createPreviewFrames(
                 states, route, sectionFacings, preset);
         return new AutogenPlan(world.provider.getDimension(), operations, new ArrayList<>(route),

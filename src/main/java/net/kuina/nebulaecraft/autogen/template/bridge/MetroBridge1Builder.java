@@ -1,6 +1,8 @@
 package net.kuina.nebulaecraft.autogen.template.bridge;
 
 import net.kuina.nebulaecraft.autogen.AutogenBuildException;
+import net.kuina.nebulaecraft.autogen.AutogenBuildOrder;
+import net.kuina.nebulaecraft.autogen.AutogenBuildOrder.Stage;
 import net.kuina.nebulaecraft.autogen.AutogenConfig;
 import net.kuina.nebulaecraft.autogen.AutogenPlan;
 import net.kuina.nebulaecraft.autogen.AutogenSelection;
@@ -82,18 +84,28 @@ public final class MetroBridge1Builder {
             throw new AutogenBuildException(
                     "预计修改方块数超过配置上限 " + settings.maxChangedBlocks);
         }
-        List<PlannedState> ordered = new ArrayList<>(states.values());
-        Collections.sort(ordered, Comparator.comparingInt(value -> value.priority));
         List<AutogenPlan.Operation> operations = new ArrayList<>(operationCount);
-        for (PlannedState state : ordered) {
+        for (PlannedState state : states.values()) {
             operations.add(new AutogenPlan.Operation(state.pos, state.state));
         }
         operations.addAll(railFinalizations);
+        orderOperations(operations, geometry.route, materials);
 
         return new AutogenPlan(world.provider.getDimension(), operations,
                 new ArrayList<>(geometry.route), createPreviewFrames(geometry),
                 geometry.length, geometry.minimumRadius, geometry.maximumGrade,
                 templateId, displayName, AutogenTemplateKind.BRIDGE);
+    }
+
+    static void orderOperations(List<AutogenPlan.Operation> operations,
+                                List<BlockPos> route, Materials materials) {
+        new AutogenBuildOrder(Stage.CATENARY)
+                .materials(Stage.CONCRETE, materials.concrete.getBlock())
+                .materials(Stage.TRACKBED, materials.centerTrackbed.getBlock(),
+                        materials.sideTrackbed.getBlock())
+                .materials(Stage.TRACKS, materials.reinforcedTrack)
+                .materials(Stage.FIXTURES, materials.fence.getBlock())
+                .sort(operations, route);
     }
 
     static void validateSelection(WorldServer world,

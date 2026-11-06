@@ -2,8 +2,11 @@ package net.kuina.nebulaecraft.autogen;
 
 import net.kuina.nebulaecraft.NebulaecraftMod;
 import net.kuina.nebulaecraft.network.PacketTunnelPreview;
+import net.minecraft.block.SoundType;
+import net.minecraft.block.material.Material;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.SoundCategory;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -142,8 +145,15 @@ public final class TunnelGenerationManager {
         if (activeJob == null) {
             return;
         }
-        int budget = AutogenConfig.get().blocksPerTick;
-        while (budget-- > 0 && activeJob.index < activeJob.total()) {
+        AutogenConfig.Settings settings = AutogenConfig.get();
+        int budget = settings.operationsPerTick;
+        int changedBlocks = 0;
+        AutogenPlan.Operation soundSource = null;
+        if (activeJob.soundCooldown > 0) {
+            activeJob.soundCooldown--;
+        }
+        while (budget-- > 0 && activeJob.index < activeJob.total()
+                && (activeJob.undoing || changedBlocks < settings.blocksPerTick)) {
             if (activeJob.undoing) {
                 activeJob.undoEntries.get(activeJob.index).restore(activeJob.world);
             } else {
@@ -151,13 +161,31 @@ public final class TunnelGenerationManager {
                 if (operation.captureUndo) {
                     activeJob.undoData.capture(activeJob.world, operation.pos);
                 }
-                activeJob.world.setBlockState(operation.pos, operation.state, 2);
+                boolean changed = activeJob.world.setBlockState(operation.pos, operation.state, 2);
+                if (changed && operation.captureUndo) {
+                    changedBlocks++;
+                    if (operation.state.getMaterial() != Material.AIR) {
+                        soundSource = operation;
+                    }
+                }
             }
             activeJob.index++;
+        }
+        if (soundSource != null && activeJob.soundCooldown == 0) {
+            playPlacementSound(activeJob.world, soundSource);
+            activeJob.soundCooldown = settings.placementSoundIntervalTicks;
         }
         if (activeJob.index >= activeJob.total()) {
             finishActiveJob();
         }
+    }
+
+    private static void playPlacementSound(WorldServer world, AutogenPlan.Operation operation) {
+        SoundType sound = operation.state.getBlock().getSoundType(
+                operation.state, world, operation.pos, null);
+        // A null player broadcasts the material's placement sound to all nearby players.
+        world.playSound(null, operation.pos, sound.getPlaceSound(), SoundCategory.BLOCKS,
+                (sound.getVolume() + 1.0F) * 0.25F, sound.getPitch() * 0.8F);
     }
 
     private void finishActiveJob() {
@@ -236,6 +264,7 @@ public final class TunnelGenerationManager {
         final List<TunnelUndoData.Entry> undoEntries;
         final boolean undoing;
         int index;
+        int soundCooldown;
 
         private ActiveJob(UUID owner, WorldServer world, AutogenPlan plan, TunnelUndoData undoData,
                           List<TunnelUndoData.Entry> undoEntries, boolean undoing) {
