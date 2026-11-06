@@ -9,9 +9,9 @@ import net.kuina.nebulaecraft.autogen.route.RouteGeometry;
 import net.kuina.nebulaecraft.autogen.route.RoutePlanner;
 import net.kuina.nebulaecraft.autogen.route.RouteVector;
 import net.kuina.nebulaecraft.autogen.template.AutogenTemplateKind;
-import net.kuina.nebulaecraft.block.BlockAsphaltAddon;
 import net.kuina.nebulaecraft.block.BlockAutogenMarker;
 import net.minecraft.block.Block;
+import net.minecraft.block.BlockHorizontal;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.init.Blocks;
 import net.minecraft.util.EnumFacing;
@@ -35,7 +35,8 @@ import java.util.Set;
 
 /**
  * Sweeps the reference road cross-sections with shared curved markings and half-block grades.
- * No save data, client classes, or railway materials are needed at runtime.
+ * Ground roads need no railway materials; bridge variants use the reference concrete and fences.
+ * No save data or client classes are needed at runtime.
  */
 final class GroundRoadBuilder {
     private static final double MINIMUM_RADIUS = 12.0;
@@ -47,7 +48,7 @@ final class GroundRoadBuilder {
 
     static AutogenPlan build(WorldServer world, AutogenSelection.Selection selection,
                              String templateId, String displayName,
-                             GroundRoadProfile profile, int dashLength)
+                             GroundRoadProfile profile, int dashLength, boolean bridge)
             throws AutogenBuildException {
         if (dashLength != 2 && dashLength != 3) {
             throw new AutogenBuildException("虚线实空组合只能为 2+2 或 3+3");
@@ -71,6 +72,11 @@ final class GroundRoadBuilder {
         Collections.sort(orderedCells);
         for (long cell : orderedCells) {
             states.put(cell, materials.asphalt);
+        }
+        if (materials.median != null) {
+            for (BlockPos pos : geometry.route) {
+                states.put(key(pos), materials.median.concrete);
+            }
         }
         for (GroundRoadProfile.Line line : profile.lines) {
             placeLine(states, footprint.lines.get(line.leftOffset),
@@ -97,13 +103,85 @@ final class GroundRoadBuilder {
             throw new AutogenBuildException("预计修改方块数超过配置上限 "
                     + settings.maxChangedBlocks);
         }
-        new AutogenBuildOrder(AutogenBuildOrder.Stage.SURFACE)
-                .sort(operations, geometry.route);
+        AutogenBuildOrder buildOrder = new AutogenBuildOrder(AutogenBuildOrder.Stage.SURFACE);
+        if (bridge) {
+            addBridgeStructure(operations, footprint, geometry, layout, buildOrder);
+        }
+        if (materials.median != null) {
+            addMedianStructure(operations, geometry, layout, materials.median, buildOrder);
+        }
+        if (operations.size() > settings.maxChangedBlocks) {
+            throw new AutogenBuildException("预计修改方块数超过配置上限 "
+                    + settings.maxChangedBlocks);
+        }
+        for (AutogenPlan.Operation operation : operations) {
+            if (operation.pos.getY() < 0 || operation.pos.getY() >= world.getHeight()) {
+                throw new AutogenBuildException("道路将超出世界高度范围，请调整标记高度");
+            }
+        }
+        buildOrder.sort(operations, geometry.route);
         return new AutogenPlan(world.provider.getDimension(), operations, geometry.route,
                 createPreviewFrames(geometry, logicalPositions, 2 * dashLength,
-                        profile.halfWidth, layout),
+                        profile.halfWidth, layout, bridge, profile.median),
                 geometry.length, geometry.minimumRadius,
-                geometry.maximumGrade, templateId, displayName, AutogenTemplateKind.GROUND);
+                geometry.maximumGrade, templateId,
+                displayName + (bridge ? "（桥梁）" : "") + (profile.median ? "（带中间隔离带）" : ""),
+                bridge ? AutogenTemplateKind.BRIDGE : AutogenTemplateKind.GROUND);
+    }
+
+    private static void addMedianStructure(List<AutogenPlan.Operation> operations,
+                                            RouteGeometry geometry, SurfaceLayout layout,
+                                            MedianMaterials materials, AutogenBuildOrder buildOrder) {
+        buildOrder.materials(AutogenBuildOrder.Stage.CONCRETE,
+                        materials.concrete.getBlock(), materials.concreteSlab)
+                .materials(AutogenBuildOrder.Stage.FIXTURES, materials.barrier,
+                        materials.barrierCorner, materials.shield, materials.shieldCorner);
+        for (int i = 0; i < geometry.route.size(); i++) {
+            RoadSurface surface = layout.surfaceAt(key(geometry.route.get(i)));
+            BlockPos support = surface.slab == null ? surface.base : surface.slab;
+            operations.add(new AutogenPlan.Operation(support.up(),
+                    medianState(geometry.route, i, materials.barrier,
+                            materials.barrierCorner, surface.slab != null)));
+            operations.add(new AutogenPlan.Operation(support.up(2),
+                    medianState(geometry.route, i, materials.shield,
+                            materials.shieldCorner, surface.slab != null)));
+        }
+    }
+
+    private static IBlockState medianState(List<BlockPos> path, int index,
+                                           Block straight, Block corner, boolean slab) {
+        IBlockState state = lineState(path, index, straight, corner);
+        if (!isCorner(path, index) && state.getValue(BlockHorizontal.FACING) == EnumFacing.WEST) {
+            // The sample uses east-facing straight fixtures; both axis directions share a model.
+            state = state.withProperty(BlockHorizontal.FACING, EnumFacing.EAST);
+        }
+        // Both fixture families encode the variant lowered by half a block in metadata bit 2.
+        return slab ? state.getBlock().getStateFromMeta(state.getBlock().getMetaFromState(state) + 4)
+                : state;
+    }
+
+    private static void addBridgeStructure(List<AutogenPlan.Operation> operations,
+                                            Footprint footprint, RouteGeometry geometry,
+                                            SurfaceLayout layout, AutogenBuildOrder buildOrder)
+            throws AutogenBuildException {
+        // Resolve Railcraft only when a bridge was requested, preserving standalone ground roads.
+        IBlockState concrete = Materials.resolve("railcraft:reinforced_concrete").getStateFromMeta(8);
+        IBlockState fence = Materials.resolve("road_fence").getDefaultState();
+        buildOrder.materials(AutogenBuildOrder.Stage.CONCRETE, concrete.getBlock())
+                .materials(AutogenBuildOrder.Stage.FIXTURES, fence.getBlock());
+        for (long cell : footprint.cells) {
+            operations.add(new AutogenPlan.Operation(layout.surfaceAt(cell).base.down(), concrete));
+        }
+
+        Set<Long> edges = expand(footprint.cells, geometry);
+        // The hand-built sample includes the exterior elbow at every diagonal corner.
+        connectCorners(edges, footprint.cells, geometry);
+        for (long cell : edges) {
+            BlockPos base = layout.surfaceAt(cell).base;
+            operations.add(new AutogenPlan.Operation(base, concrete));
+            operations.add(new AutogenPlan.Operation(base.up(), concrete));
+            operations.add(new AutogenPlan.Operation(base.up(2), fence));
+        }
     }
 
     private static void validateSelection(WorldServer world,
@@ -151,7 +229,9 @@ final class GroundRoadBuilder {
                         geometry.route.get(last).offset(
                                 geometry.sectionFacings.get(last).rotateYCCW(), side * distance));
                 path = alignBandTransitions(path, geometry, side > 0, distance,
-                        profile.halfWidth % 2 != 0);
+                        // Keep the first yellow bands outside the occupied concrete centre.
+                        // Odd-width rounding can otherwise move an inner corner onto the median.
+                        profile.halfWidth % 2 != 0 && !profile.median);
                 if (distance < profile.halfWidth) {
                     for (BlockPos pos : path) {
                         interior.add(key(pos));
@@ -164,7 +244,7 @@ final class GroundRoadBuilder {
         }
         Set<Long> cells = new HashSet<>(interior);
         Set<Long> lineCells = new HashSet<>();
-        if (profile.hasLineAtDistance(0)) {
+        if (profile.hasLineAtDistance(0) || profile.median) {
             lineCells.addAll(center);
         }
         for (Map.Entry<Integer, List<BlockPos>> line : lines.entrySet()) {
@@ -388,14 +468,14 @@ final class GroundRoadBuilder {
             // Road addon models use facing=west for the reference's east-west stripe.
             EnumFacing facing = before.getAxis() == EnumFacing.Axis.X
                     ? EnumFacing.WEST : EnumFacing.NORTH;
-            return straight.getDefaultState().withProperty(BlockAsphaltAddon.BlockCustom.FACING, facing);
+            return straight.getDefaultState().withProperty(BlockHorizontal.FACING, facing);
         }
         // The unrotated (facing=east) diagonal model connects its north and east faces.
         boolean north = before == EnumFacing.NORTH || after == EnumFacing.NORTH;
         boolean east = before == EnumFacing.EAST || after == EnumFacing.EAST;
         EnumFacing facing = north ? (east ? EnumFacing.EAST : EnumFacing.NORTH)
                 : (east ? EnumFacing.SOUTH : EnumFacing.WEST);
-        return corner.getDefaultState().withProperty(BlockAsphaltAddon.BlockCustom.FACING, facing);
+        return corner.getDefaultState().withProperty(BlockHorizontal.FACING, facing);
     }
 
     private static EnumFacing direction(BlockPos from, BlockPos to) {
@@ -408,8 +488,9 @@ final class GroundRoadBuilder {
 
     private static List<AutogenPlan.PreviewFrame> createPreviewFrames(
             RouteGeometry geometry, int[] logicalPositions, int repeatLength,
-            int halfWidth, SurfaceLayout layout) {
+            int halfWidth, SurfaceLayout layout, boolean bridge, boolean median) {
         List<AutogenPlan.PreviewFrame> frames = new ArrayList<>();
+        int outerWidth = halfWidth + (bridge ? 1 : 0);
         int last = geometry.route.size() - 1;
         for (int i = 0; i <= last; i++) {
             BlockPos center = geometry.route.get(i);
@@ -418,17 +499,24 @@ final class GroundRoadBuilder {
             double endOffset = i == 0 ? -0.5 : i == last ? 0.5 : 0;
             double x = center.getX() + 0.5 + forward.getFrontOffsetX() * endOffset;
             double z = center.getZ() + 0.5 + forward.getFrontOffsetZ() * endOffset;
-            double leftX = x + left.getFrontOffsetX() * (halfWidth + 0.5);
-            double leftZ = z + left.getFrontOffsetZ() * (halfWidth + 0.5);
-            double rightX = x - left.getFrontOffsetX() * (halfWidth + 0.5);
-            double rightZ = z - left.getFrontOffsetZ() * (halfWidth + 0.5);
-            RoadSurface leftSurface = layout.surfaceAt(key(center.offset(left, halfWidth)));
-            RoadSurface rightSurface = layout.surfaceAt(key(center.offset(left, -halfWidth)));
+            double leftX = x + left.getFrontOffsetX() * (outerWidth + 0.5);
+            double leftZ = z + left.getFrontOffsetZ() * (outerWidth + 0.5);
+            double rightX = x - left.getFrontOffsetX() * (outerWidth + 0.5);
+            double rightZ = z - left.getFrontOffsetZ() * (outerWidth + 0.5);
+            RoadSurface leftSurface = layout.surfaceAt(key(center.offset(left, outerWidth)));
+            RoadSurface rightSurface = layout.surfaceAt(key(center.offset(left, -outerWidth)));
+            double leftTop = bridge ? leftSurface.base.getY() + 3 : leftSurface.top();
+            double rightTop = bridge ? rightSurface.base.getY() + 3 : rightSurface.top();
+            if (median) {
+                double medianTop = layout.surfaceAt(key(center)).top() + 1.625;
+                leftTop = Math.max(leftTop, medianTop);
+                rightTop = Math.max(rightTop, medianTop);
+            }
             frames.add(new AutogenPlan.PreviewFrame(
-                    new Vec3d(leftX, leftSurface.base.getY(), leftZ),
-                    new Vec3d(leftX, leftSurface.top(), leftZ),
-                    new Vec3d(rightX, rightSurface.top(), rightZ),
-                    new Vec3d(rightX, rightSurface.base.getY(), rightZ),
+                    new Vec3d(leftX, leftSurface.base.getY() - (bridge ? 1 : 0), leftZ),
+                    new Vec3d(leftX, leftTop, leftZ),
+                    new Vec3d(rightX, rightTop, rightZ),
+                    new Vec3d(rightX, rightSurface.base.getY() - (bridge ? 1 : 0), rightZ),
                     i == 0 || i == last || logicalPositions[i] % repeatLength == 0
                     && logicalPositions[i] != logicalPositions[i - 1]));
         }
@@ -570,6 +658,7 @@ final class GroundRoadBuilder {
         final Map<GroundRoadProfile.Marking, Block> corners =
                 new EnumMap<>(GroundRoadProfile.Marking.class);
         final Map<Block, Block> slabs = new HashMap<>();
+        final MedianMaterials median;
 
         Materials(GroundRoadProfile profile) throws AutogenBuildException {
             slabs.put(asphalt.getBlock(), resolve("asphalt_slab"));
@@ -584,20 +673,41 @@ final class GroundRoadBuilder {
                     slabs.put(corner, resolve(name + "_diagonal_slab"));
                 }
             }
+            median = profile.median ? new MedianMaterials() : null;
+            if (median != null) {
+                slabs.put(median.concrete.getBlock(), median.concreteSlab);
+            }
         }
 
         IBlockState slabState(IBlockState full) {
+            if (median != null && full.getBlock() == median.concrete.getBlock()) {
+                // Railcraft concrete uses metadata 8; our lower concrete slab uses metadata 0.
+                return median.concreteSlab.getStateFromMeta(0);
+            }
             // Each existing road/slab pair uses the same facing/subtype metadata encoding.
             return slabs.get(full.getBlock()).getStateFromMeta(full.getBlock().getMetaFromState(full));
         }
 
         private static Block resolve(String name) throws AutogenBuildException {
-            ResourceLocation id = new ResourceLocation("nebulaecraft", name);
+            ResourceLocation id = name.indexOf(':') >= 0
+                    ? new ResourceLocation(name) : new ResourceLocation("nebulaecraft", name);
             Block block = ForgeRegistries.BLOCKS.getValue(id);
             if (block == null || block == Blocks.AIR) {
                 throw new AutogenBuildException("找不到道路模板所需方块: " + id);
             }
             return block;
+        }
+    }
+
+    private static final class MedianMaterials {
+        final IBlockState concrete = Materials.resolve("railcraft:reinforced_concrete").getStateFromMeta(8);
+        final Block concreteSlab = Materials.resolve("reinforced_concrete_slab");
+        final Block barrier = Materials.resolve("median_strips");
+        final Block barrierCorner = Materials.resolve("median_strips_diagonal");
+        final Block shield = Materials.resolve("antiglare_shield");
+        final Block shieldCorner = Materials.resolve("antiglare_shield_diagonal");
+
+        MedianMaterials() throws AutogenBuildException {
         }
     }
 }

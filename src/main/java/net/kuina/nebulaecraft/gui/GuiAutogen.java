@@ -56,10 +56,20 @@ public final class GuiAutogen extends GuiScreen {
 
         PacketAutogenGui.TemplateData selected = selectedTemplate();
         if (selected != null) {
+            int row = 0;
             for (int i = 0; i < selected.parameters.size(); i++) {
+                boolean roadPair = selected.parameters.get(i).id.equals("road_structure")
+                        && i + 1 < selected.parameters.size()
+                        && selected.parameters.get(i + 1).id.equals("road_median");
                 buttonList.add(new GuiButton(PARAMETER_BUTTON_BASE + i,
-                        left + 15, top + 73 + i * 22, 260, 20,
+                        left + 15, top + 73 + row * 22, roadPair ? 127 : 260, 20,
                         parameterText(i)));
+                if (roadPair) {
+                    i++;
+                    buttonList.add(new GuiButton(PARAMETER_BUTTON_BASE + i,
+                            left + 148, top + 73 + row * 22, 127, 20, parameterText(i)));
+                }
+                row++;
             }
         }
 

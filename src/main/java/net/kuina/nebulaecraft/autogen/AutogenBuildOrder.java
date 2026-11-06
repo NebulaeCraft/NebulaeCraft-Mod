@@ -17,9 +17,9 @@ public final class AutogenBuildOrder {
         CONCRETE,
         TRACKBED,
         TRACKS,
+        SURFACE,
         FIXTURES,
-        CATENARY,
-        SURFACE
+        CATENARY
     }
 
     private final Stage defaultStage;

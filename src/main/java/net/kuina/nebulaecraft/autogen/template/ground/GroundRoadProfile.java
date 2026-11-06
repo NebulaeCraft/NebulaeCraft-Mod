@@ -13,10 +13,14 @@ final class GroundRoadProfile {
 
     final int halfWidth;
     final List<Line> lines;
+    final boolean twoWay;
+    final boolean median;
 
-    private GroundRoadProfile(int halfWidth, List<Line> lines) {
+    private GroundRoadProfile(int halfWidth, List<Line> lines, boolean twoWay, boolean median) {
         this.halfWidth = halfWidth;
         this.lines = Collections.unmodifiableList(new ArrayList<>(lines));
+        this.twoWay = twoWay;
+        this.median = median;
     }
 
     /** One asphalt cell per lane, with a marking cell between adjacent lanes. */
@@ -28,7 +32,7 @@ final class GroundRoadProfile {
             lines.add(line(lanes - 2 * lane, Marking.WHITE, true));
         }
         lines.add(line(-lanes, Marking.WHITE, false));
-        return new GroundRoadProfile(lanes, lines);
+        return new GroundRoadProfile(lanes, lines, false, false);
     }
 
     /** Symmetric two-way road; the argument counts lanes in each direction. */
@@ -46,7 +50,28 @@ final class GroundRoadProfile {
             lines.add(line(-2 * lane, Marking.WHITE, true));
         }
         lines.add(line(-halfWidth, Marking.WHITE, false));
-        return new GroundRoadProfile(halfWidth, lines);
+        return new GroundRoadProfile(halfWidth, lines, true, false);
+    }
+
+    /** Replace the centre marking with concrete and a solid yellow line on either side. */
+    GroundRoadProfile withMedian() {
+        if (!twoWay) {
+            throw new IllegalStateException("Only two-way roads support a central median");
+        }
+        if (median) {
+            return this;
+        }
+        List<Line> dividedLines = new ArrayList<>();
+        for (Line line : lines) {
+            if (line.leftOffset == 0) {
+                dividedLines.add(line(1, Marking.YELLOW, false));
+                dividedLines.add(line(-1, Marking.YELLOW, false));
+            } else {
+                dividedLines.add(line(line.leftOffset + Integer.signum(line.leftOffset),
+                        line.marking, line.dashed));
+            }
+        }
+        return new GroundRoadProfile(halfWidth + 1, dividedLines, true, true);
     }
 
     private static void requireLanes(int lanes) {
