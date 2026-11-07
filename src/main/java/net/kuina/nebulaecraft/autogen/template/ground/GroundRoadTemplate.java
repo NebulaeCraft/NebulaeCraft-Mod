@@ -27,14 +27,31 @@ abstract class GroundRoadTemplate implements AutogenTemplate {
     private final String id;
     private final String displayName;
     private final GroundRoadProfile profile;
+    private final int defaultDashLength;
+    private final boolean configurableDashPattern;
     private final List<AutogenParameter> parameters;
 
     GroundRoadTemplate(String id, String displayName, GroundRoadProfile profile) {
+        this(id, displayName, profile, 2, true);
+    }
+
+    /** A fixed pattern is shared by ground, bridge and median variants without a dash control. */
+    GroundRoadTemplate(String id, String displayName, GroundRoadProfile profile, int fixedDashLength) {
+        this(id, displayName, profile, fixedDashLength, false);
+    }
+
+    private GroundRoadTemplate(String id, String displayName, GroundRoadProfile profile,
+                               int defaultDashLength, boolean configurableDashPattern) {
+        if (defaultDashLength != 2 && defaultDashLength != 3) {
+            throw new IllegalArgumentException("Road dash length must be 2 or 3");
+        }
         this.id = id;
         this.displayName = displayName;
         this.profile = profile;
+        this.defaultDashLength = defaultDashLength;
+        this.configurableDashPattern = configurableDashPattern && profile.hasDashedLines();
         List<AutogenParameter> parameters = new ArrayList<>();
-        if (profile.hasDashedLines()) {
+        if (this.configurableDashPattern) {
             parameters.add(AutogenParameter.choice("dash_pattern",
                     "gui.nebulaecraft.autogen.dash_pattern", "2+2", DASH_PATTERNS));
         }
@@ -67,7 +84,7 @@ abstract class GroundRoadTemplate implements AutogenTemplate {
 
     @Override
     public final String getUsage() {
-        return (profile.hasDashedLines() ? "[dashPattern: 2+2|3+3] " : "")
+        return (configurableDashPattern ? "[dashPattern: 2+2|3+3] " : "")
                 + "[roadStructure: ground|bridge]" + (profile.twoWay ? " [median]" : "");
     }
 
@@ -79,7 +96,7 @@ abstract class GroundRoadTemplate implements AutogenTemplate {
         if (complete < 0) {
             return choices;
         }
-        if (profile.hasDashedLines()) {
+        if (configurableDashPattern) {
             if (complete == 0) {
                 choices.addAll(DASH_PATTERNS);
             } else if (DASH_PATTERNS.contains(arguments[next])) {
@@ -103,8 +120,8 @@ abstract class GroundRoadTemplate implements AutogenTemplate {
     public final AutogenPlan build(WorldServer world, AutogenSelection.Selection selection,
                                    String[] arguments) throws AutogenBuildException {
         int next = 0;
-        int dashLength = 2;
-        if (profile.hasDashedLines() && arguments.length > 0
+        int dashLength = defaultDashLength;
+        if (configurableDashPattern && arguments.length > 0
                 && DASH_PATTERNS.contains(arguments[0])) {
             dashLength = arguments[next++].equals("2+2") ? 2 : 3;
         }

@@ -78,12 +78,14 @@ final class GroundRoadBuilder {
                 states.put(key(pos), materials.median.concrete);
             }
         }
-        for (GroundRoadProfile.Line line : profile.lines) {
-            placeLine(states, footprint.lines.get(line.leftOffset),
-                    materials.straight.get(line.marking), materials.corners.get(line.marking),
-                    line.dashed, dashLength);
-        }
         int[] logicalPositions = logicalPositions(geometry.route);
+        for (GroundRoadProfile.Line line : profile.lines) {
+            List<BlockPos> path = footprint.lines.get(line.leftOffset);
+            placeLine(states, path,
+                    materials.straight.get(line.marking), materials.corners.get(line.marking),
+                    line.dashed ? alignedLogicalPositions(path, layout, logicalPositions) : null,
+                    dashLength);
+        }
 
         List<AutogenPlan.Operation> operations = new ArrayList<>(states.size());
         for (Map.Entry<Long, IBlockState> entry : states.entrySet()) {
@@ -418,15 +420,40 @@ final class GroundRoadBuilder {
     }
 
     private static void placeLine(Map<Long, IBlockState> states, List<BlockPos> path,
-                                  Block straight, Block corner, boolean dashed, int dashLength) {
-        int[] positions = dashed ? logicalPositions(path) : null;
+                                  Block straight, Block corner, int[] positions, int dashLength) {
         for (int i = 0; i < path.size(); i++) {
-            // The references repeat .WW./.YY.; 3+3 repeats .WWW../.YYY...
-            int phase = dashed ? positions[i] % (2 * dashLength) : 0;
-            if (!dashed || phase >= 1 && phase <= dashLength) {
+            // Every marking uses the same centre-section phase, including after a curve.
+            int phase = positions == null ? 0 : positions[i] % (2 * dashLength);
+            if (positions == null || phase >= 1 && phase <= dashLength) {
                 states.put(key(path.get(i)), lineState(path, i, straight, corner));
             }
         }
+    }
+
+    /**
+     * Like paired tunnel_metro_2 supports, offset markings share centre-route sections rather
+     * than counting their unequal inner/outer lengths. Keep each diagonal pair in one phase.
+     */
+    private static int[] alignedLogicalPositions(List<BlockPos> path, SurfaceLayout layout,
+                                                  int[] centerPositions) {
+        int[] positions = new int[path.size()];
+        int index = 0;
+        while (index < path.size()) {
+            int section = layout.sectionAt(key(path.get(index)));
+            boolean pair = isCorner(path, index) && isCorner(path, index + 1);
+            if (pair) {
+                int nextSection = layout.sectionAt(key(path.get(index + 1)));
+                section = (section + nextSection) / 2;
+            }
+            positions[index] = centerPositions[section];
+            if (pair) {
+                positions[index + 1] = positions[index];
+                index += 2;
+            } else {
+                index++;
+            }
+        }
+        return positions;
     }
 
     /** A pair of consecutive diagonal marking blocks shares a single dash/gap position. */

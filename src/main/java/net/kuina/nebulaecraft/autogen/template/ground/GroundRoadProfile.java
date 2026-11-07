@@ -10,6 +10,7 @@ final class GroundRoadProfile {
     static final GroundRoadProfile ONE_WAY_TWO_LANE = oneWay(2);
     static final GroundRoadProfile TWO_WAY_TWO_LANE = twoWay(1);
     static final GroundRoadProfile TWO_WAY_FOUR_LANE = twoWay(2);
+    static final GroundRoadProfile TWO_WAY_SIX_LANE = twoWay(3);
 
     final int halfWidth;
     final List<Line> lines;

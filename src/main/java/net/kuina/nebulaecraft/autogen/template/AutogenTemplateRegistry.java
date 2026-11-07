@@ -5,6 +5,7 @@ import net.kuina.nebulaecraft.autogen.template.bridge.MetroBridge2Template;
 import net.kuina.nebulaecraft.autogen.template.ground.OneWayOneLaneRoadTemplate;
 import net.kuina.nebulaecraft.autogen.template.ground.OneWayTwoLaneRoadTemplate;
 import net.kuina.nebulaecraft.autogen.template.ground.TwoWayFourLaneRoadTemplate;
+import net.kuina.nebulaecraft.autogen.template.ground.TwoWaySixLaneRoadTemplate;
 import net.kuina.nebulaecraft.autogen.template.ground.TwoWayTwoLaneRoadTemplate;
 import net.kuina.nebulaecraft.autogen.template.tunnel.MetroTunnel1Template;
 import net.kuina.nebulaecraft.autogen.template.tunnel.MetroTunnel2Template;
@@ -34,10 +35,11 @@ public final class AutogenTemplateRegistry {
         register(new MetroTunnel2Template());
         register(new MetroBridge1Template());
         register(new MetroBridge2Template());
-        register(new OneWayTwoLaneRoadTemplate());
-        register(new TwoWayFourLaneRoadTemplate());
-        register(new TwoWayTwoLaneRoadTemplate());
         register(new OneWayOneLaneRoadTemplate());
+        register(new OneWayTwoLaneRoadTemplate());
+        register(new TwoWayTwoLaneRoadTemplate());
+        register(new TwoWayFourLaneRoadTemplate());
+        register(new TwoWaySixLaneRoadTemplate());
         builtInsRegistered = true;
     }
 
