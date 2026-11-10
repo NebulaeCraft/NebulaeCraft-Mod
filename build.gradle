@@ -105,7 +105,7 @@ dependencies {
 
 // ForgeGradle 3's legacy 1.12 joined artifact still contains Side.BUKKIT, which
 // crashes NetworkRegistry before a development client can reach the title screen.
-// Use the correctly recompiled Forge artifact for runs and apply the two Railcraft
+// Use the correctly recompiled Forge artifact for runs and apply Railcraft's
 // access wideners to a project-local copy. Production jars use META-INF/FMLAT.
 def devForgeRecompiled = new File(gradle.gradleUserHomeDir,
         'caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/' +
@@ -193,9 +193,14 @@ tasks.withType(JavaExec).all { task ->
             isLegacyDevClient || isLegacyDevServer) {
         dependsOn prepareDevForgeJar
         doFirst {
+            // ForgeGradle resolves either the joined jar or its own "-recomp" jar
+            // depending on cache state; neither carries the full dev AT.
+            def resolvedForgeJars = [
+                    'forge-1.12.2-14.23.5.2864_mapped_snapshot_20171003-1.12.jar',
+                    'forge-1.12.2-14.23.5.2864_mapped_snapshot_20171003-1.12-recomp.jar'
+            ]
             task.classpath = files(task.classpath.files.collect { entry ->
-                entry.name == 'forge-1.12.2-14.23.5.2864_mapped_snapshot_20171003-1.12.jar' ?
-                        devForgePatched : entry
+                entry.name in resolvedForgeJars ? devForgePatched : entry
             })
         }
     }

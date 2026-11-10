@@ -202,7 +202,11 @@ Railcraft 是必需依赖。隧道与桥梁模板通过 Forge 注册表查找 Ra
 
 开发环境通过 `META-INF/nebulaecraft_at.cfg` 同步公开 Railcraft 所需的 `TileEntity.REGISTRY` 和 `NBTTagList.tagList`。这是因为 ForgeGradle 3 的反混淆运行环境会读取 `run/mods` 中外部 Railcraft JAR 的 Access Transformer，却不会把这些 SRG 字段规则提前应用到开发用 Minecraft 依赖；发布 JAR 清单也包含同一 `FMLAT` 声明。
 
-本项目使用的 ForgeGradle 3 旧版 1.12 管线在 AT 内容变化后可能把仍含 `Side.BUKKIT` 的 joined 中间包放进 `runClient`/`runServer` 类路径，导致 `NetworkRegistry.newChannel` 在模组构造阶段空指针。`prepareDevForgeJar` 会从正确的 `-recomp.jar` 生成项目本地副本，使用 `gradle/nebulaecraft_dev_at.cfg` 中的 MCP 字段名应用同样两条规则；两个运行任务会自动使用该副本。此逻辑仅服务开发运行，不进入发布模组。
+本项目使用的 ForgeGradle 3 旧版 1.12 管线在 AT 内容变化后可能把仍含 `Side.BUKKIT` 的 joined 中间包放进 `runClient`/`runServer` 类路径，导致 `NetworkRegistry.newChannel` 在模组构造阶段空指针。`prepareDevForgeJar` 会从正确的 `-recomp.jar` 生成项目本地副本，使用 `gradle/nebulaecraft_dev_at.cfg` 中的 MCP 名应用访问规则；两个运行任务会自动使用该副本。此逻辑仅服务开发运行，不进入发布模组。
+
+`gradle/nebulaecraft_dev_at.cfg` 须覆盖 Railcraft `META-INF/railcraft_at.cfg` 的全部规则（当前 15 条，含上述两条），而不只是本项目自己用到的字段：`run/mods` 中的 Railcraft 字节码会被重映射为 MCP 名，但它自带的 SRG 名规则不会作用到开发用 Forge JAR，缺哪一条，Railcraft 走到对应代码时就会抛 `IllegalAccessError`。最初只补了两条，放下 `railcraft:cart_basic` 时即因 `EntityMinecart.MATRIX` 仍为 `private` 而崩溃。Railcraft 增删 AT 规则后需同步此文件，MCP 名可在 `build/createSrgToMcp/output.srg` 中按 SRG 名查到。
+
+运行任务按文件名把类路径里的 Forge JAR 换成 `build/dev` 副本。ForgeGradle 解析出的可能是 joined 包（`…-1.12.jar`），也可能是项目 `build/fg_cache` 下的 `…-1.12-recomp.jar`，两个名字都要替换。早先只匹配前者，而实际类路径里是后者，于是替换静默失效，客户端一直在用只含两条规则的 `fg_cache` JAR——这也是补全 `nebulaecraft_dev_at.cfg` 后仍然崩溃的原因。排查时看 `run/logs/debug.log` 开头的 `Java classpath at launch`，或崩溃报告模组列表中 FML 的 Source：应为 `forge-1.12.2-14.23.5.2864-recomp-nebulaecraft-at.jar`。
 
 ---
 
