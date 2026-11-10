@@ -23,6 +23,8 @@ public class ClientProxyNebulaecraftMod implements IProxyNebulaecraftMod {
 				net.kuina.nebulaecraft.client.render.TunnelPreviewRenderer.INSTANCE);
 		MinecraftForge.EVENT_BUS.register(
 				net.kuina.nebulaecraft.client.render.EmissiveModels.INSTANCE);
+		MinecraftForge.EVENT_BUS.register(
+				net.kuina.nebulaecraft.client.CameraCartKeyHandler.INSTANCE);
 	}
 
 	@Override

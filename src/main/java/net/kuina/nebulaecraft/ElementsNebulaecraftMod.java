@@ -80,6 +80,8 @@ public class ElementsNebulaecraftMod implements IFuelHandler, IWorldGenerator {
 				net.kuina.nebulaecraft.network.PacketAutogenAction.class, Side.SERVER);
 		this.addNetworkMessage(net.kuina.nebulaecraft.network.PacketAutogenGui.Handler.class,
 				net.kuina.nebulaecraft.network.PacketAutogenGui.class, Side.CLIENT);
+		this.addNetworkMessage(net.kuina.nebulaecraft.network.PacketCameraCartControl.Handler.class,
+				net.kuina.nebulaecraft.network.PacketCameraCartControl.class, Side.SERVER);
 	}
 
 	public void registerSounds(RegistryEvent.Register<net.minecraft.util.SoundEvent> event) {
